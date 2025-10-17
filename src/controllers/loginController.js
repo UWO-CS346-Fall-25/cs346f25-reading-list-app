@@ -20,24 +20,13 @@
  */
 exports.getHome = async (req, res, next) => {
   try {
-    // Fetch any data needed for the home page
-    // const data = await SomeModel.findAll();
-
     res.render('index', {
       title: 'Home',
-      // data: data,
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
     next(error);
   }
-};
-
-exports.getLogin = (req, res) => {
-  res.render('login', {
-    title: 'Login',
-    csrfToken: req.csrfToken(),
-  });
 };
 
 /**
@@ -54,5 +43,3 @@ exports.getRegister = async (req, res, next) => {
     next(error);
   }
 };
-
-// Add more controller methods as needed

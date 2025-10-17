@@ -50,7 +50,7 @@ exports.postRegister = async (req, res, next) => {
  * Display login form
  */
 exports.getLogin = (req, res) => {
-  res.render('users/login', {
+  res.render('login', {
     title: 'Login',
     csrfToken: req.csrfToken(),
   });
