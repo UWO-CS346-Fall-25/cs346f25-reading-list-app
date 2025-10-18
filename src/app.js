@@ -79,6 +79,9 @@ app.use('/', csrfProtection, indexRouter);
 const loginRouter = require('./routes/login');
 app.use('/', csrfProtection, loginRouter);
 
+const booklistRouter = require('./routes/booklist');
+app.use('/', csrfProtection, booklistRouter);
+
 // Placeholder home route
 app.get('/', csrfProtection, (req, res) => {
   res.render('index', {
@@ -99,6 +102,14 @@ app.get('/', csrfProtection, (req, res) => {
 app.get('/', csrfProtection, (req, res) => {
   res.render('register', {
     title: 'Register',
+    csrfToken: req.csrfToken(),
+  });
+});
+
+// Placeholder register route
+app.get('/', csrfProtection, (req, res) => {
+  res.render('booklist', {
+    title: 'Booklist',
     csrfToken: req.csrfToken(),
   });
 });

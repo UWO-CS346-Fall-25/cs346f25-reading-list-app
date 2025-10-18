@@ -20,8 +20,8 @@
  */
 exports.getHome = async (req, res, next) => {
   try {
-    res.render('index', {
-      title: 'Home',
+    res.render('booklist', {
+      title: 'Books',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
@@ -37,21 +37,6 @@ exports.getRegister = async (req, res, next) => {
   try {
     res.render('register', {
       title: 'Register',
-      csrfToken: req.csrfToken(),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
- * GET /about
- * Display the about page
- */
-exports.getBooklist= async (req, res, next) => {
-  try {
-    res.render('booklist', {
-      title: 'Booklist',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
