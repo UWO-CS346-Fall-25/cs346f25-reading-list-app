@@ -1,4 +1,19 @@
-# CS346 Semester Project Template
+# Feature/Week7-Layout Update
+
+index.ejs has been updated to act as the landing page. This page will display recommendations for
+users who are not logged in, as well as display the most recent updates to the website.
+
+login.ejs has been added to provide a screen for users to log in to the website, or reset their password.
+
+register.ejs has been added to provide a screen for users to register with our website.
+
+booklist.ejs has been added to provide logged in users with a screen to see the following lists:
+
+- books they plan to read
+- books they are reading
+- books they have finished reading
+
+## CS346 Semester Project Template
 
 A teaching template for building secure web applications with Node.js, Express, EJS, and PostgreSQL.
 
@@ -14,44 +29,52 @@ A teaching template for building secure web applications with Node.js, Express, 
 ## Quick Start
 
 1. **Clone the repository**
+
    ```bash
    git clone <your-repository-url>
    cd cs346-semester-project-template
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your database credentials
    ```
 
 4. **Set up PostgreSQL database**
+
    ```bash
    # Create database (adjust credentials as needed)
    createdb your_database_name
    ```
 
 5. **Run migrations**
+
    ```bash
    npm run migrate
    ```
 
 6. **Seed database (optional)**
+
    ```bash
    npm run seed
    ```
 
 7. **Start the application**
+
    ```bash
    npm run dev
    ```
 
 8. **Open your browser**
+
    ```
    http://localhost:3000
    ```
@@ -130,6 +153,7 @@ Comprehensive documentation is available in the `docs/` folder:
 ## Contributing
 
 This is a teaching template. Feel free to:
+
 - Report issues
 - Suggest improvements
 - Submit pull requests
