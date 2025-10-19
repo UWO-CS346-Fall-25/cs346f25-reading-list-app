@@ -33,10 +33,10 @@ exports.getHome = async (req, res, next) => {
  * GET /about
  * Display the about page
  */
-exports.getRegister = async (req, res, next) => {
+exports.getLogin = async (req, res, next) => {
   try {
-    res.render('register', {
-      title: 'Register',
+    res.render('login', {
+      title: 'Login',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {

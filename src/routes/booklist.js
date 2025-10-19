@@ -1,5 +1,5 @@
 /**
- * 
+ *
  *
  * Define routes for the main pages of your application here.
  * Routes connect HTTP requests to controller functions.
@@ -24,7 +24,7 @@ const booklistController = require('../controllers/booklistController');
 // Define routes
 router.get('/booklist', booklistController.getHome);
 
-router.get('/register', booklistController.getRegister);
+router.get('/login', booklistController.getLogin);
 
 // dummy comment
 
