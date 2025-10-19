@@ -19,12 +19,14 @@ const express = require('express');
 const router = express.Router();
 
 // Import controllers
-const indexController = require('../controllers/indexController');
+const loginController = require('../controllers/loginController');
 
 // Define routes
-router.get('/login', indexController.getLogin);
+router.get('/index', loginController.getHome);
 
-router.get('/register', indexController.getRegister);
+router.get('/register', loginController.getRegister);
+
+router.get('/booklist', loginController.getBooklist);
 
 // dummy comment
 

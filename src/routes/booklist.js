@@ -1,5 +1,5 @@
 /**
- * Index Routes
+ *
  *
  * Define routes for the main pages of your application here.
  * Routes connect HTTP requests to controller functions.
@@ -19,12 +19,12 @@ const express = require('express');
 const router = express.Router();
 
 // Import controllers
-const indexController = require('../controllers/indexController');
+const booklistController = require('../controllers/booklistController');
 
 // Define routes
-router.get('/login', indexController.getLogin);
+router.get('/booklist', booklistController.getHome);
 
-router.get('/register', indexController.getRegister);
+router.get('/login', booklistController.getLogin);
 
 // dummy comment
 

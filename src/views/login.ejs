@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Bookshelf</title>
+  <link rel="stylesheet" href="/css/log_reg_style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="container">
+        <a href="/" class="logo">Bookshelf</a>
+        <ul class="nav-links">
+          <li><a href="/index">Home</a></li>
+          <li><a href="/register">Register</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div id="content">
+      <h1>Log in</h1>
+      <section>
+        <h2>Email Address:</h2>
+        <input id="username" class="entry">
+        <p class="invalid">The username entered is invalid</p>
+      </section>
+      <section>
+        <h2>Password:</h2>
+        <input id="password" class="entry" type="password">
+        <p class="invalid">The password entered is invalid</p>
+      </section>
+      <a href="">Forgot your password?</a>
+      <a href="/booklist"><button>Log in</button></a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 CS346 Project. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
