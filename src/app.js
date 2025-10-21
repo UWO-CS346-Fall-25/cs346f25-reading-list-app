@@ -93,6 +93,31 @@ app.get('/', csrfProtection, (req, res) => {
   });
 });
 
+// Placeholder login route
+app.get('/', csrfProtection, (req, res) => {
+  res.render('login', {
+    title: 'Login',
+    csrfToken: req.csrfToken(),
+  });
+});
+
+// Placeholder register route
+app.get('/', csrfProtection, (req, res) => {
+  res.render('register', {
+    title: 'Register',
+    csrfToken: req.csrfToken(),
+  });
+});
+
+// Placeholder register route
+app.get('/', csrfProtection, (req, res) => {
+  res.render('booklist', {
+    title: 'Booklist',
+    csrfToken: req.csrfToken(),
+  });
+});
+
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).render('error', {

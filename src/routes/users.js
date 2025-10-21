@@ -27,7 +27,7 @@ const router = express.Router();
 
 // Import controllers
 const userController = require('../controllers/userController');
-const registerController = require('../controllers/registerController');
+// const registerController = require('../controllers/registerController');
 
 // Define routes
 router.get('/login', userController.getLogin);
