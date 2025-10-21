@@ -22,8 +22,8 @@ const router = express.Router();
 const indexController = require('../controllers/indexController');
 
 // Define routes
+router.get('/recommended', indexController.getRecommended);
 router.get('/login', indexController.getLogin);
-
 router.get('/register', indexController.getRegister);
 
 // dummy comment

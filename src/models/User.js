@@ -39,6 +39,21 @@ class User {
     }
   }
 
+  /**
+   * Returns the entire books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getRecommended() {
+    try {
+      const { data, error } = await supabase.supabase.from('books').select('*');
+      return data;
+    }
+    catch(error) {
+      console.log("database crash!");
+    }
+  }
+
 //   /**
 //    * Find all users
 //    * @returns {Promise<Array>} Array of users

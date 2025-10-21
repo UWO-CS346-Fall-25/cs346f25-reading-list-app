@@ -12,8 +12,8 @@
  */
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-  const button = document.getElementById("register"); // register button
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content'); // csrf-token for security
+  const button = document.getElementById("register"); // register button
   try { // fetch request to add register a user
     button.addEventListener('click', async () => {
       let response = await fetch('/register',

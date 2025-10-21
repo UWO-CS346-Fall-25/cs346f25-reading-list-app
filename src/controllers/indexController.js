@@ -12,7 +12,22 @@
  */
 
 // Import models if needed
-// const SomeModel = require('../models/SomeModel');
+const User = require('../models/User');
+
+/**
+ * GET /
+ * Returns the fulls list of books
+ * from the database
+ */
+exports.getRecommended = async (req, res) => {
+  try {
+    const result = await User.getRecommended();
+    res.status(201).json({ success: true, data: result });
+  }
+  catch(error) {
+    console.log("Failed");
+  }
+}
 
 /**
  * GET /
