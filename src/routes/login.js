@@ -28,6 +28,8 @@ router.get('/register', loginController.getRegister);
 
 router.get('/booklist', loginController.getBooklist);
 
+router.put('/validate_login', loginController.getLogin);
+
 // dummy comment
 
 module.exports = router;

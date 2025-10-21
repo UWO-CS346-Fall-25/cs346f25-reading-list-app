@@ -12,7 +12,7 @@
  */
 
 // Import models if needed
-// const SomeModel = require('../models/SomeModel');
+const User = require('../models/User');
 
 /**
  * GET /
@@ -48,7 +48,7 @@ exports.getRegister = async (req, res, next) => {
  * GET /about
  * Display the about page
  */
-exports.getBooklist= async (req, res, next) => {
+exports.getBooklist = async (req, res, next) => {
   try {
     res.render('booklist', {
       title: 'Booklist',
@@ -56,5 +56,15 @@ exports.getBooklist= async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+exports.getLogin = async (req, res) => {
+  try {
+    const response = await User.validateLogin(req.body.email, req.body.password);
+    console.log(response);
+    
+  } catch (error) {
+    
   }
 };

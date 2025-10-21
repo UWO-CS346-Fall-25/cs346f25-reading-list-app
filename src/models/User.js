@@ -54,6 +54,17 @@ class User {
     }
   }
 
+  static async validateLogin(email, password) {
+    try {
+      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email);
+      // this returns an array containing the empty login details
+      console.log(data);
+    }
+    catch(error) {
+      console.log("database crash!");
+    }
+  }
+
 //   /**
 //    * Find all users
 //    * @returns {Promise<Array>} Array of users
