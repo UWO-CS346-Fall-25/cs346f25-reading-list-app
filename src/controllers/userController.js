@@ -28,6 +28,7 @@ exports.getRegister = (req, res) => {
  */
 exports.postRegister = async (req, res, next) => {
   try {
+    console.log("this worked");
     // const { username, email, password } = req.body;
 
     // Validate input

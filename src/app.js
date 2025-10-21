@@ -79,6 +79,9 @@ app.use('/', csrfProtection, indexRouter);
 const loginRouter = require('./routes/login');
 app.use('/', csrfProtection, loginRouter);
 
+const registerRouter = require('./routes/register');
+app.use('/', csrfProtection, registerRouter);
+
 const booklistRouter = require('./routes/booklist');
 app.use('/', csrfProtection, booklistRouter);
 
@@ -89,31 +92,6 @@ app.get('/', csrfProtection, (req, res) => {
     csrfToken: req.csrfToken(),
   });
 });
-
-// Placeholder login route
-app.get('/', csrfProtection, (req, res) => {
-  res.render('login', {
-    title: 'Login',
-    csrfToken: req.csrfToken(),
-  });
-});
-
-// Placeholder register route
-app.get('/', csrfProtection, (req, res) => {
-  res.render('register', {
-    title: 'Register',
-    csrfToken: req.csrfToken(),
-  });
-});
-
-// Placeholder register route
-app.get('/', csrfProtection, (req, res) => {
-  res.render('booklist', {
-    title: 'Booklist',
-    csrfToken: req.csrfToken(),
-  });
-});
-
 
 // 404 handler
 app.use((req, res) => {

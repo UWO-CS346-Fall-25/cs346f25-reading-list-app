@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <title><%= title %> - Bookshelf</title>
   <link rel="stylesheet" href="/css/log_reg_style.css">
 </head>
@@ -24,15 +25,15 @@
       <h1>Register</h1>
       <section>
         <h2>Email Address:</h2>
-        <input id="username" class="entry">
-        <p class="invalid">The username entered is invalid</p>
+        <input id="email" class="entry">
+        <p class="invalid">The email entered is invalid</p>
       </section>
       <section>
         <h2>Password:</h2>
         <input id="password" class="entry" type="password">
         <p class="invalid">The password entered is invalid</p>
       </section>
-      <button>Register</button>
+      <button id="register">Register</button>
     </div>
   </main>
 
@@ -42,6 +43,7 @@
     </div>
   </footer>
 
+  <!-- <script>window.csrfToken = "<%= csrfToken %>";</script> -->
   <script src="/js/main.js"></script>
 </body>
 </html>
