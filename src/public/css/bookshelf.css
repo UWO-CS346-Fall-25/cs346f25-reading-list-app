@@ -107,7 +107,19 @@ main {
 .nav-links {
     display: flex;
     flex-direction: row;
+    list-style: none;
 }
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.managebooks {
+  
+}
+
+
 
 #book-sections {
     display: flex;

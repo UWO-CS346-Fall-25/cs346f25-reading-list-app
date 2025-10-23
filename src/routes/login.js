@@ -26,7 +26,7 @@ router.get('/index', loginController.getHome);
 
 router.get('/register', loginController.getRegister);
 
-router.get('/booklist', loginController.getBooklist);
+router.get('/bookshelf', loginController.getBookshelf);
 
 router.put('/validate_login', loginController.getLogin);
 

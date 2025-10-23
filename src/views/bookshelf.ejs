@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %> - BookShelf</title>
-  <link rel="stylesheet" href="/css/booksstyle.css">
+  <link rel="stylesheet" href="/css/bookshelf.css">
 </head>
 <body>
   <header>
@@ -12,7 +12,18 @@
       <div class="container">
         <a href="/" class="logo">BookShelf</a>
         <ul class="nav-links">
-          <li><a href="/">Add Books</a></li>
+
+        <li class="dropdown">
+          <button class="managebooks" onclick="toggleDropdown()">Manage Books</button>
+          <div class="books-dropdown-content" id="books-dropdown-menu">
+            <a href="Add Book"></a>
+            <a href="Change Book"></a>
+            <a href="Move Book"></a>
+            <a href="Delete Book"></a>
+            <!-- <a href="Upload Book File"></a> -->
+          </div>
+          </li>
+
           <li><a href="/">Home</a></li>
           <% if (user) { %>
             <li><a href="/profile">Profile</a></li>
@@ -73,6 +84,6 @@
     </div>
   </footer>
 
-  <script src="/js/main.js"></script>
+  <script src="/js/bookshelf.js"></script>
 </body>
 </html>

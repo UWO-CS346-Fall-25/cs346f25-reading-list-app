@@ -12,10 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                   body: JSON.stringify({ email: document.getElementById("email").value,
                                                          password: document.getElementById("password").value}),
                                 });
-    //   if (response.status === 201) { // successful register
-    //     alert("Registration Successful!\nPlease login to continue.");
-    //     window.location.href = '/login';
-    //   }
+      if (response.status === 201) { // successful register
+        window.location.href = '/bookshelf';
+      }
     //   else if (response.status === 409) { // existing email address
     //     alert("An account already exists with this email!");
     //   }

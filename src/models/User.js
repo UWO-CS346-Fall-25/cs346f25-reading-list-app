@@ -58,7 +58,8 @@ class User {
     try {
       const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email);
       // this returns an array containing the empty login details
-      console.log(data);
+      // console.log(data);
+      return data;
     }
     catch(error) {
       console.log("database crash!");

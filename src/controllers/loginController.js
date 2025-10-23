@@ -48,10 +48,10 @@ exports.getRegister = async (req, res, next) => {
  * GET /about
  * Display the about page
  */
-exports.getBooklist = async (req, res, next) => {
+exports.getBookshelf = async (req, res, next) => {
   try {
-    res.render('booklist', {
-      title: 'Booklist',
+    res.render('bookshelf', {
+      title: 'Bookshelf',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
@@ -62,7 +62,9 @@ exports.getBooklist = async (req, res, next) => {
 exports.getLogin = async (req, res) => {
   try {
     const response = await User.validateLogin(req.body.email, req.body.password);
-    console.log(response);
+    if(response.length != 0) {
+      res.status(201).json({success:true});
+    }
     
   } catch (error) {
     

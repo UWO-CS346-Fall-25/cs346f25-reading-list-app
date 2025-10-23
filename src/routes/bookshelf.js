@@ -22,7 +22,7 @@ const router = express.Router();
 const booklistController = require('../controllers/booklistController');
 
 // Define routes
-router.get('/booklist', booklistController.getHome);
+router.get('/bookshelf', booklistController.getHome);
 
 router.get('/login', booklistController.getLogin);
 
