@@ -8,8 +8,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (json.success) {
       json.data.forEach(element => {
         const li = document.createElement('li');
-        li.textContent = element.title + " : " + element.author;
-        li.classList.add('book');
+        const book = document.createElement('div');
+        book.classList.add('book');
+        const leftSpacer = document.createElement('div');
+        leftSpacer.classList.add('left-spacer');
+        book.append(leftSpacer);
+        const center = document.createElement('div');
+        center.classList.add('center');
+        const title = document.createElement('p');
+        title.textContent = element.title;
+        center.append(title);
+        const author = document.createElement('p');
+        author.textContent = element.author;
+        center.append(author);
+        book.append(center);
+        const rightSpacer = document.createElement('div');
+        rightSpacer.classList.add('right-spacer');
+        book.append(rightSpacer);
+        li.append(book);
         recommendedList.append(li);
       });
     }
