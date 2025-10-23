@@ -116,10 +116,43 @@ main {
 }
 
 .managebooks {
-  
+  background-color: grey;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.books-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  border-radius: 4px;
+  flex-direction: column;
 }
 
 
+/* Style each dropdown link */
+.books-dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* When JS adds .show, it becomes visible */
+.books-dropdown-content.show {
+  display: flex;
+}
+
+.books-dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
 
 #book-sections {
     display: flex;
@@ -134,7 +167,7 @@ main {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1rem;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .book-column p {

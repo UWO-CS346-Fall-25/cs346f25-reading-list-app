@@ -3,39 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> - BookShelf</title>
+  <title><%= title %> - Bookshelf - </title>
   <link rel="stylesheet" href="/css/bookshelf.css">
 </head>
 <body>
   <header>
     <nav>
       <div class="container">
-        <a href="/" class="logo">BookShelf</a>
+        <a href="/" class="logo">Bookshelf</a>
         <ul class="nav-links">
 
         <li class="dropdown">
           <button class="managebooks" onclick="toggleDropdown()">Manage Books</button>
           <div class="books-dropdown-content" id="books-dropdown-menu">
-            <a href="Add Book"></a>
-            <a href="Change Book"></a>
-            <a href="Move Book"></a>
-            <a href="Delete Book"></a>
-            <!-- <a href="Upload Book File"></a> -->
+            <a href="#">Add</a>
+            <a href="#">Edit</a>
+            <a href="#">Move</a>
+            <a href="#">Delete</a>
           </div>
           </li>
 
-          <li><a href="/">Home</a></li>
-          <% if (user) { %>
-            <li><a href="/profile">Profile</a></li>
-            <li>
-              <form action="/users/logout" method="POST" style="display: inline;">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <button type="submit" class="btn-link">Logout</button>
-              </form>
-            </li>
-          <% } else { %>
-            <li><a href="/login">Logout</a></li>
-          <% } %>
+          
         </ul>
       </div>
     </nav>
