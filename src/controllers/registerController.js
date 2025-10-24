@@ -36,6 +36,13 @@ exports.getLogin = (req, res) => {
   });
 };
 
+exports.getBookshelf = (req, res) => {
+  res.render('bookshelf', {
+    title: 'Bookshelf',
+    csrfToken: req.csrfToken(),
+  });
+};
+
 /**
  * POST /
  * Registers a new user

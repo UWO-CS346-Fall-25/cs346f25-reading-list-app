@@ -3,14 +3,6 @@
  *
  * This model handles all database operations related to users.
  * Use parameterized queries ($1, $2, etc.) to prevent SQL injection.
- *
- * Example methods:
- * - findAll(): Get all users
- * - findById(id): Get user by ID
- * - findByEmail(email): Get user by email
- * - create(userData): Create a new user
- * - update(id, userData): Update a user
- * - delete(id): Delete a user
  */
 // Supabase connection
 const supabase = require('../models/db');
@@ -19,6 +11,21 @@ const supabase = require('../models/db');
  * The class that communicates directly with the database
  */
 class User {
+
+  /**
+   * Returns the entire books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getRecommended() {
+    const { data, error } = await supabase.supabase.from('books').select('*');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
 
   /**
    * Adds a new user to the user table
@@ -36,21 +43,6 @@ class User {
     }
     catch (error) { // rethrowing email already exists error
       throw new Error('Email already exists');
-    }
-  }
-
-  /**
-   * Returns the entire books table from
-   * the database
-   * @returns {Promise<object>} the book list
-   */
-  static async getRecommended() {
-    try {
-      const { data, error } = await supabase.supabase.from('books').select('*');
-      return data;
-    }
-    catch(error) {
-      console.log("database crash!");
     }
   }
 

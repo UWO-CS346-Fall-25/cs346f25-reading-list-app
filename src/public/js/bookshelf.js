@@ -1,9 +1,10 @@
 /**
- * 
- * 
+ *
+ *
  */
 function toggleDropdown() {
     document.getElementById("books-dropdown-menu").classList.toggle("show");
+    alert("this is not working");
   }
 
   // Optional: close dropdown if user clicks outside
@@ -21,14 +22,14 @@ function toggleDropdown() {
 
 /**
  * Create the book constructor
- * w/ author, pageCount, genre, and 
- * 
- * 
+ * w/ author, pageCount, genre, and
+ *
+ *
  */
 
 /***
- * 
- * document.querySelector("#author").value = 
- * 
- * 
+ *
+ * document.querySelector("#author").value =
+ *
+ *
  */

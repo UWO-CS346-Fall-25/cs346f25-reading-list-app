@@ -63,10 +63,13 @@ exports.getLogin = async (req, res) => {
   try {
     const response = await User.validateLogin(req.body.email, req.body.password);
     if(response.length != 0) {
-      res.status(201).json({success:true});
+      res.status(201).json( { success: true } );
     }
-    
+    else {
+      res.status(500).json( { success: false } );
+    }
+
   } catch (error) {
-    
+
   }
 };

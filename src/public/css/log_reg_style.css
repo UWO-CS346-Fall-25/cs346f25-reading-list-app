@@ -25,7 +25,7 @@
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
   --border-radius: 4px;
-  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Reset/Base Styles */
@@ -129,12 +129,14 @@ main::before {
   height: 100vh;
   position: fixed;
   filter: blur(5px);
-  background-size: auto;
+  background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background-image: url("/images/sign_in_background.jpg");
 }
 
-#content {
+form {
   width: 300px;
   height: 500px;
   display: flex;
@@ -143,42 +145,53 @@ main::before {
   border-radius: 10px;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 1);
+  box-shadow: var(--box-shadow);
+}
+
+figure {
+  text-align: center;
 }
 
 h1 {
-  flex: 1;
   text-align: center;
 }
 
-#content section {
-  flex: 2;
-  text-align: center;
+#content {
+  width: 80%;
+  height: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
-#content a {
-  flex: 0.5;
-  text-align: center;
-  text-decoration: none;
+.user-detail {
+  flex: 1;
+  display: flex;
+  justify-content: end;
+  flex-direction: column;
+}
+
+.user-detail:last-child {
+  justify-content: center;
 }
 
 input {
-  width: 60%;
-  height: 30px
+  width: 100%;
+  height: 30px;
+  border-radius: 5px;
 }
 
 button {
-  flex: 1;
-  font-size: 20px;
+  height: 50px;
+  color: white;
+  border-radius: 5px;
+  background-color: var(--dark-color);
 }
 
-#content p {
+.error-text {
+  font-size: 0.75rem;
   visibility: hidden;
-  color: darkred;
+  color: var(--danger-color);
 }
 
 /* Footer */

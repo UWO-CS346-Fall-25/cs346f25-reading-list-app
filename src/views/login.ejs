@@ -21,26 +21,32 @@
   </header>
 
   <main>
-    <div id="content">
-      <h1>Log in</h1>
-      <section>
-        <h2>Email Address:</h2>
-        <input id="email" class="entry">
-        <p class="invalid">The email entered is invalid</p>
-      </section>
-      <section>
-        <h2>Password:</h2>
-        <input id="password" class="entry" type="password">
-        <p class="invalid">The password entered is invalid</p>
-      </section>
-      <a href="">Forgot your password?</a>
-      <button id="login">Log in</button>
-    </div>
+    <form novalidate>
+      <figure>
+        <img src="/images/open-book.png" alt="book image" width="100">
+      </figure>
+      <h1>Log In</h1>
+      <div id="content">
+        <div class="user-detail">
+          <h2>Email Address:</h2>
+          <input id="email" type="email" required>
+          <div id="email-error" class="error-text">error text</div>
+        </div>
+        <div class="user-detail">
+          <h2>Password:</h2>
+          <input id="password" type="password" required>
+          <div id="password-error" class="error-text">error text</div>
+        </div>
+        <div class="user-detail">
+          <button id="register" type="submit">Log In</button>
+        </div>
+      </div>
+    </form>
   </main>
 
   <footer>
     <div class="container">
-      <p>&copy; 2024 CS346 Project. All rights reserved.</p>
+      <p>&copy; 2025 CS346 Project. All rights reserved.</p>
     </div>
   </footer>
 
