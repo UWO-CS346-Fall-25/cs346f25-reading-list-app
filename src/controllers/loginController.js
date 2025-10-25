@@ -12,7 +12,7 @@
  */
 
 // Import models if needed
-// const SomeModel = require('../models/SomeModel');
+const User = require('../models/User');
 
 /**
  * GET /
@@ -48,13 +48,28 @@ exports.getRegister = async (req, res, next) => {
  * GET /about
  * Display the about page
  */
-exports.getBooklist= async (req, res, next) => {
+exports.getBookshelf = async (req, res, next) => {
   try {
-    res.render('booklist', {
-      title: 'Booklist',
+    res.render('bookshelf', {
+      title: 'Bookshelf',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
     next(error);
+  }
+};
+
+exports.getLogin = async (req, res) => {
+  try {
+    const response = await User.validateLogin(req.body.email, req.body.password);
+    if(response.length != 0) {
+      res.status(201).json( { success: true } );
+    }
+    else {
+      res.status(500).json( { success: false } );
+    }
+
+  } catch (error) {
+
   }
 };

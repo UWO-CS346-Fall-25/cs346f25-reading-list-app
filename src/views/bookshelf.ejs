@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Bookshelf - </title>
+  <link rel="stylesheet" href="/css/bookshelf.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="container">
+        <a href="/" class="logo">Bookshelf</a>
+        <ul class="nav-links">
+
+          <!-- Remove in-line jscript -->
+        <li class="dropdown"> 
+          <button id="manage-books" class="managebooks">Manage Books</button>
+          <div class="books-dropdown-content" id="books-dropdown-menu">
+            <a href="#">Add</a>
+            <a href="#">Edit</a>
+            <a href="#">Move</a>
+            <a href="#">Delete</a>
+          </div>
+          </li>
+          <li id="sign-out">
+            <button id="sign-out" type="submit">Sign Out</button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+  <div id="book-sections">
+
+    <div class="book-column" id="already-read">
+      <p>Successfully Read</p>
+      <ul>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
+      </ul>
+    </div>
+
+    <div class="book-column" id="currently-reading">
+      <p>Currently Reading</p>
+      <ul>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
+      </ul>
+    </div>
+
+    <div class="book-column" id="will-read">
+      <p>Will Read</p>
+      <ul>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 CS346 Project. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/bookshelf.js"></script>
+</body>
+</html>

@@ -19,12 +19,12 @@ const express = require('express');
 const router = express.Router();
 
 // Import controllers
-const booklistController = require('../controllers/booklistController');
+const bookshelfController = require('../controllers/bookshelfController');
 
 // Define routes
-router.get('/booklist', booklistController.getHome);
+router.get('/bookshelf', bookshelfController.getHome);
 
-router.get('/login', booklistController.getLogin);
+router.get('/login', bookshelfController.getLogin);
 
 // dummy comment
 

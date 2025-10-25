@@ -12,7 +12,7 @@
  */
 
 // Import models if needed
-// const SomeModel = require('../models/SomeModel');
+const User = require('../models/User');
 
 /**
  * GET /
@@ -34,4 +34,30 @@ exports.getLogin = (req, res) => {
     title: 'Login',
     csrfToken: req.csrfToken(),
   });
+};
+
+exports.getBookshelf = (req, res) => {
+  res.render('bookshelf', {
+    title: 'Bookshelf',
+    csrfToken: req.csrfToken(),
+  });
+};
+
+/**
+ * POST /
+ * Registers a new user
+ */
+exports.postRegister = async (req, res) => {
+  try { // attempting registration
+    const result = await User.registerUser(req.body.email, req.body.password);
+    res.status(201).json({ success: true, data: result }); // registration successful
+  }
+  catch(error) {
+    if (error.message === 'Email already exists') { // email already exists
+      res.status(409).json({ success: false, message: error.message });
+    }
+    else { // unable to connect to database
+      res.status(500).json({ success: false, message: 'Registration failed' });
+    }
+  }
 };

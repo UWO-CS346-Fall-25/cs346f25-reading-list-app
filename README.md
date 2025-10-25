@@ -13,6 +13,18 @@ booklist.ejs has been added to provide logged in users with a screen to see the 
 - books they are reading
 - books they have finished reading
 
+#Feature/Week8-Interactivity
+
+Added 4 jscript files: bookshelf, index, login, and register
+   Index handles the book recommendation logic for the home screen
+   Login and register handle email and password logic
+      - Added error handlers in app.js for the email and password routing
+      - loginController, registerController, and userController are modified for request and response handling with our database
+
+booklist.ejs and its counterparts are now bookshelf.ejs etc. Users can now move books between columns by dragging, and will be granted the option to add, delete, update, or move books, as well as sign out. 
+   - Bookshelf.js handles the dropdown button and drag and drop logic
+
+
 ## CS346 Semester Project Template
 
 A teaching template for building secure web applications with Node.js, Express, EJS, and PostgreSQL.

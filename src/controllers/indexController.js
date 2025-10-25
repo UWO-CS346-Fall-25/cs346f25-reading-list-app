@@ -1,18 +1,22 @@
 /**
  * Index Controller
- *
- * Controllers handle the business logic for routes.
- * They process requests, interact with models, and send responses.
- *
- * Best practices:
- * - Keep controllers focused on request/response handling
- * - Move complex business logic to separate service files
- * - Use models to interact with the database
- * - Handle errors appropriately
  */
+const User = require('../models/User');
 
-// Import models if needed
-// const SomeModel = require('../models/SomeModel');
+/**
+ * GET /
+ * Returns the fulls list of books
+ * from the database
+ */
+exports.getRecommended = async (req, res) => {
+  try { // getting recommended list
+    const result = await User.getRecommended();
+    res.status(201).json({ success: true, data: result });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 /**
  * GET /
@@ -25,7 +29,6 @@ exports.getHome = async (req, res, next) => {
 
     res.render('index', {
       title: 'Home',
-      // data: data,
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
@@ -54,5 +57,3 @@ exports.getRegister = async (req, res, next) => {
     next(error);
   }
 };
-
-// Add more controller methods as needed
