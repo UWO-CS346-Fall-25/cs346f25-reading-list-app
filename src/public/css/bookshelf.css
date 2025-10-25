@@ -110,12 +110,13 @@ main {
     list-style: none;
 }
 
+/* Manage Books Button Stylings */
 .dropdown {
   position: relative;
   display: inline-block;
 }
 
-.managebooks {
+#manage-books {
   background-color: grey;
   color: white;
   padding: 10px 16px;
@@ -147,7 +148,7 @@ main {
 
 /* When JS adds .show, it becomes visible */
 .books-dropdown-content.show {
-  display: flex;
+  display: block;
 }
 
 .books-dropdown-content a:hover {
@@ -161,6 +162,7 @@ main {
     width: 100%;
 }
 
+/* Stylings for the books columns */
 .book-column {
     flex: 1;
     background-color: burlywood;
@@ -197,6 +199,18 @@ main {
     
 }
 
+/* Highlight book when dragging */
+.book-column li.dragging {
+  opacity: 0.5;
+  background-color: #d3d3d3;
+}
+
+/* Highlight drop zone */
+.book-column ul.over {
+  background-color: rgba(0, 123, 255, 0.1);
+  border: 2px dashed #007bff;
+  transition: background-color 0.2s;
+}
 
 /* Footer */
 footer {

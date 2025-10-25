@@ -13,8 +13,9 @@
         <a href="/" class="logo">Bookshelf</a>
         <ul class="nav-links">
 
-        <li class="dropdown">
-          <button class="managebooks" onclick="toggleDropdown()">Manage Books</button>
+          <!-- Remove in-line jscript -->
+        <li class="dropdown"> 
+          <button id="manage-books" class="managebooks">Manage Books</button>
           <div class="books-dropdown-content" id="books-dropdown-menu">
             <a href="#">Add</a>
             <a href="#">Edit</a>
@@ -22,49 +23,53 @@
             <a href="#">Delete</a>
           </div>
           </li>
-
-          
+          <li id="sign-out">
+            <button id="sign-out" type="submit">Sign Out</button>
+          </li>
         </ul>
       </div>
     </nav>
   </header>
 
   <main class="container">
-    <div id="book-sections">
-      <div class="book-column">
+  <div id="book-sections">
+
+    <div class="book-column" id="already-read">
       <p>Successfully Read</p>
       <ul>
-        <li>Book 1</li>
-        <li>Book 2</li>
-        <li>Book 3</li>
-        <li>Book 4</li>
-        <li>Book 5</li>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
       </ul>
-      </div>
-      <div class="book-column">
-      <p>Currently Reading</p>
-      <ul>
-        <li>Book 1</li>
-        <li>Book 2</li>
-        <li>Book 3</li>
-        <li>Book 4</li>
-        <li>Book 5</li>
-      </ul>
-      </div>
-
-      <div class="book-column">
-      <p>Will Read</p>
-      <ul>
-        <li>Book 1</li>
-        <li>Book 2</li>
-        <li>Book 3</li>
-        <li>Book 4</li>
-        <li>Book 5</li>
-      </ul>
-      </div>
     </div>
 
-  </main>
+    <div class="book-column" id="currently-reading">
+      <p>Currently Reading</p>
+      <ul>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
+      </ul>
+    </div>
+
+    <div class="book-column" id="will-read">
+      <p>Will Read</p>
+      <ul>
+        <li draggable="true">Book 1</li>
+        <li draggable="true">Book 2</li>
+        <li draggable="true">Book 3</li>
+        <li draggable="true">Book 4</li>
+        <li draggable="true">Book 5</li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
 
   <footer>
     <div class="container">
