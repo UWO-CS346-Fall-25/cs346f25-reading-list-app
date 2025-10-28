@@ -33,9 +33,9 @@ class User {
    * @param {object} password - user password
    * @returns {Promise<object>} the user object
    */
-  static async registerUser(email, password) {
+  static async registerUser(email, password, dataUsage) {
     try { // attempting to add the user
-      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, username: 'Arthur0', books_to_read: [], books_reading: [], books_read: []}]);
+      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, books_to_read: [], books_reading: [], books_read: [], sharing_data: dataUsage}]);
       if (error && error.code === '23505') { // email already exists
         throw new Error('Email already exists');
       }

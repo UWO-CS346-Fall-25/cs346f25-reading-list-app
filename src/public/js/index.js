@@ -33,11 +33,13 @@ function loadList(loadDefault, list) {
   }
   const recommendedList = document.getElementById("books");
   list.forEach(element => { // building a visual book object
+    const color = '#' + Math.floor(Math.random()*16777215).toString(16);
     const li = document.createElement('li');
     const book = document.createElement('div');
     book.classList.add('book');
     const leftSpacer = document.createElement('div');
     leftSpacer.classList.add('left-spacer');
+    leftSpacer.style.borderColor = color;
     book.append(leftSpacer);
     const center = document.createElement('div');
     center.classList.add('center');
@@ -50,6 +52,11 @@ function loadList(loadDefault, list) {
     book.append(center);
     const rightSpacer = document.createElement('div');
     rightSpacer.classList.add('right-spacer');
+    const button = document.createElement('button');
+    button.textContent = '+';
+    button.title = 'Add to bookshelf';
+    rightSpacer.append(button);
+    rightSpacer.style.borderColor = color;
     book.append(rightSpacer);
     li.append(book);
     recommendedList.append(li);
