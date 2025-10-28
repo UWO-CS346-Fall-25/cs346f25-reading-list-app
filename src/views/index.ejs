@@ -21,22 +21,34 @@
   </header>
 
   <main class="container">
-    <div id="whats-new">
-      <h1>What's New:</h1>
-      <ul>
-        <li>something new</li>
-        <li>something new</li>
-        <li>something new</li>
-        <li>something new</li>
-        <li>something new</li>
-      </ul>
-    </div>
-    <div id="recommendations">
+
+
+
+    <form novalidate>
+      <h1>Filter</h1>
       <section>
-        <h2>User recommendations:</h2>
-        <ul id="books"></ul>
+        <h2>Author</h2>
+        <input list="authors">
+        <datalist id="authors"></datalist>
       </section>
-    </div>
+      <section>
+        <h2>Genre</h2>
+        <input list="genres">
+        <datalist id="genres"></datalist>
+      </section>
+      <section>
+        <h2>Page count</h2>
+        <input type="range" step="5" min="0" max="1000" value="0">
+        <p>value</p>
+      </section>
+    </form>
+
+
+
+    <section id="recommendations">
+      <h2>User recommendations</h2>
+      <ul id="books"></ul>
+    </section>
   </main>
 
   <footer>

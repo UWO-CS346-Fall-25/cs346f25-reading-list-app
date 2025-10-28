@@ -28,6 +28,36 @@ class User {
   }
 
   /**
+   * Returns a list of all authors
+   * from the books table
+   * @returns {Promise<object>} the author list
+   */
+  static async getAuthors() {
+    const { data, error } = await supabase.supabase.from('books').select('author');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+  /**
+   * Returns a list of all genres
+   * from the books table
+   * @returns {Promise<object>} the genre list
+   */
+  static async getGenres() {
+    const { data, error } = await supabase.supabase.from('books').select('genre');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+  /**
    * Adds a new user to the user table
    * @param {object} email - user email
    * @param {object} password - user password

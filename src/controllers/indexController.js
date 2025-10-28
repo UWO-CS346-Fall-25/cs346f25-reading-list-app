@@ -5,21 +5,6 @@ const User = require('../models/User');
 
 /**
  * GET /
- * Returns the fulls list of books
- * from the database
- */
-exports.getRecommended = async (req, res) => {
-  try { // getting recommended list
-    const result = await User.getRecommended();
-    res.status(201).json({ success: true, data: result });
-  }
-  catch(error) { // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
-  }
-}
-
-/**
- * GET /
  * Display the home page
  */
 exports.getHome = async (req, res, next) => {
@@ -57,3 +42,63 @@ exports.getRegister = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * GET /
+ * Returns the fulls list of books
+ * from the database
+ */
+exports.getRecommended = async (req, res) => {
+  try { // getting recommended list
+    const result = await User.getRecommended();
+    res.status(201).json({ success: true, data: result });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+/**
+ * A function that appears database
+ * data, removes duplicates, and
+ * repackages that data in a sorted list
+ * @param {object} list - data to sort
+ * @returns {Promise<object>} sorted data list
+ */
+function sortData(list) {
+  const dataList = new Set();
+  list.forEach(dataPoint => {
+    dataList.add(Object.values(dataPoint)[0]);
+  });
+  return (Array.from(dataList)).sort();
+}
+
+/**
+ * GET /
+ * Returns the fulls list of authors
+ * from the database
+ */
+exports.getAuthors = async (req, res) => {
+  try { // getting authors list
+    const result = await User.getAuthors();
+    res.status(201).json({ success: true, data: sortData(result) });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+/**
+ * GET /
+ * Returns the fulls list of genres
+ * from the database
+ */
+exports.getGenres = async (req, res) => {
+  try { // getting authors list
+    const result = await User.getGenres();
+    res.status(201).json({ success: true, data: sortData(result) });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
