@@ -1,6 +1,7 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
   fillComboBoxes();
+  fetchPageRadios();
   fetchRecommendations();
 });
 
@@ -51,13 +52,55 @@ function addOptions(error, requestType, options) {
     // this is going to need to read the default list from somewhere based on request type
   }
   else {
-
     const optionsList = document.getElementById(requestType);
     options.forEach(option => { // add each option
       const newOption = document.createElement('option');
       newOption.value = option;
       optionsList.append(newOption);
     });
+  }
+}
+
+/**
+ * A function that creates the page count
+ * radio buttons for the filter form
+ */
+async function fetchPageRadios() {
+  const radioLocation = document.getElementById('page-count');
+  try {
+    const response = await fetch('/pages');
+    if (response.ok) {
+      const json = await response.json();
+      if (json.success) {
+        buildRadios(json.data[0].page_count);
+      }
+      else { // loading default max pages if cannot translate to json
+        buildRadios(1500);
+      }
+    }
+    else { // loading default max pages if database could not be reached
+      buildRadios(1500);
+    }
+  }
+  catch(error) { // picking default value
+    buildRadios(1500);
+  }
+}
+
+/**
+ * A function that builds the radio buttons
+ * for the filter form
+ * @param {number} maxNumPages
+ */
+function buildRadios(maxNumPages) {
+  let radioValue = 0;
+  const radioList = document.getElementById('page-count');
+  while(radioValue < maxNumPages) {
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = radioList.id;
+    radioList.append(radio);
+    radioValue += 150;
   }
 }
 

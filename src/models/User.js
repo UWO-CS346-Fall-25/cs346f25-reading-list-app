@@ -13,21 +13,6 @@ const supabase = require('../models/db');
 class User {
 
   /**
-   * Returns the entire books table from
-   * the database
-   * @returns {Promise<object>} the book list
-   */
-  static async getRecommended() {
-    const { data, error } = await supabase.supabase.from('books').select('*');
-    if (error === null) { // validating query
-      return data;
-    }
-    else { // throwing an error if an error occurred
-      throw new Error("Database connection error");
-    }
-  }
-
-  /**
    * Returns a list of all authors
    * from the books table
    * @returns {Promise<object>} the author list
@@ -49,6 +34,35 @@ class User {
    */
   static async getGenres() {
     const { data, error } = await supabase.supabase.from('books').select('genre');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+   /**
+   * Returns the largest page count in the books table
+   * @returns {Promise<object>} the largest page count
+   */
+  static async getPages() {
+    const { data, error } = await supabase.supabase.from('books').select('page_count').order('page_count', {ascending: false}).limit(1);
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+   /**
+   * Returns the entire books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getRecommended() {
+    const { data, error } = await supabase.supabase.from('books').select('*');
     if (error === null) { // validating query
       return data;
     }

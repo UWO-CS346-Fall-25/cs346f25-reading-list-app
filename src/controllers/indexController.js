@@ -44,21 +44,6 @@ exports.getRegister = async (req, res, next) => {
 };
 
 /**
- * GET /
- * Returns the fulls list of books
- * from the database
- */
-exports.getRecommended = async (req, res) => {
-  try { // getting recommended list
-    const result = await User.getRecommended();
-    res.status(201).json({ success: true, data: result });
-  }
-  catch(error) { // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
-  }
-}
-
-/**
  * A function that appears database
  * data, removes duplicates, and
  * repackages that data in a sorted list
@@ -97,6 +82,36 @@ exports.getGenres = async (req, res) => {
   try { // getting authors list
     const result = await User.getGenres();
     res.status(201).json({ success: true, data: sortData(result) });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+/**
+ * GET /
+ * Returns the largest page count form
+ * the books table
+ */
+exports.getPages = async (req, res) => {
+  try { // getting largest page count
+    const result = await User.getPages();
+    res.status(201).json({ success: true, data: result });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+/**
+ * GET /
+ * Returns the fulls list of books
+ * from the database
+ */
+exports.getRecommended = async (req, res) => {
+  try { // getting recommended list
+    const result = await User.getRecommended();
+    res.status(201).json({ success: true, data: result });
   }
   catch(error) { // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });

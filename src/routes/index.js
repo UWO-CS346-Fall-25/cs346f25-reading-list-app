@@ -29,6 +29,7 @@ router.get('/register', indexController.getRegister);
 // content route
 router.get('/authors', indexController.getAuthors);
 router.get('/genres', indexController.getGenres);
+router.get('/pages', indexController.getPages);
 router.get('/recommended', indexController.getRecommended);
 
 // dummy comment
