@@ -117,3 +117,18 @@ exports.getRecommended = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 }
+
+/**
+ * GET /
+ * Returns a filtered list of
+ * books from the database
+ */
+exports.getFilter = async (req, res) => {
+  try { // getting filtered list
+    const result = await User.getFiltered(req.query.author, req.query.genre, req.query.page_count);
+    res.status(201).json({ success: true, data: result });
+  }
+  catch(error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false, message: error.message });
+  }
+}

@@ -31,6 +31,7 @@ router.get('/authors', indexController.getAuthors);
 router.get('/genres', indexController.getGenres);
 router.get('/pages', indexController.getPages);
 router.get('/recommended', indexController.getRecommended);
+router.get('/filter', indexController.getFilter);
 
 // dummy comment
 

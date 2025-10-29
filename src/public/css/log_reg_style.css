@@ -211,6 +211,10 @@ h2 img {
   accent-color: var(--dark-color);
 }
 
+#data-radio input:hover {
+  cursor: pointer;
+}
+
 button {
   height: 50px;
   color: white;

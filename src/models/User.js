@@ -72,6 +72,31 @@ class User {
   }
 
   /**
+   * Returns the filtered books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getFiltered(author, genre, pageCount) {
+    let query = supabase.supabase.from('books').select('*'); // setting up the query
+    if (author.trim() !== '') { // adding author condition if not null
+      query = query.eq('author', author);
+    }
+    if (genre.trim() !== '') { // adding genre condition if not null
+      query = query.eq('genre', genre);
+    }
+    if (pageCount !== '-1') { // adding page count condition if not null
+      query = query.lte('page_count', pageCount);
+    }
+    const { data, error } = await query; // completing query
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+  /**
    * Adds a new user to the user table
    * @param {object} email - user email
    * @param {object} password - user password
