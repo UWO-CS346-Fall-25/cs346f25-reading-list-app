@@ -196,8 +196,13 @@ input[list="authors"], input[list="genres"] {
   height: 100%;
   display: flex;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 635px;
   flex-direction: column;
+}
+
+#books li:nth-child(2) {
+  animation-delay: 3s;
 }
 
 .book {
@@ -210,6 +215,8 @@ input[list="authors"], input[list="genres"] {
   border-radius: 2px;
   box-shadow: var(--box-shadow);
   background-color: var(--dark-color);
+
+  animation: slideInFromRight 2s;
 }
 
 .left-spacer {
@@ -260,6 +267,18 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Animation definition */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */
