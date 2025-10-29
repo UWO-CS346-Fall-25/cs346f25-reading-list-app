@@ -40,7 +40,6 @@ body {
   line-height: 1.6;
   color: var(--dark-color);
   background-color: #fff;
-  overflow: hidden;
 }
 
 a {
@@ -198,6 +197,7 @@ input[list="authors"], input[list="genres"] {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 635px;
+  min-height: 635px;
   flex-direction: column;
 }
 

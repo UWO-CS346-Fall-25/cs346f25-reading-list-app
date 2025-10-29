@@ -82,7 +82,7 @@ async function processForm() {
     let index = 0;
     let pageFilter = -1;
     const pageRadios = document.getElementById('radio-list').childNodes;
-    while (pageFilter === null && index < pageRadios.length) {
+    while (pageFilter === -1 && index < pageRadios.length) {
       if (pageRadios[index].firstChild.checked) {
         pageFilter = pageRadios[index].lastChild.textContent.trim();
       }
@@ -95,7 +95,6 @@ async function processForm() {
                       genre: document.getElementById('genre-input').value,
                       page_count: pageFilter};
     let response = await fetch('/filter?' + new URLSearchParams(filters).toString());
-    console.log(response.ok);
     if (response.status === 201) { // successful filter
       clearList(); // clearing the existing list
       const json = await response.json();
