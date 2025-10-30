@@ -40,7 +40,6 @@ body {
   line-height: 1.6;
   color: var(--dark-color);
   background-color: #fff;
-  overflow: hidden;
 }
 
 a {
@@ -119,9 +118,58 @@ main {
 }
 
 form {
+  gap: 10px;
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+#filters {
+  display: flex;
+  flex-direction: column;
+}
+
+#filters h2 {
+  font-size: large;
+}
+
+input[list="authors"], input[list="genres"] {
+  width: 80%;
+  height: 30px;
+  border-radius: 5px;
+}
+
+.error-text {
+  font-size: 0.75rem;
+  visibility: hidden;
+  color: var(--danger-color);
+}
+
+#page-count {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#radio-list {
+  flex: 1;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.radio {
+  flex: 1;
+  width: 20px;
+}
+
+.radio:hover {
+  cursor: pointer;
+}
+
+#filter {
+  max-height: 50px;
+  border-radius: 5px;
 }
 
 #recommendations {
@@ -144,10 +192,17 @@ form {
 #books {
   flex: 1;
   gap: 10px;
+  height: 100%;
   display: flex;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 635px;
+  min-height: 635px;
   flex-direction: column;
+}
+
+#books li:nth-child(2) {
+  animation-delay: 3s;
 }
 
 .book {
@@ -160,6 +215,8 @@ form {
   border-radius: 2px;
   box-shadow: var(--box-shadow);
   background-color: var(--dark-color);
+
+  animation: slideInFromRight 2s;
 }
 
 .left-spacer {
@@ -210,6 +267,18 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Animation definition */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive Design */

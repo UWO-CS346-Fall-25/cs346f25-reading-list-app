@@ -40,7 +40,6 @@ body {
   line-height: 1.6;
   color: var(--dark-color);
   background-color: #fff;
-  overflow: hidden;
 }
 
 a {
@@ -211,6 +210,10 @@ h2 img {
 #data-radio input {
   width: 40px;
   accent-color: var(--dark-color);
+}
+
+#data-radio input:hover {
+  cursor: pointer;
 }
 
 button {

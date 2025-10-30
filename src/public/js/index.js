@@ -1,9 +1,118 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
   fillComboBoxes();
-  fetchPageRadios();
+  fetchFilterRadios();
   fetchRecommendations();
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function (e) {
+    // e.preventDefault();
+    if (validateForm(form)) {
+      processForm();
+    }
+    e.preventDefault();
+  });
 });
+
+/**
+ * Validate a form
+ * @param {HTMLFormElement} form - Form element to validate
+ * @returns {boolean} - True if form is valid
+ */
+function validateForm(form) {
+  let isValid = true;
+  const filters = form.querySelectorAll('input[list]');
+  filters.forEach((filter) => {
+    if (filter.value.trim()) {
+      const options = filter.nextElementSibling.childNodes;
+      let index = 0;
+      let validEntry = false
+      while(!validEntry && index < options.length) {
+        if (options[index].value === filter.value) {
+          validEntry = true;
+        }
+        index++;
+      }
+      if (!validEntry) {
+        showError(filter, 'Invalid selection');
+        isValid = false;
+      }
+    }
+    else {
+      clearError(filter);
+    }
+  });
+  return isValid;
+}
+
+/**
+ * Show error message for a filters
+ * @param {HTMLElement} filters - Form filters
+ * @param {string} message - Error message
+ */
+function showError(filters, message) {
+  // Remove any existing error
+  clearError(filters);
+
+  // Get the error element
+  const error = filters.nextElementSibling.nextElementSibling;
+  error.textContent = message;
+  error.style.visibility = 'visible';
+
+  // Add error class to filters
+  filters.classList.add('error');
+  filters.style.borderColor = 'red';
+}
+
+/**
+ * Clear error message for a filters
+ * @param {HTMLElement} filters - Form filters
+ */
+function clearError(filters) {
+  filters.nextElementSibling.nextElementSibling.style.visibility = 'hidden';
+  filters.classList.remove('error');
+  filters.style.borderColor = '';
+}
+
+/**
+ * Processes a filter form
+ */
+async function processForm() {
+  const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
+  try { // fetch request to get book list with filters
+    let index = 0;
+    let pageFilter = -1;
+    const pageRadios = document.getElementById('radio-list').childNodes;
+    while (pageFilter === -1 && index < pageRadios.length) {
+      if (pageRadios[index].firstChild.checked) {
+        pageFilter = pageRadios[index].lastChild.textContent.trim();
+      }
+      index++;
+    }
+    if (pageFilter.length === 5) {
+      pageFilter = pageFilter.replace('+', '');
+    }
+    const filters = { author: document.getElementById('author-input').value,
+                      genre: document.getElementById('genre-input').value,
+                      page_count: pageFilter};
+    let response = await fetch('/filter?' + new URLSearchParams(filters).toString());
+    if (response.status === 201) { // successful filter
+      clearList(); // clearing the existing list
+      const json = await response.json();
+      if (json.success) {
+        loadList(false, json.data);
+      }
+      else { // unable to translate json
+        alert("Unable to connect to the database.");
+      }
+    }
+    else { // unable to connect to database
+      alert("Unable to connect to the database.");
+    }
+  }
+  catch(error) { // unable to find route to register
+    alert("Unable to connect to the database.");
+  }
+}
 
 /**
  * A function that fills each combo box
@@ -65,13 +174,12 @@ function addOptions(error, requestType, options) {
  * A function that creates the page count
  * radio buttons for the filter form
  */
-async function fetchPageRadios() {
-  const radioLocation = document.getElementById('page-count');
-  try {
+async function fetchFilterRadios() {
+  try { // attempting fetch request to get largest number of pages
     const response = await fetch('/pages');
-    if (response.ok) {
+    if (response.ok) { // validating fetch request
       const json = await response.json();
-      if (json.success) {
+      if (json.success) { // validating json translation
         buildRadios(json.data[0].page_count);
       }
       else { // loading default max pages if cannot translate to json
@@ -93,13 +201,21 @@ async function fetchPageRadios() {
  * @param {number} maxNumPages
  */
 function buildRadios(maxNumPages) {
-  let radioValue = 0;
-  const radioList = document.getElementById('page-count');
+  let radioValue = 150;
+  const radioList = document.getElementById('radio-list');
   while(radioValue < maxNumPages) {
+    const button = document.createElement('span');
     const radio = document.createElement('input');
     radio.type = 'radio';
     radio.name = radioList.id;
-    radioList.append(radio);
+    radio.classList.add('radio');
+    if (radioValue + 150 < maxNumPages) {
+      button.append(radio, " " + radioValue);
+    }
+    else {
+      button.append(radio, " " + radioValue + "+");
+    }
+    radioList.append(button);
     radioValue += 150;
   }
 }
@@ -115,18 +231,18 @@ async function fetchRecommendations() {
     if (response.ok) { // validating fetch request
       const json = await response.json();
       if (json.success) { // validating json translation
-        loadRecommendations(false, json.data);
+        loadList(false, json.data);
       }
       else { // loading default list if cannot translate to json
-        loadRecommendations(true);
+        loadList(true);
       }
     }
     else { // loading default list if database could not be reached
-      loadRecommendations(true);
+      loadList(true);
     }
   }
   catch(error) { // loading default list if fetch request could not be completed
-    loadRecommendations(true);
+    loadList(true);
   }
 }
 
@@ -137,7 +253,7 @@ async function fetchRecommendations() {
  * @param {object} error - true if default needed, false if not
  * @param {object} recommendations - list of recommendations, null if unable to located list
  */
-function loadRecommendations(error, recommendations) {
+function loadList(error, recommendations) {
   if (error) { // loading default list
     list = [{title: "Book", author: "Arthur Waldman"}];
   }
@@ -171,4 +287,8 @@ function loadRecommendations(error, recommendations) {
     li.append(book);
     recommendedList.append(li);
   });
+}
+
+function clearList() {
+  document.getElementById("books").innerHTML = '';
 }

@@ -21,35 +21,32 @@
   </header>
 
   <main class="container">
-
-
-
     <form novalidate>
       <h1>Filter</h1>
-      <section>
-        <h2>Author</h2>
-        <input list="authors">
-        <datalist id="authors"></datalist>
-      </section>
-      <section>
-        <h2>Genre</h2>
-        <input list="genres">
-        <datalist id="genres"></datalist>
-      </section>
-      <section id="page-count">
-        <h2>Page count</h2>
-      </section>
+      <div id="filters">
+        <section>
+          <h2>Author</h2>
+          <input id="author-input" list="authors">
+          <datalist id="authors"></datalist>
+          <div id="author-error" class="error-text">error text</div>
+        </section>
+        <section>
+          <h2>Genre</h2>
+          <input id="genre-input" list="genres">
+          <datalist id="genres"></datalist>
+          <div id="genre-error" class="error-text">error text</div>
+        </section>
+        <section id="page-count">
+          <h2>Maximum page count</h2>
+          <div id="radio-list"></div>
+        </section>
+      </div>
+      <button id="filter" type="submit">Filter</button>
     </form>
-
-
-
     <section id="recommendations">
       <h2>User recommendations</h2>
       <ul id="books"></ul>
     </section>
-
-
-
   </main>
 
   <footer>
