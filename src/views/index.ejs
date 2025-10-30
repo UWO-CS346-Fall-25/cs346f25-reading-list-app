@@ -11,10 +11,15 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/" class="logo">Bookshelf</a>
+        <a href="/index" class="logo">Bookshelf</a>
         <ul class="nav-links">
-          <li><a href="/login">Login</a></li>
-          <li><a href="/register">Register</a></li>
+          <% if (user) { %>
+            <li><a href="/bookshelf">Profile</a></li>
+            <li><a href="/signout">Sign Out</a></li>
+          <% } else { %>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+          <% } %>
         </ul>
       </div>
     </nav>

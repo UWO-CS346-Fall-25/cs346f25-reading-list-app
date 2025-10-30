@@ -20,8 +20,8 @@
  */
 exports.getHome = async (req, res, next) => {
   try {
-    res.render('booklist', {
-      title: 'Books',
+    res.render('index', {
+      title: 'Bookshelf',
       csrfToken: req.csrfToken(),
     });
   } catch (error) {
@@ -30,14 +30,22 @@ exports.getHome = async (req, res, next) => {
 };
 
 /**
- * GET /about
- * Display the about page
+ * GET /logout
+ * Display the home page with cleared session
  */
-exports.getLogin = async (req, res, next) => {
+exports.logout = async (req, res, next) => {
   try {
-    res.render('login', {
-      title: 'Login',
-      csrfToken: req.csrfToken(),
+    const token = req.csrfToken();
+    req.session.destroy(error => {
+      if (error) {
+        next(error);
+      }
+      res.clearCookie('connect.sid');
+      res.render('index', {
+        title: 'Bookshelf',
+        csrfToken: token,
+        user: null,
+      });
     });
   } catch (error) {
     next(error);
