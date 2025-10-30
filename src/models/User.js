@@ -115,15 +115,19 @@ class User {
     }
   }
 
+  /**
+   * A function that validates the users login credentials
+   * @param {object} email user email address
+   * @param {object} password user password
+   * @returns {Promise<object>} user entry if valid, else empty
+   */
   static async validateLogin(email, password) {
-    try {
-      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email);
-      // this returns an array containing the empty login details
-      // console.log(data);
+    try { // attempting to verify the user
+      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email).eq('password', password);
       return data;
     }
-    catch(error) {
-      console.log("database crash!");
+    catch(error) { // throwing an error if an error occurred
+      throw new Error("Database connection error");
     }
   }
 

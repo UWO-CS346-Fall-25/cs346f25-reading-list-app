@@ -9,9 +9,6 @@ const User = require('../models/User');
  */
 exports.getHome = async (req, res, next) => {
   try {
-    // Fetch any data needed for the home page
-    // const data = await SomeModel.findAll();
-
     res.render('index', {
       title: 'Home',
       csrfToken: req.csrfToken(),
@@ -21,6 +18,10 @@ exports.getHome = async (req, res, next) => {
   }
 };
 
+/**
+ * GET /login
+ * Display the login page
+ */
 exports.getLogin = (req, res) => {
   res.render('login', {
     title: 'Login',
@@ -29,14 +30,52 @@ exports.getLogin = (req, res) => {
 };
 
 /**
- * GET /about
- * Display the about page
+ * GET /register
+ * Display the register page
  */
 exports.getRegister = async (req, res, next) => {
   try {
     res.render('register', {
       title: 'Register',
       csrfToken: req.csrfToken(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /bookshelf
+ * Display the about page
+ */
+exports.getBookshelf = async (req, res, next) => {
+  try {
+    res.render('bookshelf', {
+      title: 'Bookshelf',
+      csrfToken: req.csrfToken(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /sign out
+ * Display the home page with cleared session
+ */
+exports.signOut = async (req, res, next) => {
+  try {
+    const token = req.csrfToken();
+    req.session.destroy(error => {
+      if (error) {
+        next(error);
+      }
+      res.clearCookie('connect.sid');
+      res.render('index', {
+        title: 'Bookshelf',
+        csrfToken: token,
+        user: null,
+      });
     });
   } catch (error) {
     next(error);

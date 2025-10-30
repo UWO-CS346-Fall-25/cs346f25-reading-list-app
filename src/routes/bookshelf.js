@@ -22,9 +22,9 @@ const router = express.Router();
 const bookshelfController = require('../controllers/bookshelfController');
 
 // Define routes
+router.get('/home', bookshelfController.getHome);
 router.get('/bookshelf', bookshelfController.getHome);
-
-router.get('/login', bookshelfController.getLogin);
+router.get('/logout', bookshelfController.logout);
 
 // dummy comment
 

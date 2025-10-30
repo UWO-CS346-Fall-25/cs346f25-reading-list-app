@@ -23,12 +23,9 @@ const loginController = require('../controllers/loginController');
 
 // Define routes
 router.get('/index', loginController.getHome);
-
 router.get('/register', loginController.getRegister);
-
 router.get('/bookshelf', loginController.getBookshelf);
-
-router.put('/validate_login', loginController.getLogin);
+router.post('/user_login', loginController.login);
 
 // dummy comment
 

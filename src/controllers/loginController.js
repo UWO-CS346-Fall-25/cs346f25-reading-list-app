@@ -24,7 +24,8 @@ exports.getHome = async (req, res, next) => {
       title: 'Home',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  }
+  catch (error) {
     next(error);
   }
 };
@@ -39,7 +40,8 @@ exports.getRegister = async (req, res, next) => {
       title: 'Register',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  }
+  catch (error) {
     next(error);
   }
 };
@@ -54,22 +56,28 @@ exports.getBookshelf = async (req, res, next) => {
       title: 'Bookshelf',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  }
+  catch (error) {
     next(error);
   }
 };
 
-exports.getLogin = async (req, res) => {
-  try {
+/**
+ * GET /login
+ * Gets user account details, if they exist
+ */
+exports.login = async (req, res) => {
+  try { // attempting to contact the database
     const response = await User.validateLogin(req.body.email, req.body.password);
-    if(response.length != 0) {
+    if(response.length !== 0) {
+      req.session.user = req.body.email;
       res.status(201).json( { success: true } );
     }
-    else {
-      res.status(500).json( { success: false } );
+    else { // 404 if no account in database
+      res.status(404).json( { success: false } );
     }
-
-  } catch (error) {
-
+  }
+  catch (error) { // 500 if cannot connect to database
+    res.status(500).json( { success: false } );
   }
 };

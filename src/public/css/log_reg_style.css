@@ -223,6 +223,14 @@ button {
   background-color: var(--dark-color);
 }
 
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button:active{
+  background-color: var(--dark-color);
+}
+
 #forgot-password {
   height: 12.5%;
   text-align: center;
