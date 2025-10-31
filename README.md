@@ -24,6 +24,17 @@ Added 4 jscript files: bookshelf, index, login, and register
 booklist.ejs and its counterparts are now bookshelf.ejs etc. Users can now move books between columns by dragging, and will be granted the option to add, delete, update, or move books, as well as sign out. 
    - Bookshelf.js handles the dropdown button and drag and drop logic
 
+#Feature/Week9-UI Enhancements
+
+Arthur here:
+
+Bookshelf.ejs received some placeholder books for each column, and received updated css styling. 
+   - Added gradient colorways to each column
+   - Added background photos for the header, footer, and main
+   - Added new Font Styling
+   - Sign out is no longer a button, but rather an anchor that takes users back to the Home Screen
+
+
 
 ## CS346 Semester Project Template
 

@@ -17,9 +17,32 @@
 /* Reset/Base Styles */
 * {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  padding: 0; 
+  box-sizing: border-box; 
 }
+
+@font-face {
+  font-family: 'Style Script';
+  src: url('../fonts/Style_Script/StyleScript-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Book Title';
+  src: url('../fonts/GreatVibes-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* @font-face {
+  font-family: 'Book Titles';
+  src: url('../fonts//SedgwickAveDisplay-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+} */
+
+
 
 body {
   font-family: var(--font-family);
@@ -50,6 +73,9 @@ header {
   color: white;
   padding: 1rem 0;
   box-shadow: var(--box-shadow);
+  background-image: url('../images/bookshelf_header.jpg');
+  background-repeat: repeat;
+  background-size: 75%;
 }
 
 nav .container {
@@ -101,6 +127,13 @@ main {
   min-height: calc(100vh - 200px);
   padding: 2rem 0;
   display: flex;
+  background-position: 0 0, 100px 100px;
+  background-image:
+  url('../images/wrinkled_paper.jpg'),
+  url('../images/wrinkled_paper.jpg');
+  background-repeat: repeat;
+  background-size: 400px 400px;
+  background-blend-mode: multiply;
 }
 
 /* New Stylings for Nav bar and main content */
@@ -156,38 +189,55 @@ main {
 }
 
 #book-sections {
-    display: flex;
-    justify-content: space-evenly;
-    gap: 2rem;
-    width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  /* gap: 1em; */
+  width: 90%;
+  margin: 0 auto;
 }
+
 
 /* Stylings for the books columns */
 .book-column {
-    flex: 1;
-    background-color: burlywood;
+    background: radial-gradient(circle at top, rgba(222, 104, 19, 0.95) 0%, rgba(170, 86, 13, 0.999));
+  /* background: linear-gradient(180deg, rgba(222, 104, 19, 0.95) 0%, rgba(134, 65, 20, 0.95) 100%); */
     border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    border-top: 20px solid rgba(193, 91, 36, 0.858);
+    border-right: 20px solid rgba(130, 51, 8, 0.858);
+    /* border-left: 20px solid rgba(130, 51, 8, 0.858); */
     padding: 1rem;
     overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    max-height: 75vh;
+    min-width: 25%;
+
+    transition: flex-basis 0.3s ease, width 0.3s ease;
+
+
 }
 
 .book-column p {
-  font-family: "Rye", serif;
+  font-family: 'Style Script', cursive;
+  text-decoration: underline;
   font-optical-sizing: auto;
   font-weight: 900;
   font-style: normal;
-  font-size: 115%;
+  font-size: 125%;
   color: black;
   margin-bottom: 0.5rem;
   text-align: center;
 }
 
+
 #book-sections ul {
     list-style-type: none;
     padding-left: 0;
     text-align: center;
-    font-family: "Ewert", serif;
+    font-family: "Style Script", cursive;
+    font-size: 115%;
     font-weight: 800;
     font-style: normal;
     color: black;
@@ -212,13 +262,17 @@ main {
   transition: background-color 0.2s;
 }
 
+
 /* Footer */
 footer {
   background-color: var(--dark-color);
   color: white;
   text-align: center;
   padding: 2rem 0;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
+  background-image: url('../images/bookshelf_footer.jpg');
+  background-repeat: repeat;
+  background-size: 75%;
 }
 
 /* Responsive Design */
@@ -246,8 +300,6 @@ footer {
     .book-column:nth-child(2) {
         display: block;
     }
-
-
 }
 
 /* Add animations for books being dragged from Currently Reading to Read and Will Read to Currently Reading */
