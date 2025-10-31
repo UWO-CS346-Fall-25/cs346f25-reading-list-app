@@ -1,4 +1,28 @@
-# Feature/Week7-Layout Update
+# Feature/Week9-UI Enhancements
+
+Bookshelf.ejs received some placeholder books for each column, and received updated css styling.
+   - Added gradient colorways to each column
+   - Added background photos for the header, footer, and main
+   - Added new Font Styling
+   - Sign out is no longer a button, but rather an anchor that takes users back to the Home Screen
+
+Index page updates:
+- functioning filter form
+- books enter page with animation
+- nav bar options change if sessions is active
+
+## Feature/Week8-Interactivity
+
+Added 4 jscript files: bookshelf, index, login, and register
+   Index handles the book recommendation logic for the home screen
+   Login and register handle email and password logic
+      - Added error handlers in app.js for the email and password routing
+      - loginController, registerController, and userController are modified for request and response handling with our database
+
+booklist.ejs and its counterparts are now bookshelf.ejs etc. Users can now move books between columns by dragging, and will be granted the option to add, delete, update, or move books, as well as sign out.
+   - Bookshelf.js handles the dropdown button and drag and drop logic
+
+## Feature/Week7-Layout Update
 
 index.ejs has been updated to act as the landing page. This page will display recommendations for
 users who are not logged in, as well as display the most recent updates to the website.
@@ -12,29 +36,6 @@ booklist.ejs has been added to provide logged in users with a screen to see the 
 - books they plan to read
 - books they are reading
 - books they have finished reading
-
-#Feature/Week8-Interactivity
-
-Added 4 jscript files: bookshelf, index, login, and register
-   Index handles the book recommendation logic for the home screen
-   Login and register handle email and password logic
-      - Added error handlers in app.js for the email and password routing
-      - loginController, registerController, and userController are modified for request and response handling with our database
-
-booklist.ejs and its counterparts are now bookshelf.ejs etc. Users can now move books between columns by dragging, and will be granted the option to add, delete, update, or move books, as well as sign out. 
-   - Bookshelf.js handles the dropdown button and drag and drop logic
-
-#Feature/Week9-UI Enhancements
-
-Arthur here:
-
-Bookshelf.ejs received some placeholder books for each column, and received updated css styling. 
-   - Added gradient colorways to each column
-   - Added background photos for the header, footer, and main
-   - Added new Font Styling
-   - Sign out is no longer a button, but rather an anchor that takes users back to the Home Screen
-
-
 
 ## CS346 Semester Project Template
 
