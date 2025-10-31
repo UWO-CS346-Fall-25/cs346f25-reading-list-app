@@ -13,6 +13,50 @@ const supabase = require('../models/db');
 class User {
 
   /**
+   * Returns a list of all authors
+   * from the books table
+   * @returns {Promise<object>} the author list
+   */
+  static async getAuthors() {
+    const { data, error } = await supabase.supabase.from('books').select('author');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+  /**
+   * Returns a list of all genres
+   * from the books table
+   * @returns {Promise<object>} the genre list
+   */
+  static async getGenres() {
+    const { data, error } = await supabase.supabase.from('books').select('genre');
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+   /**
+   * Returns the largest page count in the books table
+   * @returns {Promise<object>} the largest page count
+   */
+  static async getPages() {
+    const { data, error } = await supabase.supabase.from('books').select('page_count').order('page_count', {ascending: false}).limit(1);
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+   /**
    * Returns the entire books table from
    * the database
    * @returns {Promise<object>} the book list
@@ -28,14 +72,39 @@ class User {
   }
 
   /**
+   * Returns the filtered books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getFiltered(author, genre, pageCount) {
+    let query = supabase.supabase.from('books').select('*'); // setting up the query
+    if (author.trim() !== '') { // adding author condition if not null
+      query = query.eq('author', author);
+    }
+    if (genre.trim() !== '') { // adding genre condition if not null
+      query = query.eq('genre', genre);
+    }
+    if (pageCount !== '-1') { // adding page count condition if not null
+      query = query.lte('page_count', pageCount);
+    }
+    const { data, error } = await query; // completing query
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error("Database connection error");
+    }
+  }
+
+  /**
    * Adds a new user to the user table
    * @param {object} email - user email
    * @param {object} password - user password
    * @returns {Promise<object>} the user object
    */
-  static async registerUser(email, password) {
+  static async registerUser(email, password, dataUsage) {
     try { // attempting to add the user
-      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, username: 'Arthur0', books_to_read: [], books_reading: [], books_read: []}]);
+      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, books_to_read: [], books_reading: [], books_read: [], sharing_data: dataUsage}]);
       if (error && error.code === '23505') { // email already exists
         throw new Error('Email already exists');
       }
@@ -46,15 +115,19 @@ class User {
     }
   }
 
+  /**
+   * A function that validates the users login credentials
+   * @param {object} email user email address
+   * @param {object} password user password
+   * @returns {Promise<object>} user entry if valid, else empty
+   */
   static async validateLogin(email, password) {
-    try {
-      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email);
-      // this returns an array containing the empty login details
-      // console.log(data);
+    try { // attempting to verify the user
+      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email).eq('password', password);
       return data;
     }
-    catch(error) {
-      console.log("database crash!");
+    catch(error) { // throwing an error if an error occurred
+      throw new Error("Database connection error");
     }
   }
 

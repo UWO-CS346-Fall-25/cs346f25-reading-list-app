@@ -10,11 +10,11 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/" class="logo">Bookshelf</a>
+        <a href="/home" class="logo">Bookshelf</a>
         <ul class="nav-links">
 
-          <!-- Remove in-line jscript -->
-        <li class="dropdown"> 
+          
+        <li class="dropdown">
           <button id="manage-books" class="managebooks">Manage Books</button>
           <div class="books-dropdown-content" id="books-dropdown-menu">
             <a href="#">Add</a>
@@ -23,9 +23,7 @@
             <a href="#">Delete</a>
           </div>
           </li>
-          <li id="sign-out">
-            <button id="sign-out" type="submit">Sign Out</button>
-          </li>
+          <li><a href="/logout">Sign Out</a></li>
         </ul>
       </div>
     </nav>
@@ -34,38 +32,39 @@
   <main class="container">
   <div id="book-sections">
 
-    <div class="book-column" id="already-read">
-      <p>Successfully Read</p>
-      <ul>
-        <li draggable="true">Book 1</li>
-        <li draggable="true">Book 2</li>
-        <li draggable="true">Book 3</li>
-        <li draggable="true">Book 4</li>
-        <li draggable="true">Book 5</li>
-      </ul>
-    </div>
+<div class="book-column" id="already-read">
+  <p>Successfully Read</p>
+  <ul>
+    <li draggable="true">Pride and Prejudice by Jane Austen</li>
+    <li draggable="true">To Kill a Mockingbird by Harper Lee</li>
+    <li draggable="true">1984 by George Orwell</li>
+    <li draggable="true">The Great Gatsby by F. Scott Fitzgerald</li>
+    <li draggable="true">The Catcher in the Rye by J.D. Salinger</li>
+  </ul>
+</div>
 
-    <div class="book-column" id="currently-reading">
-      <p>Currently Reading</p>
-      <ul>
-        <li draggable="true">Book 1</li>
-        <li draggable="true">Book 2</li>
-        <li draggable="true">Book 3</li>
-        <li draggable="true">Book 4</li>
-        <li draggable="true">Book 5</li>
-      </ul>
-    </div>
+<div class="book-column" id="currently-reading">
+  <p>Currently Reading</p>
+  <ul>
+    <li draggable="true">The Night Circus by Erin Morgenstern</li>
+    <li draggable="true">Educated by Tara Westover</li>
+    <li draggable="true">Project Hail Mary by Andy Weir</li>
+    <li draggable="true">The Song of Achilles by Madeline Miller</li>
+    <li draggable="true">Circe by Madeline Miller</li>
+  </ul>
+</div>
 
-    <div class="book-column" id="will-read">
-      <p>Will Read</p>
-      <ul>
-        <li draggable="true">Book 1</li>
-        <li draggable="true">Book 2</li>
-        <li draggable="true">Book 3</li>
-        <li draggable="true">Book 4</li>
-        <li draggable="true">Book 5</li>
-      </ul>
-    </div>
+<div class="book-column" id="will-read">
+  <p>Will Read</p>
+  <ul>
+    <li draggable="true">Dune by Frank Herbert</li>
+    <li draggable="true">The Midnight Library by Matt Haig</li>
+    <li draggable="true">A Man Called Ove by Fredrik Backman</li>
+    <li draggable="true">The Book Thief by Markus Zusak</li>
+    <li draggable="true">The Hobbit by J.R.R. Tolkien</li>
+  </ul>
+</div>
+
 
   </div>
 </main>

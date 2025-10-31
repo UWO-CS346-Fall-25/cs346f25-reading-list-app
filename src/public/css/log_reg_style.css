@@ -40,7 +40,6 @@ body {
   line-height: 1.6;
   color: var(--dark-color);
   background-color: #fff;
-  overflow: hidden;
 }
 
 a {
@@ -136,6 +135,8 @@ main::before {
   background-image: url("/images/sign_in_background.jpg");
 }
 
+/* Maybe we can add something like input:invalid { border: 2px solid red; } for incorrectly formatted email and password AND keep your alert on button click */
+
 form {
   width: 300px;
   height: 500px;
@@ -181,11 +182,60 @@ input {
   border-radius: 5px;
 }
 
+#user-data {
+  flex: 0.25;
+  justify-content: center;
+}
+
+#data-tooltip {
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
+#user-data h2 {
+  font-size: 100%;
+  text-align: center;
+}
+
+h2 img {
+  vertical-align: middle;
+}
+
+#data-radio {
+  display: flex;
+  justify-content: space-evenly;
+
+}
+
+#data-radio input {
+  width: 40px;
+  accent-color: var(--dark-color);
+}
+
+#data-radio input:hover {
+  cursor: pointer;
+}
+
 button {
   height: 50px;
   color: white;
   border-radius: 5px;
   background-color: var(--dark-color);
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+button:active{
+  background-color: var(--dark-color);
+}
+
+#forgot-password {
+  height: 12.5%;
+  text-align: center;
+  text-decoration: none;
+  color: var(--primary-color);
 }
 
 .error-text {

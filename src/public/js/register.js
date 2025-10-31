@@ -42,7 +42,12 @@ function validateForm(form) {
       isValid = false;
     }
     else if (!field.checkValidity()) {
-      showError(field, 'Please enter a valid Email Address');
+      if (field.type === 'email') {
+        showError(field, 'Please enter a valid Email Address');
+      }
+      else {
+        showError(field, 'Password must be at least 10 characters long');
+      }
       isValid = false;
     }
     else {
@@ -93,7 +98,8 @@ async function processForm() {
                                 'Content-Type': 'application/json',
                                 'CSRF-Token': token},
                                 body: JSON.stringify({ email: document.getElementById("email").value,
-                                                       password: document.getElementById("password").value}),
+                                                       password: document.getElementById("password").value,
+                                                       dataUsage: document.getElementById("data-input").checked}),
                               });
     if (response.status === 201) { // successful register
       alert("Registration Successful!\nPlease login to continue.");

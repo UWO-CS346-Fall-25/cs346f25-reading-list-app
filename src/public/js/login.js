@@ -86,9 +86,9 @@ function clearError(field) {
  */
 async function processForm() {
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
-  try { // fetch request to add register a user
-    let response = await fetch('/validate_login',
-                              { method: 'PUT',
+  try { // fetch request to attempt to log user into their account
+    let response = await fetch('/user_login',
+                              { method: 'POST',
                                 headers: {
                                 'Content-Type': 'application/json',
                                 'CSRF-Token': token},
@@ -98,15 +98,12 @@ async function processForm() {
     if (response.status === 201) { // successful register
       window.location.href = '/bookshelf';
     }
-    else {
-      alert("Unable to locate account!");
+    else if (response.status === 404) { // no account found
+      alert("The email or password is incorrect");
     }
-    // else if (response.status === 409) { // existing email address
-    //   alert("An account already exists with this email!");
-    // }
-    // else { // unable to connect to database
-    //   alert("Account registration error. Please try again later.");
-    // }
+    else { // unable to access the database
+      alert("Log in error. Please try again later.");
+    }
   }
   catch(error) { // unable to find route to register
     alert("Log in error. Please try again later.");

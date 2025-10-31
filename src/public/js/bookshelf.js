@@ -8,7 +8,7 @@
 
 
 /**
- * Handles the Manage Books button dropdown event 
+ * Handles the Manage Books button dropdown event
  */
 function bookDropdown() {
 
@@ -39,7 +39,7 @@ function dragBooks() {
 
   let draggedItem = null;
 
-  //lets each book be dragged 
+  //lets each book be dragged
   bookItems.forEach(item => {
     item.addEventListener('dragstart', () => {
       draggedItem = item;

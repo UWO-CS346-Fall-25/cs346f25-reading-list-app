@@ -49,7 +49,7 @@ exports.getBookshelf = (req, res) => {
  */
 exports.postRegister = async (req, res) => {
   try { // attempting registration
-    const result = await User.registerUser(req.body.email, req.body.password);
+    const result = await User.registerUser(req.body.email, req.body.password, req.body.dataUsage);
     res.status(201).json({ success: true, data: result }); // registration successful
   }
   catch(error) {
