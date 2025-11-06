@@ -73,9 +73,12 @@ header {
   color: white;
   padding: 1rem 0;
   box-shadow: var(--box-shadow);
-  background-image: url('../images/bookshelf_header.jpg');
+  background-image: url('../images/bookshelf_footer.jpg');
   background-repeat: repeat;
   background-size: 75%;
+  /* background-image: url('../images/new_bookshelf_header');
+  background-repeat: repeat-x;
+  background-size: 22%; */
 }
 
 nav .container {
@@ -128,12 +131,11 @@ main {
   padding: 2rem 0;
   display: flex;
   background-position: 0 0, 100px 100px;
-  background-image:
-  url('../images/wrinkled_paper.jpg'),
-  url('../images/wrinkled_paper.jpg');
+  /* background-image:
+  url('../images/new_bookshelf_header');
   background-repeat: repeat;
   background-size: 400px 400px;
-  background-blend-mode: multiply;
+  background-blend-mode: multiply; */
 }
 
 /* New Stylings for Nav bar and main content */
@@ -262,6 +264,44 @@ main {
   transition: background-color 0.2s;
 }
 
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 5;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  box-shadow: 0 0 10px #333;
+}
+
+.modal-content input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 8px;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.close {
+  float: right;
+  font-size: 1.5em;
+  cursor: pointer;
+}
 
 /* Footer */
 footer {
@@ -270,9 +310,6 @@ footer {
   text-align: center;
   padding: 2rem 0;
   /* margin-top: 1rem; */
-  background-image: url('../images/bookshelf_footer.jpg');
-  background-repeat: repeat;
-  background-size: 75%;
 }
 
 /* Responsive Design */

@@ -25,6 +25,8 @@ const bookshelfController = require('../controllers/bookshelfController');
 router.get('/home', bookshelfController.getHome);
 router.get('/bookshelf', bookshelfController.getHome);
 router.get('/logout', bookshelfController.logout);
+router.post()
+//function in here needs to be in the controller
 
 // dummy comment
 

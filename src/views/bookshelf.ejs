@@ -17,10 +17,10 @@
         <li class="dropdown">
           <button id="manage-books" class="managebooks">Manage Books</button>
           <div class="books-dropdown-content" id="books-dropdown-menu">
-            <a href="#">Add</a>
-            <a href="#">Edit</a>
-            <a href="#">Move</a>
-            <a href="#">Delete</a>
+            <a href="#" class="dropdown-link">Add</a>
+            <a href="#" class="dropdown-link">Edit</a>
+            <a href="#" class="dropdown-link">Move</a>
+            <a href="#" class="dropdown-link">Delete</a>
           </div>
           </li>
           <li><a href="/logout">Sign Out</a></li>
@@ -68,6 +68,25 @@
 
   </div>
 </main>
+
+  <!-- Add Book Modal -->
+<div id="addBookModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Add a New Book</h2>
+
+    <form id="addBookForm">
+      <label for="bookTitle">Title:</label>
+      <input type="text" id="bookTitle" name="bookTitle" required>
+
+      <label for="bookAuthor">Author:</label>
+      <input type="text" id="bookAuthor" name="bookAuthor" required>
+
+      <button type="submit" id="submitBookBtn">Add Book</button>
+    </form>
+  </div>
+</div>
+
 
 
   <footer>

@@ -30,6 +30,26 @@ exports.getHome = async (req, res, next) => {
 };
 
 /**
+ * GET /
+ * Displays the bookshelf page 
+ */
+// exports.getBookshelf = async (req, res, next) => {
+//   try {
+//     res.render('bookshelf', {
+//       title: 'My Bookshelf',
+//       supabaseUrl: process.env.SUPABASE_URL,
+//       supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+//       // csrfToken: req.csrfToken(),
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+
+
+/**
  * GET /logout
  * Display the home page with cleared session
  */
