@@ -102,20 +102,16 @@ class User {
    * @param {object} password - user password
    * @returns {Promise<object>} the user object
    */
-  static async registerUser(email, password, dataUsage) {
+  static async registerUser(email, password) {
     try { // attempting to register a user
       const {data, error} = await supabase.supabase.auth.signUp( {email, password} );
-      let userId = data.user.id;
-      if (data.user.user_metadata.email_verified === undefined) {
-        return false;
+      if (error) { // throwing an error if cannot connect to database
+        throw new Error();
       }
-      else {
-        const {data, error} = await supabase.supabase.from('bookshelves').insert( {userId} );
-        
-      }
+      return data;
     }
-    catch (networkError) { // catching an error is the database could not be reached
-      throw new Error(networkError);
+    catch (networkError) { // catching potential network error
+      throw new Error();
     }
   }
 
@@ -127,11 +123,11 @@ class User {
    */
   static async validateLogin(email, password) {
     try { // attempting to verify the user
-      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email).eq('password', password);
+      const { data, error } = await supabase.supabase.auth.signInWithPassword( {email, password} );
       return data;
     }
-    catch(error) { // throwing an error if an error occurred
-      throw new Error("Database connection error");
+    catch(networkError) { // throwing an error if an error occurred
+      throw new Error();
     }
   }
 
