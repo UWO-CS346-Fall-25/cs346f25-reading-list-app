@@ -103,15 +103,19 @@ class User {
    * @returns {Promise<object>} the user object
    */
   static async registerUser(email, password, dataUsage) {
-    try { // attempting to add the user
-      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, books_to_read: [], books_reading: [], books_read: [], sharing_data: dataUsage}]);
-      if (error && error.code === '23505') { // email already exists
-        throw new Error('Email already exists');
+    try { // attempting to register a user
+      const {data, error} = await supabase.supabase.auth.signUp( {email, password} );
+      let userId = data.user.id;
+      if (data.user.user_metadata.email_verified === undefined) {
+        return false;
       }
-      return data;
+      else {
+        const {data, error} = await supabase.supabase.from('bookshelves').insert( {userId} );
+        
+      }
     }
-    catch (error) { // rethrowing email already exists error
-      throw new Error('Email already exists');
+    catch (networkError) { // catching an error is the database could not be reached
+      throw new Error(networkError);
     }
   }
 
