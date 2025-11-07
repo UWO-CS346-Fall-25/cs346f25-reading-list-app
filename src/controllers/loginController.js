@@ -69,7 +69,6 @@ exports.getBookshelf = async (req, res, next) => {
 exports.login = async (req, res) => {
   try { // attempting to contact the database
     const response = await User.validateLogin(req.body.email, req.body.password);
-    console.log(response);
     if (response.user === null) { // 404 if no account in database
       res.status(404).json( { success: false } );
     }
