@@ -95,7 +95,7 @@ async function processForm() {
                                 body: JSON.stringify({ email: document.getElementById("email").value,
                                                        password: document.getElementById("password").value}),
                               });
-    if (response.status === 201) { // successful register
+    if (response.status === 201) { // successful login
       window.location.href = '/bookshelf';
     }
     else if (response.status === 404) { // no account found

@@ -102,16 +102,16 @@ class User {
    * @param {object} password - user password
    * @returns {Promise<object>} the user object
    */
-  static async registerUser(email, password, dataUsage) {
-    try { // attempting to add the user
-      const {data, error} = await supabase.supabase.from('users').insert([{email: email, password: password, books_to_read: [], books_reading: [], books_read: [], sharing_data: dataUsage}]);
-      if (error && error.code === '23505') { // email already exists
-        throw new Error('Email already exists');
+  static async registerUser(email, password) {
+    try { // attempting to register a user
+      const {data, error} = await supabase.supabase.auth.signUp( {email, password} );
+      if (error) { // throwing an error if cannot connect to database
+        throw new Error();
       }
       return data;
     }
-    catch (error) { // rethrowing email already exists error
-      throw new Error('Email already exists');
+    catch (networkError) { // catching potential network error
+      throw new Error();
     }
   }
 
@@ -123,11 +123,11 @@ class User {
    */
   static async validateLogin(email, password) {
     try { // attempting to verify the user
-      const { data, error } = await supabase.supabase.from('users').select('*').eq('email', email).eq('password', password);
+      const { data, error } = await supabase.supabase.auth.signInWithPassword( {email, password} );
       return data;
     }
-    catch(error) { // throwing an error if an error occurred
-      throw new Error("Database connection error");
+    catch(networkError) { // throwing an error if an error occurred
+      throw new Error();
     }
   }
 

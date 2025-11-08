@@ -69,12 +69,12 @@ exports.getBookshelf = async (req, res, next) => {
 exports.login = async (req, res) => {
   try { // attempting to contact the database
     const response = await User.validateLogin(req.body.email, req.body.password);
-    if(response.length !== 0) {
-      req.session.user = req.body.email;
-      res.status(201).json( { success: true } );
-    }
-    else { // 404 if no account in database
+    if (response.user === null) { // 404 if no account in database
       res.status(404).json( { success: false } );
+    }
+    else { // storing session and 201 if account found
+      req.session.user = response.session;
+      res.status(201).json( { success: true } );
     }
   }
   catch (error) { // 500 if cannot connect to database
