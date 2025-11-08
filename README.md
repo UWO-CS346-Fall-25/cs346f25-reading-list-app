@@ -1,4 +1,11 @@
-# Feature/Week9-UI Enhancements
+# Feature/week10-Database-Integration
+
+Small updates added to index.ejs to ensure filter works correctly.
+Login processes now checks auth table in database to log in users.
+The '+' button on index.ejs is now hooked up to an external API,
+allowing users to select the edition of the book they want to add.
+
+## Feature/Week9-UI Enhancements
 
 Bookshelf.ejs received some placeholder books for each column, and received updated css styling.
    - Added gradient colorways to each column

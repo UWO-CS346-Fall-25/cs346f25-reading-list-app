@@ -36,6 +36,9 @@ router.get('/pages', indexController.getPages);
 router.get('/recommended', indexController.getRecommended);
 router.get('/filter', indexController.getFilter);
 
+// book routes
+router.post('/add', indexController.addBook);
+
 // dummy comment
 
 module.exports = router;
