@@ -171,3 +171,46 @@ exports.getFilter = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 }
+
+/**
+ * POST /
+ * Adds a book to a user's to read bookshelf
+ */
+exports.addBook = async (req, res) => {
+  try {
+    const result = await User.getBookList(req.body.title, req.body.author);
+    if (result.ok) {
+      const books = await result.json();
+      let bookList = [];
+      for (const book of books.docs) {
+        let coverURL = null;
+        if (book.cover_i) {
+          coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
+        }
+        else if (book.cover_edition_key) {
+          coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
+        }
+        else if (book.ocaid) {
+          coverURL = `https://archive.org/services/img/${book.ocaid}`;
+        }
+        else {
+          coverURL = "/images/broken_image.png";
+        }
+        let displayBook = {
+            title: book.title,
+            authors: book.author_name,
+            cover: coverURL
+        }
+        console.log(book);
+        bookList.push(displayBook);
+      }
+      res.status(201).json({ success: true, data: bookList });
+    }
+    else {
+      res.status(404).json({ success: false, message: "Book not found" });
+    }
+  }
+  catch(error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
