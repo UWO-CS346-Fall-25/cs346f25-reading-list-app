@@ -33,7 +33,7 @@ exports.getHome = async (req, res, next) => {
     if(userId) { //call getBooks to fetch the books from the database
       books = await Book.getBooks(userId);
     }
-    
+
     res.render('index', {
       title: 'Bookshelf',
       csrfToken: req.csrfToken(),
@@ -45,13 +45,10 @@ exports.getHome = async (req, res, next) => {
   }
 };
 
-
-const Book = require('../models/Book');
-
 /**
- * 
+ *
  * Gets the book from the add book button
- * @returns 
+ * @returns
  */
 exports.postAddBook = async (req, res, next) => {
   try {
@@ -66,7 +63,7 @@ exports.postAddBook = async (req, res, next) => {
     }
 
     const newBook = await Book.addBook({
-      title, 
+      title,
       author,
       status,
       userId
