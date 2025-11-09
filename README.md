@@ -22,6 +22,11 @@ Index page updates:
 - books enter page with animation
 - nav bar options change if sessions is active
 
+How would we use row level security?
+We would use row level security by ensuring that users cannot add books
+to bookshelves that do not contain their user id. This would prevent users
+from being able to modify each other's bookshelves.
+
 ## Feature/Week8-Interactivity
 
 Added 4 jscript files: bookshelf, index, login, and register
