@@ -1,117 +1,30 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
+  calibrateModal();
   fillComboBoxes();
   fetchFilterRadios();
+  initFormValidation();
   fetchRecommendations();
-  const form = document.querySelector('form');
-  form.addEventListener('submit', function (e) {
-    // e.preventDefault();
-    if (validateForm(form)) {
-      processForm();
-    }
-    e.preventDefault();
-  });
 });
 
 /**
- * Validate a form
- * @param {HTMLFormElement} form - Form element to validate
- * @returns {boolean} - True if form is valid
+ * A function that adds listeners to
+ * close the modal window when the close
+ * button or empty space is clicked
  */
-function validateForm(form) {
-  let isValid = true;
-  const filters = form.querySelectorAll('input[list]');
-  filters.forEach((filter) => {
-    if (filter.value.trim()) {
-      const options = filter.nextElementSibling.childNodes;
-      let index = 0;
-      let validEntry = false
-      while(!validEntry && index < options.length) {
-        if (options[index].value === filter.value) {
-          validEntry = true;
-        }
-        index++;
-      }
-      if (!validEntry) {
-        showError(filter, 'Invalid selection');
-        isValid = false;
-      }
-    }
-    else {
-      clearError(filter);
+function calibrateModal() {
+  const modalWindow = document.getElementById('popup');
+  modalWindow.addEventListener('click', function(e) { // empty space listener
+    if (e.target == modalWindow) {
+      modalWindow.style.display = 'none';
+      document.getElementById("book-list").innerHTML = '';
     }
   });
-  return isValid;
-}
-
-/**
- * Show error message for a filters
- * @param {HTMLElement} filters - Form filters
- * @param {string} message - Error message
- */
-function showError(filters, message) {
-  // Remove any existing error
-  clearError(filters);
-
-  // Get the error element
-  const error = filters.nextElementSibling.nextElementSibling;
-  error.textContent = message;
-  error.style.visibility = 'visible';
-
-  // Add error class to filters
-  filters.classList.add('error');
-  filters.style.borderColor = 'red';
-}
-
-/**
- * Clear error message for a filters
- * @param {HTMLElement} filters - Form filters
- */
-function clearError(filters) {
-  filters.nextElementSibling.nextElementSibling.style.visibility = 'hidden';
-  filters.classList.remove('error');
-  filters.style.borderColor = '';
-}
-
-/**
- * Processes a filter form
- */
-async function processForm() {
-  const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
-  try { // fetch request to get book list with filters
-    let index = 0;
-    let pageFilter = -1;
-    const pageRadios = document.getElementById('radio-list').childNodes;
-    while (pageFilter === -1 && index < pageRadios.length) {
-      if (pageRadios[index].firstChild.checked) {
-        pageFilter = pageRadios[index].lastChild.textContent.trim();
-      }
-      index++;
-    }
-    if (pageFilter.length === 5) {
-      pageFilter = pageFilter.replace('+', '');
-    }
-    const filters = { author: document.getElementById('author-input').value,
-                      genre: document.getElementById('genre-input').value,
-                      page_count: pageFilter};
-    let response = await fetch('/filter?' + new URLSearchParams(filters).toString());
-    if (response.status === 201) { // successful filter
-      clearList(); // clearing the existing list
-      const json = await response.json();
-      if (json.success) {
-        loadList(false, json.data);
-      }
-      else { // unable to translate json
-        alert("Unable to connect to the database.");
-      }
-    }
-    else { // unable to connect to database
-      alert("Unable to connect to the database.");
-    }
-  }
-  catch(error) { // unable to find route to register
-    alert("Unable to connect to the database.");
-  }
+  const closeButton = document.getElementById('close');
+  closeButton.addEventListener('click', function () { // close button listener
+    modalWindow.style.display = 'none';
+    document.getElementById("book-list").innerHTML = '';
+  });
 }
 
 /**
@@ -221,6 +134,121 @@ function buildRadios(maxNumPages) {
 }
 
 /**
+ * Initialize form validation
+ */
+function initFormValidation() {
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function (e) {
+      if (validateForm(form)) {
+        processForm();
+      }
+      e.preventDefault();
+  });
+}
+
+/**
+ * Validate a form
+ * @param {HTMLFormElement} form - Form element to validate
+ * @returns {boolean} - True if form is valid
+ */
+function validateForm(form) {
+  let isValid = true;
+  const filters = form.querySelectorAll('input[list]');
+  filters.forEach((filter) => {
+    if (filter.value.trim()) {
+      const options = filter.nextElementSibling.childNodes;
+      let index = 0;
+      let validEntry = false
+      while(!validEntry && index < options.length) {
+        if (options[index].value === filter.value) {
+          validEntry = true;
+          clearError(filter);
+        }
+        index++;
+      }
+      if (!validEntry) {
+        showError(filter, 'Invalid selection');
+        isValid = false;
+      }
+    }
+    else {
+      clearError(filter);
+    }
+  });
+  return isValid;
+}
+
+/**
+ * Show error message for a filters
+ * @param {HTMLElement} filters - Form filters
+ * @param {string} message - Error message
+ */
+function showError(filters, message) {
+  // Remove any existing error
+  clearError(filters);
+
+  // Get the error element
+  const error = filters.nextElementSibling.nextElementSibling;
+  error.textContent = message;
+  error.style.visibility = 'visible';
+
+  // Add error class to filters
+  filters.classList.add('error');
+  filters.style.borderColor = 'red';
+}
+
+/**
+ * Clear error message for a filters
+ * @param {HTMLElement} filters - Form filters
+ */
+function clearError(filters) {
+  filters.nextElementSibling.nextElementSibling.style.visibility = 'hidden';
+  filters.classList.remove('error');
+  filters.style.borderColor = '';
+}
+
+/**
+ * Processes a filter form
+ */
+async function processForm() {
+  const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
+  try { // fetch request to get book list with filters
+    let index = 0;
+    let pageFilter = -1;
+    const pageRadios = document.getElementById('radio-list').childNodes;
+    while (pageFilter === -1 && index < pageRadios.length) {
+      if (pageRadios[index].firstChild.checked) {
+        pageFilter = pageRadios[index].lastChild.textContent.trim();
+      }
+      index++;
+    }
+    if (pageFilter.length === 5) {
+      pageFilter = pageFilter.replace('+', '');
+    }
+    const filters = { author: document.getElementById('author-input').value,
+                      genre: document.getElementById('genre-input').value,
+                      page_count: pageFilter};
+    let response = await fetch('/filter?' + new URLSearchParams(filters).toString());
+    if (response.status === 201) { // successful filter
+      clearList(); // clearing the existing list
+      const json = await response.json();
+      if (json.success) {
+        loadList(false, json.data);
+      }
+      else { // unable to translate json
+        alert("Unable to connect to the database.");
+      }
+    }
+    else { // unable to connect to database
+      alert("Unable to connect to the database.");
+    }
+  }
+  catch(error) { // unable to find route to register
+    alert("Unable to connect to the database.");
+  }
+}
+
+/**
  * A function that attempts to load all
  * recommendations to the recommendations
  * sections of the page
@@ -281,14 +309,124 @@ function loadList(error, recommendations) {
     const button = document.createElement('button');
     button.textContent = '+';
     button.title = 'Add to bookshelf';
+    button.classList.add('add-button');
     rightSpacer.append(button);
     rightSpacer.style.borderColor = color;
     book.append(rightSpacer);
     li.append(book);
     recommendedList.append(li);
   });
+  configureAddButtons();
 }
 
+/**
+ * A helper function that clears all the books form the
+ * books list
+ */
 function clearList() {
   document.getElementById("books").innerHTML = '';
+}
+ /**
+  * A function that adds a listener to the add button
+  * on each book in the user recommendations sections
+  */
+function configureAddButtons() {
+  const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
+  const buttonList = document.querySelectorAll('.add-button');
+  buttonList.forEach(button => {
+    button.addEventListener('click', async function() {
+      try{
+        const title = button.parentNode.previousSibling.firstChild.textContent;
+        const author = button.parentNode.previousSibling.lastChild.textContent;
+        let response = await fetch('add',
+                                  { method: 'POST',
+                                    headers: {
+                                    'Content-Type': 'application/json',
+                                    'CSRF-Token': token},
+                                    body: JSON.stringify({ title: title, author: author })
+                                  });
+        if (response.status === 201) { // book added successfully
+          const json = await response.json();
+          if (json.success) { // validating json translation
+            const popup = document.getElementsByClassName('modal');
+            popup[0].style.display = 'block';
+            buildBookSelector(json.data); // building the book selector
+          }
+          else { // loading default list if cannot translate to json
+            alert("Error! Please try again");
+          }
+        }
+        else if (response.status === 404) { // cannot add book, no user logged in
+          alert("Please log in to add books to your bookshelf");
+        }
+        else { // unable to access the database
+          alert("Network error. Please try again later");
+        }
+      }
+      catch(error) { // unable to access the database
+        alert("Network error. Please try again later");
+      }
+    });
+  });
+}
+
+/**
+ * A helper function that builds the book selector
+ * for when a user wants to add a book to their bookshelf
+ * @param {object} books
+ */
+function buildBookSelector(books) {
+  const targetLocation = document.getElementById('book-list');
+  books.forEach(book => {
+    console.log(book);
+    const bookItem = document.createElement('li');
+    const displayBook = document.createElement('div');
+    displayBook.classList.add('display-book');
+    // created of image section
+    const imageSection = document.createElement('div');
+    imageSection.classList.add('image-section');
+    const image = document.createElement('img');
+    image.src = book.cover;
+    image.height = 94;
+    image.alt = book.title;
+    imageSection.append(image);
+    displayBook.append(imageSection);
+    // creation of title section
+    const titleSection = document.createElement('div');
+    titleSection.classList.add('title-section');
+    const title = document.createElement('p');
+    title.textContent = 'Title';
+    title.style.textDecoration = 'underline';
+    titleSection.append(title);
+    const bookTitle = document.createElement('p');
+    bookTitle.textContent = book.title;
+    bookTitle.style.fontSize = '11px';
+    titleSection.append(bookTitle);
+    displayBook.append(titleSection);
+    // creation of authors section
+    const authorSection = document.createElement('div');
+    authorSection.classList.add('author-section');
+    const author = document.createElement('p');
+    author.textContent = 'Author(s)';
+    author.style.textDecoration = 'underline';
+    authorSection.append(author);
+    book.authors.forEach(author => {
+      const bookAuthor = document.createElement('p');
+      bookAuthor.textContent = author;
+      bookAuthor.style.fontSize = '11px';
+      authorSection.append(bookAuthor);
+    });
+    displayBook.append(authorSection);
+    // creation of button section
+    const buttonSection = document.createElement('div');
+    buttonSection.classList.add('button-section');
+    const button = document.createElement('button');
+    button.textContent = 'Add';
+    button.id = 'add-button'
+    buttonSection.append(button);
+    displayBook.append(buttonSection);
+    // putting everything together
+    bookItem.append(displayBook);
+    targetLocation.append(bookItem);
+  });
 }
