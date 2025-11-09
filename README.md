@@ -5,7 +5,9 @@ Login processes now checks auth table in database to log in users.
 The '+' button on index.ejs is now hooked up to an external API,
 allowing users to select the edition of the book they want to add.
 
-Bookshelf now displays a user's books, and inside of Manage Books, add and delete are functional. 
+-Bookshelf now displays a user's books, and inside of Manage Books, add is partially functional. 
+-Working on modifiying the existing code for fetching the books for the page.
+-Delete is also partially completed
 
 ## Feature/Week9-UI Enhancements
 

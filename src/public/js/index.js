@@ -360,7 +360,7 @@ function configureAddButtons() {
           alert("Please log in to add books to your bookshelf");
         }
         else { // unable to access the database
-          alert("Network. Please try again later");
+          alert("Network error. Please try again later");
         }
       }
       catch(error) { // unable to access the database

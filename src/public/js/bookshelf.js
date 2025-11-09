@@ -108,29 +108,33 @@ function handleBookSelection() {
 /**
  * Adds a book to the table of the users choosing
  */
-async function addBookToShelf(title, author, status) {
+async function addBookToShelf() {
   const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
-  try {
-    const response = await fetch('/bookshelf/add', {
+  try { // attempting to add the requested book
+    const author = document.getElementById('book-author').value;
+    const title = document.getElementById('book-title').value;
+    const bookshelfTable = document.getElementById('book-status').value;
+
+    const response = await fetch('/addbook', { // fetch to attempt to add book
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'CSRF-Token': csrfToken
       },
-      body: JSON.stringify({ title, author, status })
+      body: JSON.stringify({ title, author, bookshelfTable })
     });
-
-    const result = await response.json();
-
-    if (result.success) {
-      console.log('Book added:', result.book);
-      addBookToDOM(result.book, status);
-    } else {
-      alert('Error: ' + result.message);
+    if (response.status === 201) { // add the book to the DOM structure
+      // TO DO FOR DANE
     }
-  } catch (error) {
-    console.error('Network error:', error);
+    else if (response.status === 409){ // duplicate book detected
+      alert("The requested book already exists in the table");
+    }
+    else { // alerting user of network error
+      alert("Network error! Please try again later");
+    }
+  }
+  catch (error) { // alerting user of network error
     alert('A network error occurred.');
   }
 }
@@ -204,15 +208,9 @@ function setupAddBookModal() {
   //handle form submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const title = document.getElementById('bookTitle').value.trim();
-    const author = document.getElementById('bookAuthor').value.trim();
-    const status = document.getElementById('bookStatus').value;
-
-    if (!title || !author) return;
 
     //call addBookToShelf to perform the fetch
-    await addBookToShelf(title, author, status);
+    await addBookToShelf();
     
     modal.style.display = 'none';
     form.reset();
@@ -222,7 +220,7 @@ function setupAddBookModal() {
 /**
  * Helper function to add a new book to the DOM.
  */
-function addBookToDOM(book, status) {
+function addBookToDOM(title, author, bookshelfTable) {
   const statusToColumnId = {
     'to-read': 'will-read',
     'reading': 'currently-reading',

@@ -12,7 +12,7 @@
  */
 
 // Import models if needed
-// const SomeModel = require('../models/SomeModel');
+const User = require('../models/User');
 
 /**
  * GET /
@@ -79,6 +79,22 @@ exports.postAddBook = async (req, res, next) => {
   }
 }
 
+exports.addBook = async (req, res) => {
+  try {
+    const { author, title, bookshelfTable } = req.body;
+    const userId = req.session.user.user.id;
+    const result = await User.addBook(author, title, bookshelfTable, userId);
+    if (result) { // addition worked
+      res.status(201).json({success: true});
+    }
+    else { // addition failed
+      res.status(409).json({success: false});
+    }
+  } catch (error) { // network error
+    res.status(500).json({success: false});
+  }
+}
+
 /**
  * Handle book deletion
  */
@@ -86,7 +102,7 @@ exports.postDeleteBook = async (req, res, next) => {
   try {
     const { bookId, status } = req.body;
 
-    const userId = req.session.user ? req.session.user.id : null;
+    const userId = req.session.user.user.id ? req.session.user.user.id : null;
 
     if(!userId) {
       return res.status(401).json({success: false, message: 'User not logged in.'});
