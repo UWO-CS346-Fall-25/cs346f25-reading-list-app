@@ -6,32 +6,37 @@
  *
  */
 
-//This breaks the page, gotta figure out another way to get the supabase client
-// const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-//Lets the DOMContent be loaded before any of the functions are called
+/**
+ * Load the DOM content
+ */
 document.addEventListener('DOMContentLoaded', () => {
   bookDropdown();
   dragBooks();
+  handleBookSelection();
   setupAddBookModal();
+  
+  // Find and attach the delete button listener
+  // We need to give your delete link an ID
+  const deleteBtn = document.getElementById('delete-book-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      deleteBook();
+    });
+  }
 });
-
-const manageBtn = document.getElementById('manage-books');
-
-//Need to validate the book from the library api, then update the respective column with the new book list
 
 /**
  * Handles the Manage Books button dropdown event
  */
 function bookDropdown() {
-
+  const manageBtn = document.getElementById('manage-books');
   const dropdownMenu = document.getElementById('books-dropdown-menu');
 
   //Clicking toggles the dropdown
   manageBtn.addEventListener('click', () => {
     dropdownMenu.classList.toggle('show');
   });
-
 
   //If the user clicks outside, close it
   window.addEventListener('click', (event) => {
@@ -48,11 +53,10 @@ function bookDropdown() {
  */
 function dragBooks() {
   const bookItems = document.querySelectorAll('.book-column li');
-  const bookColumns = document.querySelectorAll('.book-column'); // <-- columns, not ul
+  const bookColumns = document.querySelectorAll('.book-column');
 
   let draggedItem = null;
 
-  //lets each book be dragged
   bookItems.forEach(item => {
     item.addEventListener('dragstart', () => {
       draggedItem = item;
@@ -65,21 +69,16 @@ function dragBooks() {
     });
   });
 
-  //Books can be dropped into the entire column, rather than just the list-item space
   bookColumns.forEach(column => {
     column.addEventListener('dragover', e => {
       e.preventDefault();
       column.classList.add('over');
     });
-
     column.addEventListener('dragleave', () => {
       column.classList.remove('over');
     });
-
     column.addEventListener('drop', () => {
       column.classList.remove('over');
-
-      // find this column's <ul>
       const list = column.querySelector('ul');
       if (draggedItem && list) {
         list.appendChild(draggedItem);
@@ -88,110 +87,177 @@ function dragBooks() {
   });
 }
 
-
-
-const dropdownMenu = document.getElementById('books-dropdown-menu');
-const links = dropdownMenu.querySelectorAll('a');
-
-links.forEach(link => {
-  link.addEventListener('click', () => {
-    dropdownMenu.classList.remove('show');
-    console.log(link.id + ' clicked');
+/**
+ * Handles selecting a book when clicked.
+ */
+function handleBookSelection() {
+  //select all book items
+  document.querySelectorAll('.book-column li').forEach(item => {
+    item.addEventListener('click', () => {
+      //remove 'selected' from any other book
+      const currentSelected = document.querySelector('.book-column li.selected');
+      if (currentSelected && currentSelected !== item) {
+        currentSelected.classList.remove('selected');
+      }
+      //toggle 'selected' on the clicked item
+      item.classList.toggle('selected');
+    });
   });
-});
+}
 
 /**
- * 
+ * Adds a book to the table of the users choosing
  */
-function addBook() {
+async function addBookToShelf(title, author, status) {
+  const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
+  try {
+    const response = await fetch('/bookshelf/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': csrfToken
+      },
+      body: JSON.stringify({ title, author, status })
+    });
 
-  const addBookLink = document.getElementById('addBook');
-  addBookLink.addEventListener('click', async (e) => {
-    e.preventDefault();
+    const result = await response.json();
 
-    const title = prompt('Enter book title:');
-    const author = prompt('Enter author name:');
-    if (!title || !author) return;
-
-    await addBookToShelf(title, author);
-  });
-
-}
-
-async function addBookToShelf(title, author) {
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    console.error('User not logged in:', userError.message);
-    return;
-  }
-
-  const userId = user.id;
-
-  // Fetch existing bookshelf record
-  const { data, error } = await supabase
-    .from('bookshelves')
-    .select('to_read')
-    .eq('user_id', userId)
-    .single();
-
-  if (error) {
-    console.error('Error fetching bookshelf:', error.message);
-    return;
-  }
-
-  const currentList = data.to_read || [];
-
-  // Add new book
-  const updatedList = [...currentList, { title, author }];
-
-  // Update table
-  const { error: updateError } = await supabase
-    .from('bookshelves')
-    .update({ to_read: updatedList })
-    .eq('user_id', userId);
-
-  if (updateError) {
-    console.error('Error updating bookshelf:', updateError.message);
-  } else {
-    alert(`Added "${title}" by ${author} to your To Read list!`);
+    if (result.success) {
+      console.log('Book added:', result.book);
+      addBookToDOM(result.book, status);
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    alert('A network error occurred.');
   }
 }
 
+/**
+ * Handles deleting a book
+ */
+async function deleteBook() {
+  const selectedBook = document.querySelector('.book-column li.selected');
+  if (!selectedBook) {
+    alert('Please click on a book to select it first.');
+    return;
+  }
 
+  const bookId = selectedBook.dataset.bookId;
+  const column = selectedBook.closest('.book-column');
+  
+  const statusMap = {
+    'already-read': 'read',
+    'currently-reading': 'reading',
+    'will-read': 'to-read'
+  };
+  const status = statusMap[column.id];
+  const csrfToken = document.querySelector('input[name="_csrf"]').value;
+
+  try {
+    const response = await fetch('/bookshelf/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': csrfToken
+      },
+      body: JSON.stringify({ bookId, status })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      selectedBook.remove();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+    alert('A network error occurred.');
+  }
+}
+
+/**
+ * Handles the form submission and buttons for adding a book
+ */
 function setupAddBookModal() {
   const modal = document.getElementById('addBookModal');
-  const addLink = document.querySelector('.dropdown-link:nth-child(1)');
+  const addLink = document.querySelector('.dropdown-link:nth-child(1)'); // "Add" link
   const closeBtn = modal.querySelector('.close');
   const form = document.getElementById('addBookForm');
 
-  // Open modal when "Add" clicked
   addLink.addEventListener('click', (e) => {
     e.preventDefault();
     modal.style.display = 'block';
   });
 
-  // Close modal when X clicked
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
   });
 
-  // Close when clicking outside modal
   window.addEventListener('click', (e) => {
     if (e.target === modal) modal.style.display = 'none';
   });
 
-  // Handle form submit
+  //handle form submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
     const title = document.getElementById('bookTitle').value.trim();
     const author = document.getElementById('bookAuthor').value.trim();
+    const status = document.getElementById('bookStatus').value;
 
     if (!title || !author) return;
 
-    await addBookToShelf(title, author);
+    //call addBookToShelf to perform the fetch
+    await addBookToShelf(title, author, status);
+    
     modal.style.display = 'none';
     form.reset();
   });
 }
+
+/**
+ * Helper function to add a new book to the DOM.
+ */
+function addBookToDOM(book, status) {
+  const statusToColumnId = {
+    'to-read': 'will-read',
+    'reading': 'currently-reading',
+    'read': 'already-read'
+  };
+  const columnId = statusToColumnId[status];
+  const list = document.querySelector(`#${columnId} ul`);
+  if (!list) return;
+
+  const newBookItem = document.createElement('li');
+  newBookItem.setAttribute('draggable', 'true');
+  newBookItem.setAttribute('data-book-id', book.uuid || book.to_read_id || book.being_read_id || book.read_id);
+  
+  //must match the EJS structure
+  newBookItem.innerHTML = `<p>${book.title}</p><p>${book.author}</p>`;
+
+  //add listeners to the new book
+  newBookItem.addEventListener('click', () => {
+    const currentSelected = document.querySelector('.book-column li.selected');
+    if (currentSelected) {
+      currentSelected.classList.remove('selected');
+    }
+    newBookItem.classList.add('selected');
+  });
+
+  newBookItem.addEventListener('dragstart', () => {
+    draggedItem = newBookItem;
+    setTimeout(() => newBookItem.classList.add('dragging'), 0);
+  });
+  newBookItem.addEventListener('dragend', () => {
+    newBookItem.classList.remove('dragging');
+    draggedItem = null;
+  });
+
+  list.appendChild(newBookItem);
+}
+
 

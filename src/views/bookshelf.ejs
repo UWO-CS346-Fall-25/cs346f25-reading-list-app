@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> - Bookshelf - </title>
+  <title>
+    <%= title %> - Bookshelf -
+  </title>
   <link rel="stylesheet" href="/css/bookshelf.css">
 </head>
+
 <body>
   <header>
     <nav>
@@ -13,15 +17,15 @@
         <a href="/home" class="logo">Bookshelf</a>
         <ul class="nav-links">
 
-          
-        <li class="dropdown">
-          <button id="manage-books" class="managebooks">Manage Books</button>
-          <div class="books-dropdown-content" id="books-dropdown-menu">
-            <a href="#" class="dropdown-link">Add</a>
-            <a href="#" class="dropdown-link">Edit</a>
-            <a href="#" class="dropdown-link">Move</a>
-            <a href="#" class="dropdown-link">Delete</a>
-          </div>
+
+          <li class="dropdown">
+            <button id="manage-books" class="managebooks">Manage Books</button>
+            <div class="books-dropdown-content" id="books-dropdown-menu">
+              <a href="#" class="dropdown-link">Add</a>
+              <a href="#" class="dropdown-link">Edit</a>
+              <a href="#" class="dropdown-link">Move</a>
+              <a href="#" class="dropdown-link" id="delete-book-btn">Delete</a>
+            </div>
           </li>
           <li><a href="/logout">Sign Out</a></li>
         </ul>
@@ -30,59 +34,82 @@
   </header>
 
   <main class="container">
-  <div id="book-sections">
+    <div id="book-sections">
+      
+      <!-- <div class="book-column" id="already-read">
+        <p>Successfully Read</p>
+        <ul>
+          <% if (books['read'] && books['read'].length > 0) { %>
+            <% books['read'].forEach(book => { %>
+              <li draggable="true" data-book-id="<%= book.read_id %>">
+                <p><%= book.title %></p>
+                <p><%= book.author %></p>
+              </li>
+            <% }) %>
+          <% } %>
+        </ul>
+      </div>
 
-<div class="book-column" id="already-read">
-  <p>Successfully Read</p>
-  <ul>
-    <li draggable="true">Pride and Prejudice by Jane Austen</li>
-    <li draggable="true">To Kill a Mockingbird by Harper Lee</li>
-    <li draggable="true">1984 by George Orwell</li>
-    <li draggable="true">The Great Gatsby by F. Scott Fitzgerald</li>
-    <li draggable="true">The Catcher in the Rye by J.D. Salinger</li>
-  </ul>
-</div>
+      <div class="book-column" id="currently-reading">
+        <p>Currently Reading</p>
+        <ul>
+          <% if (books['reading'] && books['reading'].length > 0) { %>
+            <% books['reading'].forEach(book => { %>
+              <li draggable="true" data-book-id="<%= book.being_read_id %>">
+                <p><%= book.title %></p>
+                <p><%= book.author %></p>
+              </li>
+            <% }) %>
+          <% } %>
+        </ul>
+      </div>
 
-<div class="book-column" id="currently-reading">
-  <p>Currently Reading</p>
-  <ul>
-    <li draggable="true">The Night Circus by Erin Morgenstern</li>
-    <li draggable="true">Educated by Tara Westover</li>
-    <li draggable="true">Project Hail Mary by Andy Weir</li>
-    <li draggable="true">The Song of Achilles by Madeline Miller</li>
-    <li draggable="true">Circe by Madeline Miller</li>
-  </ul>
-</div>
+      <div class="book-column" id="will-read">
+        <p>Will Read</p>
+        <ul>
+          <% if (books['to-read'] && books['to-read'].length > 0) { %>
+            <% books['to-read'].forEach(book => { %>
+              <li draggable="true" data-book-id="<%= book.to_read_id %>">
+                <p><%= book.title %></p>
+                <p><%= book.author %></p>
+              </li>
+            <% }) %>
+          <% } %>
+        </ul>
+      </div>
 
-<div class="book-column" id="will-read">
-  <p>Will Read</p>
-  <ul>
-    <li draggable="true">Dune by Frank Herbert</li>
-    <li draggable="true">The Midnight Library by Matt Haig</li>
-    <li draggable="true">A Man Called Ove by Fredrik Backman</li>
-    <li draggable="true">The Book Thief by Markus Zusak</li>
-    <li draggable="true">The Hobbit by J.R.R. Tolkien</li>
-  </ul>
-</div>
-
-
-  </div>
-</main>
+    </div> -->
+    </div>
+  </main>
 
   <!-- Add Book Modal -->
-<div id="addBookModal" class="modal">
+  <div id="addBookModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
     <h2>Add a New Book</h2>
-
     <form id="addBookForm">
-      <label for="bookTitle">Title:</label>
-      <input type="text" id="bookTitle" name="bookTitle" required>
+      
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-      <label for="bookAuthor">Author:</label>
-      <input type="text" id="bookAuthor" name="bookAuthor" required>
+      <div>
+        <label for="bookTitle">Title:</label>
+        <input type="text" id="bookTitle" name="title" required>
+      </div>
+      <div>
+        <label for="bookAuthor">Author:</label>
+        <input type="text" id="bookAuthor" name="author" required>
+      </div>
+      
+      <div>
+        <label for="bookStatus">Add to Shelf:</label>
+        <select id="bookStatus" name="status" required>
+          <option value="to-read">Want to Read</option>
+          <option value="reading">Currently Reading</option>
+          <option value="read">Read</option>
+        </select>
+      </div>
 
-      <button type="submit" id="submitBookBtn">Add Book</button>
+      <button type="submit">Add Book</button>
     </form>
   </div>
 </div>
@@ -97,4 +124,120 @@
 
   <script src="/js/bookshelf.js"></script>
 </body>
+
 </html>
+
+
+<!-- <div class="book-column" id="already-read">
+        <p>Successfully Read</p>
+        <ul>
+          <li draggable="true">Pride and Prejudice by Jane Austen</li>
+          <li draggable="true">To Kill a Mockingbird by Harper Lee</li>
+          <li draggable="true">1984 by George Orwell</li>
+          <li draggable="true">The Great Gatsby by F. Scott Fitzgerald</li>
+          <li draggable="true">The Catcher in the Rye by J.D. Salinger</li>
+        </ul>
+      </div> -->
+<!-- <div class="book-column" id="currently-reading">
+        <p>Currently Reading</p>
+        <ul>
+          <li draggable="true">The Night Circus by Erin Morgenstern</li>
+          <li draggable="true">Educated by Tara Westover</li>
+          <li draggable="true">Project Hail Mary by Andy Weir</li>
+          <li draggable="true">The Song of Achilles by Madeline Miller</li>
+          <li draggable="true">Circe by Madeline Miller</li>
+        </ul>
+      </div>
+      <div class="book-column" id="will-read">
+        <p>Will Read</p>
+        <ul>
+          <li draggable="true">Dune by Frank Herbert</li>
+          <li draggable="true">The Midnight Library by Matt Haig</li>
+          <li draggable="true">A Man Called Ove by Fredrik Backman</li>
+          <li draggable="true">The Book Thief by Markus Zusak</li>
+          <li draggable="true">The Hobbit by J.R.R. Tolkien</li>
+        </ul> -->
+
+
+        <!-- <main class="container">
+    <div id="book-sections">
+      <div class="book-column" id="already-read">
+        <p>Successfully Read</p>
+        <ul>
+          <li draggable="true">
+            <p>Pride and Prejudice</p>
+            <p>Jane Austen</p>
+          </li>
+          <li draggable="true">
+            <p>To Kill a Mockingbird</p>
+            <p>Harper Lee</p>
+          </li>
+          <li draggable="true">
+            <p>1984</p>
+            <p>George Orwell</p>
+          </li>
+          <li draggable="true">
+            <p>The Great Gatsby</p>
+            <p>F. Scott Fitzgerald</p>
+          </li>
+          <li draggable="true">
+            <p>The Catcher in the Rye</p>
+            <p>J.D. Salinger</p>
+          </li>
+        </ul>
+      </div>
+      <div class="book-column" id="currently-reading">
+        <p>Currently Reading</p>
+        <ul>
+          <li draggable="true">
+            <p>The Night Circus</p>
+            <p>Erin Morgenstern</p>
+          </li>
+          <li draggable="true">
+            <p>Educated</p>
+            <p>Tara Westover</p>
+          </li>
+          <li draggable="true">
+            <p>Project Hail Mary</p>
+            <p>Andy Weir</p>
+          </li>
+          <li draggable="true">
+            <p>The Song of Achilles</p>
+            <p>Madeline Miller</p>
+          </li>
+          <li draggable="true">
+            <p>Circe</p>
+            <p>Madeline Miller</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="book-column" id="will-read">
+        <p>Will Read</p>
+        <ul>
+          <li draggable="true">
+            <p>Dune</p>
+            <p>Frank Herbert</p>
+          </li>
+          <li draggable="true">
+            <p>The Midnight Library</p>
+            <p>Matt Haig</p>
+          </li>
+          <li draggable="true">
+            <p>A Man Called Ove</p>
+            <p>Fredrik Backman</p>
+          </li>
+          <li draggable="true">
+            <p>The Book Thief</p>
+            <p>Markus Zusak</p>
+          </li>
+          <li draggable="true">
+            <p>The Hobbit</p>
+            <p>J.R.R. Tolkien</p>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+    </div>
+  </main> -->
