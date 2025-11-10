@@ -49,15 +49,15 @@ exports.getBookshelf = (req, res) => {
  */
 exports.postRegister = async (req, res) => {
   try { // attempting registration
-    const result = await User.registerUser(req.body.email, req.body.password, req.body.dataUsage);
-    res.status(201).json({ success: true, data: result }); // registration successful
+    const result = await User.registerUser(req.body.email, req.body.password);
+    if (result.user.user_metadata.email_verified === undefined) { // pre-existing account
+      res.status(409).json({ success: true, data: result });
+    }
+    else { // registration successful
+      res.status(201).json({ success: true, data: result });
+    }
   }
-  catch(error) {
-    if (error.message === 'Email already exists') { // email already exists
-      res.status(409).json({ success: false, message: error.message });
-    }
-    else { // unable to connect to database
-      res.status(500).json({ success: false, message: 'Registration failed' });
-    }
+  catch(error) { // catching network error
+    res.status(500).json({ success: false, message: 'Registration failed' });
   }
 };
