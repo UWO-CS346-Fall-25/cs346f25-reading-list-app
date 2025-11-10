@@ -13,10 +13,17 @@
     "lint:fix": "eslint src/**/*.js db/**/*.js --fix",
     "format": "prettier --write \"src/**/*.js\" \"db/**/*.js\" \"src/**/*.css\""
   },
-  "keywords": ["express", "ejs", "postgres", "template", "teaching"],
+  "keywords": [
+    "express",
+    "ejs",
+    "postgres",
+    "template",
+    "teaching"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "csurf": "^1.11.0",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",

@@ -49,7 +49,7 @@ exports.getBookshelf = (req, res) => {
  */
 exports.postRegister = async (req, res) => {
   try { // attempting registration
-    const result = await User.registerUser(req.body.email, req.body.password);
+    const result = await User.registerUser(req.body.username, req.body.email, req.body.password);
     if (result.user.user_metadata.email_verified === undefined) { // pre-existing account
       res.status(409).json({ success: true, data: result });
     }

@@ -15,9 +15,10 @@
     <nav>
       <div class="container">
         <a href="/home" class="logo">Bookshelf</a>
+        <% if (user) { %>
+          <span>Welcome back <%= user.display_name %>!</span>
+        <% } %>
         <ul class="nav-links">
-
-
           <li class="dropdown">
             <button id="manage-books" class="managebooks">Manage Books</button>
             <div class="books-dropdown-content" id="books-dropdown-menu">
@@ -35,28 +36,36 @@
 
   <main class="container">
     <div id="book-sections">
-      
+
       <div class="book-column" id="already-read">
         <p>Successfully Read</p>
         <ul>
-             
+
         </ul>
       </div>
 
       <div class="book-column" id="currently-reading">
         <p>Currently Reading</p>
         <ul>
-          
-              
-           
+
+  <!-- Add Book Modal -->
+  <div id="addBookModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Add a New Book</h2>
+    <form id="addBookForm">
+
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+
         </ul>
       </div>
 
       <div class="book-column" id="will-read">
         <p>Will Read</p>
         <ul>
-          
-              
+
+
         </ul>
       </div>
 
@@ -70,7 +79,7 @@
     <span class="close">&times;</span>
     <h2>Add a New Book</h2>
     <form id="addBookForm">
-      
+
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
       <div>
@@ -81,7 +90,6 @@
         <label for="book-author">Author:</label>
         <input type="text" id="book-author" name="author" required>
       </div>
-      
       <div>
         <label for="book-status">Add to Shelf:</label>
         <select id="book-status" name="status" required>

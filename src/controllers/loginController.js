@@ -73,7 +73,14 @@ exports.login = async (req, res) => {
       res.status(404).json( { success: false } );
     }
     else { // storing session and 201 if account found
-      req.session.user = response.session;
+      req.session.user = response.session.user.user_metadata;
+      // req.session.user = {
+      //   id: response.user.id,
+      //   email: response.user.email,
+      //   display_name: response.user.display_name,
+      //   session: response.session,
+      // };
+      console.log(response.session);
       res.status(201).json( { success: true } );
     }
   }

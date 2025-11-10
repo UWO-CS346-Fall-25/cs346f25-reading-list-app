@@ -92,14 +92,18 @@ function clearError(field) {
 async function processForm() {
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
   try { // fetch request to add register a user
-    let response = await fetch('/register',
-                              { method: 'POST',
-                                headers: {
-                                'Content-Type': 'application/json',
-                                'CSRF-Token': token},
-                                body: JSON.stringify({ email: document.getElementById("email").value,
-                                                       password: document.getElementById("password").value}),
-                              });
+    let response = await fetch('/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': token,
+      },
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      }),
+    });
     if (response.status === 201) { // successful register
       alert("Registration Successful!\nPlease complete the validation process in your email.");
       window.location.href = '/index';
