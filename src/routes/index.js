@@ -38,6 +38,7 @@ router.get('/filter', indexController.getFilter);
 
 // book routes
 router.post('/add', indexController.addBook);
+router.post('/addbook', indexController.addBookToBookshelf);
 
 // dummy comment
 

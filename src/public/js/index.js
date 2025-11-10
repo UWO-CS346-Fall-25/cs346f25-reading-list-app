@@ -316,7 +316,7 @@ function loadList(error, recommendations) {
     li.append(book);
     recommendedList.append(li);
   });
-  configureAddButtons();
+  configureOuterAddButtons();
 }
 
 /**
@@ -330,7 +330,7 @@ function clearList() {
   * A function that adds a listener to the add button
   * on each book in the user recommendations sections
   */
-function configureAddButtons() {
+function configureOuterAddButtons() {
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
   const buttonList = document.querySelectorAll('.add-button');
   buttonList.forEach(button => {
@@ -422,10 +422,40 @@ function buildBookSelector(books) {
     const button = document.createElement('button');
     button.textContent = 'Add';
     button.id = 'add-button'
+    configureInnerAddButton(bookTitle.textContent, book.authors, button);
     buttonSection.append(button);
     displayBook.append(buttonSection);
     // putting everything together
     bookItem.append(displayBook);
     targetLocation.append(bookItem);
   });
+}
+
+function configureInnerAddButton(title, authors, addButton) {
+  const modalWindow = document.getElementById('popup');
+  try {
+    const token = document
+      .getElementsByName('csrf-token')[0]
+      .getAttribute('content');
+    addButton.addEventListener('click', async function () {
+      let response = await fetch('addbook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': token,
+        },
+        body: JSON.stringify({ title: title, authors: authors }),
+      });
+
+      if (response.status === 201) {
+        // do something here
+      }
+      else {
+        // do something else here
+      }
+    });
+  }
+  catch(error) {
+    alert("Network error! Please try again");
+  }
 }
