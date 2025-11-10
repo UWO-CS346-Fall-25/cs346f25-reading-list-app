@@ -201,7 +201,6 @@ exports.addBook = async (req, res) => {
             authors: book.author_name,
             cover: coverURL
         }
-        console.log(book);
         bookList.push(displayBook);
       }
       res.status(201).json({ success: true, data: bookList });

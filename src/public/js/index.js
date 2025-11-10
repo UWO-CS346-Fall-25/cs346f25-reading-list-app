@@ -283,7 +283,7 @@ async function fetchRecommendations() {
  */
 function loadList(error, recommendations) {
   if (error) { // loading default list
-    list = [{title: "Book", author: "Arthur Waldman"}];
+    recommendations = [{ title: 'Book', author: 'Arthur Waldman' }];
   }
   const recommendedList = document.getElementById("books");
   recommendations.forEach(element => { // building a visual book object
@@ -378,7 +378,6 @@ function configureAddButtons() {
 function buildBookSelector(books) {
   const targetLocation = document.getElementById('book-list');
   books.forEach(book => {
-    console.log(book);
     const bookItem = document.createElement('li');
     const displayBook = document.createElement('div');
     displayBook.classList.add('display-book');

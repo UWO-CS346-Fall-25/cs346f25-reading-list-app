@@ -182,40 +182,6 @@ input {
   border-radius: 5px;
 }
 
-#user-data {
-  flex: 0.25;
-  justify-content: center;
-}
-
-#data-tooltip {
-  border-radius: 50%;
-  border: 1px solid black;
-}
-
-#user-data h2 {
-  font-size: 100%;
-  text-align: center;
-}
-
-h2 img {
-  vertical-align: middle;
-}
-
-#data-radio {
-  display: flex;
-  justify-content: space-evenly;
-
-}
-
-#data-radio input {
-  width: 40px;
-  accent-color: var(--dark-color);
-}
-
-#data-radio input:hover {
-  cursor: pointer;
-}
-
 button {
   height: 50px;
   color: white;

@@ -20,25 +20,9 @@ const User = require('../models/User');
  */
 exports.getHome = async (req, res, next) => {
   try {
-
-    let books = {
-      'to-read': [],
-      'reading': [],
-      'read': []
-    };
-
-    //Verify user id
-    const userId = req.session.user ? req.session.user.id : null;
-
-    if(userId) { //call getBooks to fetch the books from the database
-      books = await Book.getBooks(userId);
-    }
-
     res.render('index', {
       title: 'Bookshelf',
       csrfToken: req.csrfToken(),
-      books: books, //Pass the books and user info into the bookshelf.ejs view
-      user: req.session.user || null
     });
   } catch (error) {
     next(error);
@@ -61,15 +45,7 @@ exports.postAddBook = async (req, res, next) => {
     if(!userId) {
       return res.status(401).json({success: false, message: 'User not logged in.'});
     }
-
-    const newBook = await Book.addBook({
-      title,
-      author,
-      status,
-      userId
-    });
-
-    res.status(201).json({success: true, book: newBook});
+    res.status(201).json({success: true});
 
   } catch (error) {
     res.status(500).json({success: false, message: error.message});
@@ -79,7 +55,7 @@ exports.postAddBook = async (req, res, next) => {
 exports.addBook = async (req, res) => {
   try {
     const { author, title, bookshelfTable } = req.body;
-    const userId = req.session.user.user.id;
+    const userId = req.session.user.sub;
     const result = await User.addBook(author, title, bookshelfTable, userId);
     if (result) { // addition worked
       res.status(201).json({success: true});
