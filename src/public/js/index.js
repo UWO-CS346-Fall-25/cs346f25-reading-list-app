@@ -458,6 +458,7 @@ function configureInnerAddButton(title, authors, addButton) {
       });
       if (response.status === 201) {
         alert(`${title} was added to your bookshelf`);
+        document.getElementById('book-list').innerHTML = '';
         modalWindow.style.display = 'none';
       }
       else if (response.status === 403) {
