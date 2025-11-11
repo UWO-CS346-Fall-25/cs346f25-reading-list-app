@@ -20,13 +20,14 @@ const router = express.Router();
 
 // Import controllers
 const bookshelfController = require('../controllers/bookshelfController');
-const User = require('../models/User');
 
 // Define routes
 router.get('/home', bookshelfController.getHome);
 router.get('/bookshelf', bookshelfController.getHome);
 router.get('/logout', bookshelfController.logout);
 router.post('/addbook', bookshelfController.addBook);
+router.post('/addtoselector', bookshelfController.addBooksToSelector);
+router.post('/addbooktoshelf', bookshelfController.addBookToBookshelf);
 
 // router.post('/bookshelf/add', bookshelfController.postAddBook);
 // router.post('/bookshelf/delete', bookshelfController.postDeleteBook);

@@ -20,25 +20,9 @@ const User = require('../models/User');
  */
 exports.getHome = async (req, res, next) => {
   try {
-
-    let books = {
-      'to-read': [],
-      'reading': [],
-      'read': []
-    };
-
-    //Verify user id
-    const userId = req.session.user ? req.session.user.id : null;
-
-    if(userId) { //call getBooks to fetch the books from the database
-      books = await Book.getBooks(userId);
-    }
-
     res.render('index', {
       title: 'Bookshelf',
-      csrfToken: req.csrfToken(),
-      books: books, //Pass the books and user info into the bookshelf.ejs view
-      user: req.session.user || null
+      csrfToken: req.csrfToken()
     });
   } catch (error) {
     next(error);
@@ -108,16 +92,12 @@ exports.postDeleteBook = async (req, res, next) => {
   }
 }
 
-
-
-
 /**
  * GET /logout
  * Display the home page with cleared session
  */
 exports.logout = async (req, res, next) => {
   try {
-    const token = req.csrfToken();
     req.session.destroy(error => {
       if (error) {
         next(error);
@@ -125,12 +105,74 @@ exports.logout = async (req, res, next) => {
       res.clearCookie('connect.sid');
       res.render('index', {
         title: 'Bookshelf',
-        csrfToken: token,
+        csrfToken: req.csrfToken(),
         user: null, //reassign user to null and clear the columns
-        books: {'to-read': [], 'reading': [], 'read': [] }
       });
     });
   } catch (error) {
     next(error);
+  }
+};
+
+/**
+ * POST /
+ * Adds a book to the select book window
+ */
+exports.addBooksToSelector = async (req, res) => {
+  try {
+    const result = await User.getBookList(req.body.title, req.body.author);
+    if (result.ok) {
+      const books = await result.json();
+      let bookList = [];
+      for (const book of books.docs) {
+        let coverURL = null;
+        if (book.cover_i) {
+          coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
+        } else if (book.cover_edition_key) {
+          coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
+        } else if (book.ocaid) {
+          coverURL = `https://archive.org/services/img/${book.ocaid}`;
+        } else {
+          coverURL = '/images/broken_image.png';
+        }
+        let displayBook = {
+          title: book.title,
+          authors: book.author_name,
+          cover: coverURL,
+        };
+        bookList.push(displayBook);
+      }
+      res.status(201).json({ success: true, data: bookList });
+    } else {
+      res.status(404).json({ success: false, message: 'Book not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * POST /
+ * Adds a book to the users to-read bookshelf
+ */
+exports.addBookToBookshelf = async (req, res) => {
+  if (req.session.user) {
+    try {
+      const result = await User.addBook(
+        req.body.title,
+        req.body.authors,
+        req.body.table,
+        req.session.user.sub
+      );
+      if (result) {
+        res.status(201).json({ success: true });
+      } else {
+        res.status(409).json({ success: false });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false });
+    }
+  } else {
+    res.status(403).json({ success: false });
   }
 };

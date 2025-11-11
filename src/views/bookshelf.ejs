@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
     <%= title %> - Bookshelf -
@@ -48,16 +49,6 @@
         <p>Currently Reading</p>
         <ul>
 
-  <!-- Add Book Modal -->
-  <div id="addBookModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Add a New Book</h2>
-    <form id="addBookForm">
-
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-
         </ul>
       </div>
 
@@ -70,7 +61,6 @@
       </div>
 
     </div>
-    </div>
   </main>
 
   <!-- Add Book Modal -->
@@ -79,8 +69,6 @@
     <span class="close">&times;</span>
     <h2>Add a New Book</h2>
     <form id="addBookForm">
-
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
       <div>
         <label for="book-title">Title:</label>
@@ -99,16 +87,23 @@
         </select>
       </div>
 
-      <button type="submit">Add Book</button>
+      <button type="submit">Search</button>
     </form>
   </div>
 </div>
+
+    <div id="popup" class="modal">
+      <div class="modal-content">
+        <button id="close">X</button>
+        <ul id="book-list"></ul>
+      </div>
+    </div>
 
 
 
   <footer>
     <div class="container">
-      <p>&copy; 2024 CS346 Project. All rights reserved.</p>
+      <p>&copy; 2025 CS346 Project. All rights reserved.</p>
     </div>
   </footer>
 

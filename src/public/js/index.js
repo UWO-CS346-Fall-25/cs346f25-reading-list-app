@@ -458,6 +458,7 @@ function configureInnerAddButton(title, authors, addButton) {
       });
       if (response.status === 201) {
         alert(`${title} was added to your bookshelf`);
+        modalWindow.style.display = 'none';
       }
       else if (response.status === 403) {
         alert("Please log in to add books to your bookshelf");
