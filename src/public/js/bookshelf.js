@@ -10,6 +10,7 @@
  * Load the DOM content
  */
 document.addEventListener('DOMContentLoaded', () => {
+  loadBooks();
   bookDropdown();
   dragBooks();
   handleBookSelection();
@@ -26,6 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+async function loadBooks() {
+  const csrfToken = document.getElementsByName('csrf-token')[0].getAttribute('content');
+  const bookShelves = document.getElementsByClassName('book-column');
+  for (const bookShelf in bookShelves) {
+    let result = await fetch('GET');
+  }
+}
 
 /**
  * A function that adds listeners to

@@ -15,18 +15,13 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/home" class="logo">Bookshelf</a>
-        <% if (user) { %>
-          <span>Welcome back <%= user.display_name %>!</span>
-        <% } %>
+        <a href="/home" class="logo"><%= user.display_name %>'s Bookshelf</a>
         <ul class="nav-links">
           <li class="dropdown">
             <button id="manage-books" class="managebooks">Manage Books</button>
             <div class="books-dropdown-content" id="books-dropdown-menu">
               <a href="#" class="dropdown-link">Add</a>
-              <a href="#" class="dropdown-link">Edit</a>
               <a href="#" class="dropdown-link">Move</a>
-              <a href="#" class="dropdown-link" id="delete-book-btn">Delete</a>
             </div>
           </li>
           <li><a href="/logout">Sign Out</a></li>
@@ -38,27 +33,20 @@
   <main class="container">
     <div id="book-sections">
 
-      <div class="book-column" id="already-read">
-        <p>Successfully Read</p>
-        <ul>
+      <section class="book-column" id="will-read">
+        <h2>To Read</h2>
+        <ul id="to-read-books"></ul>
+      </section>
 
-        </ul>
-      </div>
+      <section class="book-column" id="currently-reading">
+        <h2>Reading</h2>
+        <ul id="reading-books"></ul>
+      </section>
 
-      <div class="book-column" id="currently-reading">
-        <p>Currently Reading</p>
-        <ul>
-
-        </ul>
-      </div>
-
-      <div class="book-column" id="will-read">
-        <p>Will Read</p>
-        <ul>
-
-
-        </ul>
-      </div>
+      <section class="book-column" id="already-read">
+        <h2>Finished</h2>
+        <ul id="finished-books"></ul>
+      </section>
 
     </div>
   </main>
