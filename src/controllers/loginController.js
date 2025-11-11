@@ -80,7 +80,6 @@ exports.login = async (req, res) => {
       //   display_name: response.user.display_name,
       //   session: response.session,
       // };
-      console.log(response.session);
       res.status(201).json( { success: true } );
     }
   }

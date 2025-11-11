@@ -431,6 +431,13 @@ function buildBookSelector(books) {
   });
 }
 
+/**
+ * A function that adds a selected book to the users
+ * to-read bookshelf
+ * @param {object} title
+ * @param {object} authors
+ * @param {object} addButton
+ */
 function configureInnerAddButton(title, authors, addButton) {
   const modalWindow = document.getElementById('popup');
   try {
@@ -444,14 +451,22 @@ function configureInnerAddButton(title, authors, addButton) {
           'Content-Type': 'application/json',
           'CSRF-Token': token,
         },
-        body: JSON.stringify({ title: title, authors: authors }),
+        body: JSON.stringify({
+          title: title,
+          authors: authors,
+        }),
       });
-
       if (response.status === 201) {
-        // do something here
+        alert(`${title} was added to your bookshelf`);
+      }
+      else if (response.status === 403) {
+        alert("Please log in to add books to your bookshelf");
+      }
+      else if (response.status === 409) {
+        alert(`${title} is already on your bookshelf`);
       }
       else {
-        // do something else here
+        alert('Network error! Please try again');
       }
     });
   }

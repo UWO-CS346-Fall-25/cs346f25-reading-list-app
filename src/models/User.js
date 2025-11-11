@@ -178,7 +178,7 @@ class User {
   /**
    * Add
    */
-  static async addBook(title, author, bookshelfTable, userId) {
+  static async addBook(title, authors, bookshelfTable, userId) {
     try {
       let databaseTable = null;
       if (bookshelfTable === 'to-read') {
@@ -192,13 +192,13 @@ class User {
         .from(databaseTable)
         .select('*')
         .eq('title', title)
-        .eq('author', author)
+        .contains('authors', authors)
         .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
         const { data, error } = await supabase.supabase
           .from(databaseTable)
-          .insert([{ title: title, author: author, user_id: userId }]);
+          .insert([{ title: title, authors: authors, user_id: userId }]);
         if (error) {
           // addition did not work - network issue
           throw new Error();

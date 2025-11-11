@@ -66,7 +66,7 @@ exports.getBookshelf = async (req, res, next) => {
 exports.signOut = async (req, res, next) => {
   try {
     const token = req.csrfToken();
-    req.session.destroy(error => {
+    req.session.destroy((error) => {
       if (error) {
         next(error);
       }
@@ -91,10 +91,10 @@ exports.signOut = async (req, res, next) => {
  */
 function sortData(list) {
   const dataList = new Set();
-  list.forEach(dataPoint => {
+  list.forEach((dataPoint) => {
     dataList.add(Object.values(dataPoint)[0]);
   });
-  return (Array.from(dataList)).sort();
+  return Array.from(dataList).sort();
 }
 
 /**
@@ -103,14 +103,15 @@ function sortData(list) {
  * from the database
  */
 exports.getAuthors = async (req, res) => {
-  try { // getting authors list
+  try {
+    // getting authors list
     const result = await User.getAuthors();
     res.status(201).json({ success: true, data: sortData(result) });
-  }
-  catch(error) { // setting status if database connection didn't work
+  } catch (error) {
+    // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 /**
  * GET /
@@ -118,14 +119,15 @@ exports.getAuthors = async (req, res) => {
  * from the database
  */
 exports.getGenres = async (req, res) => {
-  try { // getting authors list
+  try {
+    // getting authors list
     const result = await User.getGenres();
     res.status(201).json({ success: true, data: sortData(result) });
-  }
-  catch(error) { // setting status if database connection didn't work
+  } catch (error) {
+    // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 /**
  * GET /
@@ -133,14 +135,15 @@ exports.getGenres = async (req, res) => {
  * the books table
  */
 exports.getPages = async (req, res) => {
-  try { // getting largest page count
+  try {
+    // getting largest page count
     const result = await User.getPages();
     res.status(201).json({ success: true, data: result });
-  }
-  catch(error) { // setting status if database connection didn't work
+  } catch (error) {
+    // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 /**
  * GET /
@@ -148,14 +151,15 @@ exports.getPages = async (req, res) => {
  * from the database
  */
 exports.getRecommended = async (req, res) => {
-  try { // getting recommended list
+  try {
+    // getting recommended list
     const result = await User.getRecommended();
     res.status(201).json({ success: true, data: result });
-  }
-  catch(error) { // setting status if database connection didn't work
+  } catch (error) {
+    // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 /**
  * GET /
@@ -163,18 +167,23 @@ exports.getRecommended = async (req, res) => {
  * books from the database
  */
 exports.getFilter = async (req, res) => {
-  try { // getting filtered list
-    const result = await User.getFiltered(req.query.author, req.query.genre, req.query.page_count);
+  try {
+    // getting filtered list
+    const result = await User.getFiltered(
+      req.query.author,
+      req.query.genre,
+      req.query.page_count
+    );
     res.status(201).json({ success: true, data: result });
-  }
-  catch(error) { // setting status if database connection didn't work
+  } catch (error) {
+    // setting status if database connection didn't work
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 /**
  * POST /
- * Adds a book to a user's to read bookshelf
+ * Adds a book to the select book window
  */
 exports.addBook = async (req, res) => {
   try {
@@ -186,30 +195,51 @@ exports.addBook = async (req, res) => {
         let coverURL = null;
         if (book.cover_i) {
           coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
-        }
-        else if (book.cover_edition_key) {
+        } else if (book.cover_edition_key) {
           coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
-        }
-        else if (book.ocaid) {
+        } else if (book.ocaid) {
           coverURL = `https://archive.org/services/img/${book.ocaid}`;
-        }
-        else {
-          coverURL = "/images/broken_image.png";
+        } else {
+          coverURL = '/images/broken_image.png';
         }
         let displayBook = {
-            title: book.title,
-            authors: book.author_name,
-            cover: coverURL
-        }
+          title: book.title,
+          authors: book.author_name,
+          cover: coverURL,
+        };
         bookList.push(displayBook);
       }
       res.status(201).json({ success: true, data: bookList });
+    } else {
+      res.status(404).json({ success: false, message: 'Book not found' });
     }
-    else {
-      res.status(404).json({ success: false, message: "Book not found" });
-    }
-  }
-  catch(error) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
-}
+};
+
+/**
+ * POST /
+ * Adds a book to the users to-read bookshelf
+ */
+exports.addBookToBookshelf = async (req, res) => {
+  if (req.session.user) {
+    try {
+      const result = await User.addBook(
+        req.body.title,
+        req.body.authors,
+        'to-read',
+        req.session.user.sub
+      );
+      if (result) {
+        res.status(201).json({ success: true });
+      } else {
+        res.status(409).json({ success: false });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false });
+    }
+  } else {
+    res.status(403).json({ success: false });
+  }
+};
