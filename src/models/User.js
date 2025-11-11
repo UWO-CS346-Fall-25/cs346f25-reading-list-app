@@ -216,6 +216,8 @@ class User {
     }
   }
 
+  
+
   //   /**
   //    * Find all users
   //    * @returns {Promise<Array>} Array of users

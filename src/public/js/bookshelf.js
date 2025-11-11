@@ -382,7 +382,7 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
       }
     });
   } catch (error) {
-    alert('Network error! Please try again');
+    alert('Network error! Please try again');s
   }
 }
 
