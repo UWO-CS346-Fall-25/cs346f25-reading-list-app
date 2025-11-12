@@ -29,6 +29,11 @@ router.post('/addbook', bookshelfController.addBook);
 router.post('/addtoselector', bookshelfController.addBooksToSelector);
 router.post('/addbooktoshelf', bookshelfController.addBookToBookshelf);
 
+// routes for loading bookshelves
+router.get('/toread', bookshelfController.getToReadShelf);
+router.get('/reading', bookshelfController.getReadingShelf);
+router.get('/read', bookshelfController.getReadShelf);
+
 // router.post('/bookshelf/add', bookshelfController.postAddBook);
 // router.post('/bookshelf/delete', bookshelfController.postDeleteBook);
 

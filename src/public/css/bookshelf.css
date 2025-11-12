@@ -65,7 +65,8 @@ header {
   color: white;
   padding: 1rem 0;
   box-shadow: var(--box-shadow);
-  background-image: url('../images/bookshelf_footer.jpg');
+  /* background-image: url('../images/bookshelf_footer.jpg'); */
+  background-image: var(--dark-color);
   background-repeat: repeat;
   background-size: 50%;
   /* background-size: cover; */
@@ -157,7 +158,6 @@ main {
   flex-direction: column;
 }
 
-
 /* Style each dropdown link */
 .books-dropdown-content a {
   color: black;
@@ -190,63 +190,70 @@ h2 {
 /* Stylings for the books columns */
 .book-column {
   flex: 1;
-  /* background: radial-gradient(circle at top, rgba(0, 0, 0, 0.75)); */
-  border-radius: var(--border-radius);
-  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2); */
-  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bookshelf {
+  flex: 1;
+  gap: 10px;
+  height: 100%;
+  display: flex;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  max-height: 75vh;
-  min-width: 25%;
-  transition: flex-basis 0.3s ease, width 0.3s ease;
+  max-height: 635px;
+  min-height: 635px;
+  flex-direction: column;
 }
 
-.book-column p {
-  text-decoration: underline;
-  font-optical-sizing: auto;
-  font-weight: 900;
-  font-style: normal;
-  font-size: 125%;
-  color: black;
-  margin-bottom: 0.5rem;
-  text-align: center;
+.book {
+  display: flex;
+  flex-shrink: 0;
+  height: 100px;
+  width: 95%;
+  margin: 0 auto;
+  list-style: none;
+  border-radius: 2px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--dark-color);
 }
 
-
-#book-sections ul li p {
-    list-style-type: none;
-    padding-left: 0;
-    text-align: center;
-    font-size: 115%;
-    text-decoration: none;
-    /* font-weight: 800; */
-    font-style: normal;
-    color: white;
+.left-spacer {
+  flex: 1;
+  border-right: 20px double var(--warning-color);
 }
 
-.book-column li {
-    padding: 20px;
-    border-bottom: 2px ridge black;
+.center {
+  flex: 5;
+  display: flex;
+  color: white;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.book-column li p {
-  margin: 0;
+.center p {
+  font-size: 10px;
 }
 
-/* Highlight book when dragging */
+.right-spacer {
+  flex: 1;
+  border-left: 20px double var(--warning-color);
+}
+
+/* Highlight book when dragging
 .book-column li.dragging {
   opacity: 0.5;
   background-color: #d3d3d3;
 }
 
-/* Highlight drop zone */
+Highlight drop zone
 .book-column ul.over {
   background-color: rgba(0, 123, 255, 0.1);
   border: 2px dashed #007bff;
   transition: background-color 0.2s;
-}
+} */
 
 .modal {
   display: none;

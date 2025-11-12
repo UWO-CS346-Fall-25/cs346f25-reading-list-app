@@ -71,25 +71,25 @@ exports.addBook = async (req, res) => {
 /**
  * Handle book deletion
  */
-exports.postDeleteBook = async (req, res, next) => {
-  try {
-    const { bookId, status } = req.body;
+exports.postDeleteBook = async (req, res) => {
+  // try {
+  //   const { bookId, status } = req.body;
 
-    const userId = req.session.user.user.id ? req.session.user.user.id : null;
+  //   const userId = req.session.user.user.id ? req.session.user.user.id : null;
 
-    if(!userId) {
-      return res.status(401).json({success: false, message: 'User not logged in.'});
-    }
+  //   if(!userId) {
+  //     return res.status(401).json({success: false, message: 'User not logged in.'});
+  //   }
 
-    await Book.deleteBook({
-      bookId, status, userId
-    });
+  //   await Book.deleteBook({
+  //     bookId, status, userId
+  //   });
 
-    res.status(200).json({success: true, message: 'Book successfully deleted!'});
+  //   res.status(200).json({success: true, message: 'Book successfully deleted!'});
 
-  } catch (error) {
-    res.status(500).json({success: false, message: error.message});
-  }
+  // } catch (error) {
+  //   res.status(500).json({success: false, message: error.message});
+  // }
 }
 
 /**
@@ -176,3 +176,45 @@ exports.addBookToBookshelf = async (req, res) => {
     res.status(403).json({ success: false });
   }
 };
+
+/**
+ * GET /
+ * Gets the books in a user's to-read shelf
+ */
+exports.getToReadShelf = async (req, res) => {
+  try { // getting to-read list
+    const result = await User.getToRead(req.session.user.sub);
+    res.status(201).json({ success: true, data: result });
+  }
+  catch (error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false });
+  }
+}
+
+/**
+ * GET /
+ * Gets the books in a user's reading shelf
+ */
+exports.getReadingShelf = async (req, res) => {
+  try { // getting reading list
+    const result = await User.getReading(req.session.user.sub);
+    res.status(201).json({ success: true, data: result });
+  }
+  catch (error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false });
+  }
+}
+
+/**
+ * GET /
+ * Gets the books in a user's read shelf
+ */
+exports.getReadShelf = async (req, res) => {
+  try { // getting read list
+    const result = await User.getRead(req.session.user.sub);
+    res.status(201).json({ success: true, data: result });
+  }
+  catch (error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false });
+  }
+}

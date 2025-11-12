@@ -216,7 +216,50 @@ class User {
     }
   }
 
-  
+  /**
+   * A function that retrieves a user's to-read list
+   * @param {object} userId
+   * @returns {Promise<object>} the list of books
+   */
+  static async getToRead(userId) {
+    const { data, error } = await supabase.supabase.from('books_to_read').select('title, authors').eq('user_id', userId);
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error();
+    }
+  }
+
+  /**
+   * A function that retrieves a user's reading list
+   * @param {object} userId
+   * @returns {Promise<object>} the list of books
+   */
+  static async getReading(userId) {
+    const { data, error } = await supabase.supabase.from('books_being_read').select('title, authors').eq('user_id', userId);
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error();
+    }
+  }
+
+  /**
+   * A function that retrieves a user's read list
+   * @param {object} userId
+   * @returns {Promise<object>} the list of books
+   */
+  static async getRead(userId) {
+    const { data, error } = await supabase.supabase.from('books_read').select('title, authors').eq('user_id', userId);
+    if (error === null) { // validating query
+      return data;
+    }
+    else { // throwing an error if an error occurred
+      throw new Error();
+    }
+  }
 
   //   /**
   //    * Find all users
