@@ -9,8 +9,8 @@
 /**
  * Load the DOM content
  */
-document.addEventListener('DOMContentLoaded', () => {
-  loadBooks();
+document.addEventListener('DOMContentLoaded', async function() {
+  await loadBooks();
   bookDropdown();
   dragBooks();
   handleBookSelection();
@@ -97,10 +97,8 @@ function loadList(bookShelf, bookList) {
     // rightSpacer.append(button);
     rightSpacer.style.borderColor = color;
     book.append(rightSpacer);
-
-    book.draggable = true;
-
     li.append(book);
+    li.draggable = true;
     bookShelf.append(li);
   });
 }
@@ -151,39 +149,27 @@ function bookDropdown() {
  * Handles the draggable books inside each book column
  */
 function dragBooks() {
-  const bookItems = document.querySelectorAll('.book-column li');
-  const bookColumns = document.querySelectorAll('.book-column');
-
+  const bookshelves = document.getElementsByClassName('bookshelf');
   let draggedItem = null;
-
-  bookItems.forEach(item => {
-    item.addEventListener('dragstart', () => {
-      draggedItem = item;
-      setTimeout(() => item.classList.add('dragging'), 0);
-    });
-
-    item.addEventListener('dragend', () => {
-      item.classList.remove('dragging');
-      draggedItem = null;
-    });
-  });
-
-  bookColumns.forEach(column => {
-    column.addEventListener('dragover', e => {
-      e.preventDefault();
-      column.classList.add('over');
-    });
-    column.addEventListener('dragleave', () => {
-      column.classList.remove('over');
-    });
-    column.addEventListener('drop', () => {
-      column.classList.remove('over');
-      const list = column.querySelector('ul');
-      if (draggedItem && list) {
-        list.appendChild(draggedItem);
+  for (const shelf of bookshelves) {
+    for (const book of shelf.childNodes) {
+      try {
+        book.addEventListener('dragstart', function () {
+          draggedItem = book;
+        });
       }
+      catch(error) {
+        console.log(error.message);
+      }
+    }
+    shelf.addEventListener('dragover', function (e) {
+      e.preventDefault();
     });
-  });
+    shelf.addEventListener('drop', function (e) {
+      e.preventDefault();
+      shelf.append(draggedItem);
+    });
+  }
 }
 
 /**

@@ -204,12 +204,14 @@ h2 {
   overflow-x: hidden;
   max-height: 635px;
   min-height: 635px;
+  min-width: 300px;
   flex-direction: column;
+  scrollbar-width: thin;
 }
 
 .book {
   display: flex;
-  flex-shrink: 0;
+  flex-shrink: 0px;
   height: 100px;
   width: 95%;
   margin: 0 auto;
