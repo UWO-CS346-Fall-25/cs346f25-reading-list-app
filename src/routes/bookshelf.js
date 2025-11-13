@@ -28,6 +28,7 @@ router.get('/logout', bookshelfController.logout);
 router.post('/addbook', bookshelfController.addBook);
 router.post('/addtoselector', bookshelfController.addBooksToSelector);
 router.post('/addbooktoshelf', bookshelfController.addBookToBookshelf);
+router.post('/bookshelf/move', bookshelfController.moveBook);
 
 // routes for loading bookshelves
 router.get('/toread', bookshelfController.getToReadShelf);

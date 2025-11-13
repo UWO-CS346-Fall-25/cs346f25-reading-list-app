@@ -9,13 +9,14 @@
 /**
  * Load the DOM content
  */
-document.addEventListener('DOMContentLoaded', async function() {
-  await loadBooks();
+document.addEventListener('DOMContentLoaded', () => {
+  loadBooks();
   bookDropdown();
   dragBooks();
   handleBookSelection();
   setupAddBookModal();
   calibrateModal();
+  setupMoveBookModal();
 
   // Find and attach the delete button listener
   // We need to give your delete link an ID
@@ -97,8 +98,10 @@ function loadList(bookShelf, bookList) {
     // rightSpacer.append(button);
     rightSpacer.style.borderColor = color;
     book.append(rightSpacer);
+
+    book.draggable = true;
+
     li.append(book);
-    li.draggable = true;
     bookShelf.append(li);
   });
 }
@@ -149,27 +152,39 @@ function bookDropdown() {
  * Handles the draggable books inside each book column
  */
 function dragBooks() {
-  const bookshelves = document.getElementsByClassName('bookshelf');
+  const bookItems = document.querySelectorAll('.book-column li');
+  const bookColumns = document.querySelectorAll('.book-column');
+
   let draggedItem = null;
-  for (const shelf of bookshelves) {
-    for (const book of shelf.childNodes) {
-      try {
-        book.addEventListener('dragstart', function () {
-          draggedItem = book;
-        });
-      }
-      catch(error) {
-        console.log(error.message);
-      }
-    }
-    shelf.addEventListener('dragover', function (e) {
-      e.preventDefault();
+
+  bookItems.forEach(item => {
+    item.addEventListener('dragstart', () => {
+      draggedItem = item;
+      setTimeout(() => item.classList.add('dragging'), 0);
     });
-    shelf.addEventListener('drop', function (e) {
-      e.preventDefault();
-      shelf.append(draggedItem);
+
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      draggedItem = null;
     });
-  }
+  });
+
+  bookColumns.forEach(column => {
+    column.addEventListener('dragover', e => {
+      e.preventDefault();
+      column.classList.add('over');
+    });
+    column.addEventListener('dragleave', () => {
+      column.classList.remove('over');
+    });
+    column.addEventListener('drop', () => {
+      column.classList.remove('over');
+      const list = column.querySelector('ul');
+      if (draggedItem && list) {
+        list.appendChild(draggedItem);
+      }
+    });
+  });
 }
 
 /**
@@ -277,7 +292,7 @@ async function addBookToShelf() {
  */
 function setupAddBookModal() {
   const modal = document.getElementById('addBookModal');
-  const addLink = document.querySelector('.dropdown-link:nth-child(1)'); // "Add" link
+  const addLink = document.getElementById('add-book-btn'); // "Add" link
   const closeBtn = modal.querySelector('.close');
   const form = document.getElementById('addBookForm');
 
@@ -491,4 +506,83 @@ function addBookToDOM(title, author, bookshelfTable) {
   list.appendChild(newBookItem);
 }
 
+/**
+ * Move modal for moving a book from one list to another
+ */
+function setupMoveBookModal() {
+  const modal = document.getElementById('moveModal');
+  const moveBtn = document.getElementById('move-book-btn'); 
+  const closeBtn = modal.querySelector('.close');
+  const form = document.getElementById('moveBookForm');
+  
+  const fromSelect = document.getElementById('move-from-shelf');
+  const toSelect = document.getElementById('move-to-shelf');
 
+  // 1. Open Modal
+  moveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.style.display = 'block';
+  });
+
+  // 2. Close Modal
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+
+  // 3. "From" Dropdown Logic (The "3 then 2" Feature)
+  fromSelect.addEventListener('change', () => {
+    const selectedValue = fromSelect.value;
+
+    // Enable the "To" dropdown now that "From" is picked
+    toSelect.disabled = false;
+
+    // Reset "To" selection to default
+    toSelect.value = "";
+
+    // Loop through all "To" options
+    Array.from(toSelect.options).forEach(option => {
+      // Hide the option if it matches the "From" shelf
+      if (option.value === selectedValue) {
+        option.style.display = "none";
+      } else {
+        option.style.display = "block"; // Show the other two
+      }
+    });
+  });
+
+  // 4. Submit Logic
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('move-book-title').value;
+    const fromStatus = fromSelect.value;
+    const toStatus = toSelect.value;
+    const csrfToken = form.querySelector('input[name="_csrf"]').value;
+
+    try {
+      const response = await fetch('/bookshelf/move', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': csrfToken
+        },
+        // Sending Title instead of ID
+        body: JSON.stringify({ title, fromStatus, toStatus }) 
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert(result.message || 'Could not move book. Check spelling!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Network error.');
+    }
+  });
+}

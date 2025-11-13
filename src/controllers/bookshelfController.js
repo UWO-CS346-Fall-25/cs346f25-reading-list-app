@@ -218,3 +218,78 @@ exports.getReadShelf = async (req, res) => {
     res.status(500).json({ success: false });
   }
 }
+
+
+/**
+ * Moves a book between shelves
+ */
+exports.moveBook = async (req, res) => {
+  try {
+    // We now expect 'bookId' instead of 'title'
+    const { bookId, fromStatus, toStatus } = req.body; 
+    
+    // ... (Keep your existing User ID session check logic here) ...
+    let userId = null;
+    if (req.session.user) {
+        userId = req.session.user.id || (req.session.user.user && req.session.user.user.id);
+    }
+    // ...
+
+    // Pass bookId to the model
+    const result = await User.moveBook(bookId, fromStatus, toStatus, userId);
+
+    if (result) {
+      res.status(200).json({ success: true, message: 'Book moved successfully' });
+    } else {
+      res.status(400).json({ success: false, message: 'Failed to move book.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// exports.moveBook = async (req, res) => {
+//   try {
+//     console.log("--- DEBUG MOVE BOOK ---");
+//     console.log("Session Object:", req.session);
+    
+//     const { title, fromStatus, toStatus } = req.body;
+
+//     // 1. Check if session exists at all
+//     if (!req.session || !req.session.user) {
+//       console.log("Error: No session found. User needs to log in again.");
+//       return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
+//     }
+
+//     // 2. Extract ID safely (Handles both 'User' object and 'Session' object storage)
+//     let userId = null;
+    
+//     // Case A: req.session.user is the actual User object (has .id direct)
+//     if (req.session.user.id) {
+//         userId = req.session.user.id;
+//     } 
+//     // Case B: req.session.user is a Supabase Session (has nested .user.id)
+//     else if (req.session.user.user && req.session.user.user.id) {
+//         userId = req.session.user.user.id;
+//     }
+
+//     console.log("Determined User ID:", userId);
+
+//     if (!userId) {
+//       return res.status(401).json({ success: false, message: 'User ID not found in session.' });
+//     }
+
+//     // 3. Proceed with the move
+//     const result = await User.moveBook(title, fromStatus, toStatus, userId);
+
+//     if (result) {
+//       res.status(200).json({ success: true, message: 'Book moved successfully' });
+//     } else {
+//       res.status(400).json({ success: false, message: 'Failed to move book. Check spelling.' });
+//     }
+//   } catch (error) {
+//     console.error('Move Error:', error);
+//     res.status(500).json({ success: false, message: 'Server error' });
+//   }
+// };
