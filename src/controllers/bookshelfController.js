@@ -218,3 +218,20 @@ exports.getReadShelf = async (req, res) => {
     res.status(500).json({ success: false });
   }
 }
+
+/**
+ * DELETE /
+ * Moves a book from one shelf to another
+ */
+exports.moveBook = async (req, res) => {
+  let result = await User.moveBook(req.body.book_id, req.body.start, req.body.end, req.session.user.sub);
+  if (result === null) { // the insert worked, but the delete failed
+    res.status(409).json({ success: false });
+  }
+  else if (result) { // the insert and the delete failed
+    res.status(201).json({ success: true });
+  }
+  else { // the initial select failed, or the insert failed
+    res.status(500).json({ success: false });
+  }
+}

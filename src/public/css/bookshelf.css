@@ -11,7 +11,7 @@
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
   --border-radius: 4px;
-  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
 }
 
 /* Reset/Base Styles */
@@ -19,20 +19,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-@font-face {
-  font-family: 'Style Script';
-  src: url('../fonts/Style_Script/StyleScript-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Book Title';
-  src: url('../fonts/GreatVibes-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
 }
 
 body {
@@ -204,21 +190,27 @@ h2 {
   overflow-x: hidden;
   max-height: 635px;
   min-height: 635px;
-  min-width: 300px;
   flex-direction: column;
-  scrollbar-width: thin;
 }
 
 .book {
   display: flex;
-  flex-shrink: 0px;
   height: 100px;
   width: 95%;
+  cursor: grab;
   margin: 0 auto;
   list-style: none;
   border-radius: 2px;
   box-shadow: var(--box-shadow);
   background-color: var(--dark-color);
+}
+
+.book:active {
+  cursor: grabbing;
+}
+
+.book:active-view-transition {
+  cursor: grabbing;
 }
 
 .left-spacer {
@@ -230,13 +222,20 @@ h2 {
   flex: 5;
   display: flex;
   color: white;
+  padding-bottom: 10px;
   align-items: center;
   flex-direction: column;
   justify-content: center;
 }
 
+.center > :first-child {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
 .center p {
-  font-size: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .right-spacer {

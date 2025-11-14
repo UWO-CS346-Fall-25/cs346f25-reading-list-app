@@ -73,10 +73,13 @@ function loadList(bookShelf, bookList) {
     book.append(leftSpacer);
     const center = document.createElement('div');
     center.classList.add('center');
+    const bookId = document.createElement('p');
+    bookId.textContent = 'BookID: ' + element[Object.keys(element)[0]];
+    bookId.style.fontSize = '7px';
+    center.append(bookId);
     const title = document.createElement('p');
     title.textContent = element.title;
     center.append(title);
-
     const authors = element.authors;
     const numAuthors = authors.length;
     const author = document.createElement('p');
@@ -84,7 +87,7 @@ function loadList(bookShelf, bookList) {
     center.append(author);
     if (numAuthors > 1) {
       const otherAuthors = document.createElement('p');
-      otherAuthors.textContent = `+ ${numAuthors} other authors`;
+      otherAuthors.textContent = `+ ${numAuthors} other author(s)`;
       center.append(otherAuthors);
     }
     book.append(center);
@@ -146,28 +149,45 @@ function bookDropdown() {
 }
 
 /**
- * Handles the draggable books inside each book column
+ * Makes each book draggable and performs the needed functions
+ * to ensure books are moved to the correct tables when dragged
  */
 function dragBooks() {
+  const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
   const bookshelves = document.getElementsByClassName('bookshelf');
-  let draggedItem = null;
-  for (const shelf of bookshelves) {
-    for (const book of shelf.childNodes) {
-      try {
-        book.addEventListener('dragstart', function () {
-          draggedItem = book;
-        });
-      }
-      catch(error) {
-        console.log(error.message);
-      }
+  let draggedBook = null;
+  for (const shelf of bookshelves) { // targeting all bookshelves
+    for (const book of shelf.childNodes) { // targeting all books
+      book.addEventListener('dragstart', function () { // storing pointer to each book when dragged
+        draggedBook = book;
+      });
     }
-    shelf.addEventListener('dragover', function (e) {
+    shelf.addEventListener('dragover', function (e) { // forcing drag over action on bookshelves
       e.preventDefault();
     });
-    shelf.addEventListener('drop', function (e) {
+    shelf.addEventListener('drop', async function (e) { // allowing books to be dropped into bookshelves
       e.preventDefault();
-      shelf.append(draggedItem);
+      const originShelf = draggedBook.parentElement;
+      if (originShelf.id !== shelf.id) { // only acting if a book was dragged from one shelf to another
+        shelf.append(draggedBook);
+        const bookId = (draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent).replace('BookID: ', '');
+        let response = await fetch('move', { // fetching for a move [insert -> delete]
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'CSRF-Token': token,
+            },
+            body: JSON.stringify({ book_id: bookId, start: originShelf.id, end: shelf.id }),
+        });
+        if (response.status === 409) { // insert worked, but the delete failed
+          alert('The move failed. The book may now appear on both shelves.');
+          window.location.reload();
+        }
+        else if (response.status === 500) { // failed to locate book or insert
+          alert('Could not complete the move. Please try again later.');
+          window.location.reload();
+        }
+      }
     });
   }
 }
@@ -302,6 +322,7 @@ function setupAddBookModal() {
     const title = document.getElementById('book-title').value;
     const author = document.getElementById('book-author').value;
     const bookshelfTable = document.getElementById('book-status').value;
+    alert(bookshelfTable);
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
     try {
       let response = await fetch('addtoselector', {
@@ -446,7 +467,7 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
       }
     });
   } catch (error) {
-    alert('Network error! Please try again');s
+    alert('Network error! Please try again');
   }
 }
 

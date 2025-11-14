@@ -186,12 +186,12 @@ exports.getFilter = async (req, res) => {
  * Adds a book to the select book window
  */
 exports.addBook = async (req, res) => {
-  try {
+  try { // attempting to contact Open Library
     const result = await User.getBookList(req.body.title, req.body.author);
-    if (result.ok) {
+    if (result.ok) { // determining if the fetch worked
       const books = await result.json();
-      let bookList = [];
-      for (const book of books.docs) {
+      let bookList = []; // building a list of all editions for a given title
+      for (const book of books.docs) { // getting a book cover if it exists
         let coverURL = null;
         if (book.cover_i) {
           coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
@@ -202,18 +202,18 @@ exports.addBook = async (req, res) => {
         } else {
           coverURL = '/images/broken_image.png';
         }
-        let displayBook = {
+        let displayBook = { // building a book to display in the selector window
           title: book.title,
           authors: book.author_name,
           cover: coverURL,
         };
-        bookList.push(displayBook);
+        bookList.push(displayBook); // adding a book to the book list
       }
-      res.status(201).json({ success: true, data: bookList });
-    } else {
+      res.status(201).json({ success: true, data: bookList }); // returning the completed list
+    } else { // no editions for a book were found
       res.status(404).json({ success: false, message: 'Book not found' });
     }
-  } catch (error) {
+  } catch (error) { // could not connect to Open Library
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -223,23 +223,23 @@ exports.addBook = async (req, res) => {
  * Adds a book to the users to-read bookshelf
  */
 exports.addBookToBookshelf = async (req, res) => {
-  if (req.session.user) {
-    try {
+  if (req.session.user) { // only adding if a user is logged in
+    try { // attempting to insert the book
       const result = await User.addBook(
         req.body.title,
         req.body.authors,
-        'to-read',
+        'to-read-books',
         req.session.user.sub
       );
-      if (result) {
+      if (result) { // the insert worked
         res.status(201).json({ success: true });
-      } else {
+      } else { // the insert failed
         res.status(409).json({ success: false });
       }
-    } catch (error) {
+    } catch (error) { // network error
       res.status(500).json({ success: false });
     }
-  } else {
+  } else { // no user is logged in
     res.status(403).json({ success: false });
   }
 };
