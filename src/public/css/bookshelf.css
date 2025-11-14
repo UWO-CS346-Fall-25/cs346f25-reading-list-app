@@ -209,8 +209,20 @@ h2 {
   cursor: grabbing;
 }
 
-.book:active-view-transition {
-  cursor: grabbing;
+.delete-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border-style: none;
+  background-color: var(--dark-color);
+}
+
+.delete-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.delete-button:active {
+  background-color: var(--dark-color);
 }
 
 .left-spacer {

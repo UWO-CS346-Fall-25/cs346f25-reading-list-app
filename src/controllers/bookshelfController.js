@@ -156,23 +156,24 @@ exports.addBooksToSelector = async (req, res) => {
  * Adds a book to the users to-read bookshelf
  */
 exports.addBookToBookshelf = async (req, res) => {
-  if (req.session.user) {
-    try {
+  if (req.session.user) { // checking to make sure the user is logged in
+    try { // trying to insert the book
       const result = await User.addBook(
         req.body.title,
         req.body.authors,
         req.body.table,
         req.session.user.sub
       );
-      if (result) {
-        res.status(201).json({ success: true });
-      } else {
+      if (result) { // insert worked
+        res.status(201).json({ success: true , data: result});
+      } else { // book already exists in the table
         res.status(409).json({ success: false });
       }
-    } catch (error) {
+    } catch (error) { // network error
       res.status(500).json({ success: false });
     }
-  } else {
+  }
+  else { // user is no longer logged in
     res.status(403).json({ success: false });
   }
 };
@@ -232,6 +233,20 @@ exports.moveBook = async (req, res) => {
     res.status(201).json({ success: true });
   }
   else { // the initial select failed, or the insert failed
+    res.status(500).json({ success: false });
+  }
+}
+
+/**
+ * DELETE /
+ * Removes a book from the requested shelf
+ */
+exports.removeBook = async (req, res) => {
+  try { // attempt to delete a book
+    let result = await User.removeBook(req.body.book_id, req.body.bookshelf);
+    res.status(201).json({ success: true });
+  }
+  catch (error) { // network error
     res.status(500).json({ success: false });
   }
 }

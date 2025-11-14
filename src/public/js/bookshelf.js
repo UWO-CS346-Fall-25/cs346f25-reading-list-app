@@ -93,16 +93,49 @@ function loadList(bookShelf, bookList) {
     book.append(center);
     const rightSpacer = document.createElement('div');
     rightSpacer.classList.add('right-spacer');
-    // const button = document.createElement('button');
-    // button.textContent = '+';
-    // button.title = 'Add to bookshelf';
-    // button.classList.add('add-button');
-    // rightSpacer.append(button);
+    const button = document.createElement('button');
+    button.title = 'Delete';
+    button.classList.add('delete-button');
+    const trash = document.createElement('img');
+    trash.src = "/images/trash_can.png";
+    trash.alt = "Trash"
+    trash.width = 25;
+    button.append(trash);
+    rightSpacer.append(button);
     rightSpacer.style.borderColor = color;
     book.append(rightSpacer);
     li.append(book);
     li.draggable = true;
     bookShelf.append(li);
+    configureDeleteButton(button);
+  });
+}
+
+/**
+ * A function that removes a book from a bookshelf, and if it
+ * work, removes it from the DOM
+ * @param {object} button
+ */
+function configureDeleteButton(button) {
+  const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
+  button.addEventListener('click', async function() {
+    const bookId = (button.parentElement.previousSibling.firstChild.textContent).replace('BookID: ', '');
+    const bookshelf = button.parentElement.parentElement.parentElement.parentElement;
+    let response = await fetch('delete', { // attempting delete fetch
+                                        method: 'DELETE',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                          'CSRF-Token': token,
+                                        },
+                                        body: JSON.stringify({ book_id: bookId, bookshelf: bookshelf.id }),
+    });
+    if (response.status === 201) { // removing book from DOM is delete worked
+      const book = button.parentElement.parentElement.parentElement;
+      bookshelf.removeChild(book);
+    }
+    else { // network error
+      alert('Network error! Please try again later.');
+    }
   });
 }
 
@@ -211,88 +244,6 @@ function handleBookSelection() {
 }
 
 /**
- * Adds a book to the table of the users choosing
- */
-async function addBookToShelf() {
-  const csrfToken = document
-    .getElementsByName('csrf-token')[0]
-    .getAttribute('content');
-
-  try { // attempting to add the requested book
-    const author = document.getElementById('book-author').value;
-    const title = document.getElementById('book-title').value;
-    const bookshelfTable = document.getElementById('book-status').value;
-
-    const response = await fetch('/addbook', { // fetch to attempt to add book
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'CSRF-Token': csrfToken
-      },
-      body: JSON.stringify({ title, author, bookshelfTable })
-    });
-    if (response.status === 201) { // add the book to the DOM structure
-      // TO DO FOR DANE
-    }
-    else if (response.status === 409){ // duplicate book detected
-      alert("The requested book already exists in the table");
-    }
-    else { // alerting user of network error
-      alert("Network error! Please try again later");
-    }
-  }
-  catch (error) { // alerting user of network error
-    alert('A network error occurred.');
-  }
-}
-
-/**
- * Handles deleting a book
- */
-// async function deleteBook() {
-//   const selectedBook = document.querySelector('.book-column li.selected');
-//   if (!selectedBook) {
-//     alert('Please click on a book to select it first.');
-//     return;
-//   }
-
-//   const bookId = selectedBook.dataset.bookId;
-//   const column = selectedBook.closest('.book-column');
-
-//   const statusMap = {
-//     'already-read': 'read',
-//     'currently-reading': 'reading',
-//     'will-read': 'to-read'
-//   };
-//   const status = statusMap[column.id];
-//   const csrfToken = document
-//     .getElementsByName('csrf-token')[0]
-//     .getAttribute('content');
-
-//   try {
-//     const response = await fetch('/bookshelf/delete', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'CSRF-Token': csrfToken
-//       },
-//       body: JSON.stringify({ bookId, status })
-//     });
-
-//     const result = await response.json();
-
-//     if (result.success) {
-//       selectedBook.remove();
-//     } else {
-//       alert('Error: ' + result.message);
-//     }
-//   } catch (error) {
-//     console.error('Network error:', error);
-//     alert('A network error occurred.');
-//   }
-// }
-
-/**
  * Handles the form submission and buttons for adding a book
  */
 function setupAddBookModal() {
@@ -322,7 +273,6 @@ function setupAddBookModal() {
     const title = document.getElementById('book-title').value;
     const author = document.getElementById('book-author').value;
     const bookshelfTable = document.getElementById('book-status').value;
-    alert(bookshelfTable);
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
     try {
       let response = await fetch('addtoselector', {
@@ -431,18 +381,17 @@ function buildBookSelector(books, bookshelfTable) {
 /**
  * A function that adds a selected book to the users
  * to-read bookshelf
- * @param {object} title
- * @param {object} authors
- * @param {object} addButton
+ * @param {object} title - the book title
+ * @param {object} authors - the book authors
+ * @param {object} addButton - the add button
+ * @param {object} bookshelfTable - the table to be added to
  */
 function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
   const modalWindow = document.getElementById('popup');
   try {
-    const token = document
-      .getElementsByName('csrf-token')[0]
-      .getAttribute('content');
-    addButton.addEventListener('click', async function () {
-      let response = await fetch('addbooktoshelf', {
+    const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
+    addButton.addEventListener('click', async function () { // attempting to add a book to a bookshelf
+      let response = await fetch('addbooktoshelf', { // insert fetch
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -454,62 +403,29 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
           table: bookshelfTable
         }),
       });
-      if (response.status === 201) {
+      if (response.status === 201) { // insert worked, adding book in real time if possible or refreshing page
         alert(`${title} was added to your bookshelf`);
         document.getElementById('book-list').innerHTML = '';
         modalWindow.style.display = 'none';
-      } else if (response.status === 403) {
+        const json = await response.json();
+        if (json.success) { // if the book id is available, loading book in real time
+          const book = json.data;
+          book.title = title;
+          book.authors = authors;
+          loadList(document.getElementById(bookshelfTable), [book]);
+        }
+        else { // reloading the page if cannot add book in real time
+          window.location.reload();
+        }
+      } else if (response.status === 403) { // user is no longer logged in
         alert('Please log in to add books to your bookshelf');
-      } else if (response.status === 409) {
+      } else if (response.status === 409) { // the book already exist in the bookshelf
         alert(`${title} is already on your bookshelf`);
-      } else {
+      } else { // network error
         alert('Network error! Please try again');
       }
     });
-  } catch (error) {
+  } catch (error) { // network error
     alert('Network error! Please try again');
   }
 }
-
-/**
- * Helper function to add a new book to the DOM.
- */
-function addBookToDOM(title, author, bookshelfTable) {
-  const statusToColumnId = {
-    'to-read': 'will-read',
-    'reading': 'currently-reading',
-    'read': 'already-read'
-  };
-  const columnId = statusToColumnId[status];
-  const list = document.querySelector(`#${columnId} ul`);
-  if (!list) return;
-
-  const newBookItem = document.createElement('li');
-  newBookItem.setAttribute('draggable', 'true');
-  newBookItem.setAttribute('data-book-id', book.uuid || book.to_read_id || book.being_read_id || book.read_id);
-
-  //must match the EJS structure
-  newBookItem.innerHTML = `<p>${book.title}</p><p>${book.author}</p>`;
-
-  //add listeners to the new book
-  newBookItem.addEventListener('click', () => {
-    const currentSelected = document.querySelector('.book-column li.selected');
-    if (currentSelected) {
-      currentSelected.classList.remove('selected');
-    }
-    newBookItem.classList.add('selected');
-  });
-
-  newBookItem.addEventListener('dragstart', () => {
-    draggedItem = newBookItem;
-    setTimeout(() => newBookItem.classList.add('dragging'), 0);
-  });
-  newBookItem.addEventListener('dragend', () => {
-    newBookItem.classList.remove('dragging');
-    draggedItem = null;
-  });
-
-  list.appendChild(newBookItem);
-}
-
-

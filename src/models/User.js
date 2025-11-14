@@ -204,30 +204,37 @@ class User {
   static async addBook(title, authors, bookshelfTable, userId) {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
-      const { data, error } = await supabase.supabase
-        .from(databaseTable)
-        .select('*')
-        .eq('title', title)
-        .contains('authors', authors)
-        .eq('user_id', userId);
+      const { data, error } = await supabase.supabase.from(databaseTable)
+                                                     .select('*')
+                                                     .eq('title', title)
+                                                     .contains('authors', authors)
+                                                     .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
-        const { data, error } = await supabase.supabase
-          .from(databaseTable)
-          .insert([{ title: title, authors: authors, user_id: userId }]);
-        if (error) {
-          // addition did not work - network issue
+        const { data, error } = await supabase.supabase.from(databaseTable).insert([{ title: title, authors: authors, user_id: userId }], { returning: 'representation' });
+        if (error) { // addition did not work - network issue
           throw new Error();
-        } else {
-          // addition worked
-          return true;
         }
-      } else {
-        // returning false - the addition failed because book already exists
+        else { // addition worked
+          let idType = null;
+          if (databaseTable === 'books_to_read') { // determining which column contains the bookId
+            idType = 'to_read_id';
+          } else if (databaseTable === 'books_being_read') {
+            idType = 'being_read_id';
+          } else {
+            idType = 'read_id';
+          }
+          const { data, error } = await supabase.supabase.from(databaseTable) // getting the id of the book inserted
+                                                         .select(idType)
+                                                         .eq('title', title)
+                                                         .contains('authors', authors)
+                                                         .eq('user_id', userId);
+          return data[0];
+        }
+      } else { // returning false - the addition failed because book already exists
         return false;
       }
-    } catch (networkError) {
-      // throwing an error if a network error occurred
+    } catch (networkError) { // throwing an error if a network error occurred
       throw new Error();
     }
   }
@@ -343,7 +350,31 @@ class User {
     }
   }
 
-
+  /**
+   * A function that removes a book from the
+   * requested user's bookshelf
+   * @param {object} bookId
+   * @param {object} bookshelf
+   * @returns {Promise<object>} true if success, false if not
+   */
+  static async removeBook(bookId, bookshelf) {
+    try {
+      const table = this.getTableName(bookshelf);
+      let idType = null;
+      if (table === 'books_to_read') { // determining which column contains the bookId
+        idType = 'to_read_id';
+      } else if (table === 'books_being_read') {
+        idType = 'being_read_id';
+      } else {
+        idType = 'read_id';
+      }
+      const { data, error } = await supabase.supabase.from(table).delete().eq(idType, bookId)
+      return true;
+    }
+    catch (error) { // network error
+      throw new Error();
+    }
+  }
 
   //   /**
   //    * Find all users
