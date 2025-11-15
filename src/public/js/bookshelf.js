@@ -439,9 +439,10 @@ function clearShelfModal() {
   const confirmBtn = document.getElementById('confirm-clear-shelf');
   const cancelBtn = document.getElementById('cancel-clear-shelf');
   const closeSpan = modal.querySelector('.close');
-  const clearButtons = document.querySelector('.clear-shelf-btn');
+  const clearButtons = document.querySelectorAll('.clear-shelf-btn');
 
   let currShelf = null;
+
 
   clearButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -476,7 +477,7 @@ function clearShelfModal() {
  * @param {*} currShelf 
  */
 async function clearShelf(currShelf) {
-  const token = document.getElementsByName('csrf-token'[0].getAttribute('content'));
+  const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
   try {
     const response = await fetch('clear', {
