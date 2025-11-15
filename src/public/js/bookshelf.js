@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   handleBookSelection();
   setupAddBookModal();
   calibrateModal();
+  clearShelfModal();
 
   // Find and attach the delete button listener
   // We need to give your delete link an ID
@@ -428,4 +429,47 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
   } catch (error) { // network error
     alert('Network error! Please try again');
   }
+}
+
+/**
+ * Controls the clear shelf modal's buttons and interaction 
+ */
+function clearShelfModal() {
+  const modal = document.getElementById('clear-shelf-modal');
+  const confirmBtn = document.getElementById('confirm-clear-shelf');
+  const cancelBtn = document.getElementById('cancel-clear-shelf'); 
+  const closeSpan = modal.querySelector('.close');
+  const clearButtons = document.querySelector('.clear-shelf-btn');
+
+  let currShelf = null;
+
+  clearButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      currShelf = btn.getAttribute('data-shelf');
+      modal.style.display = 'block';
+    });
+  });
+
+  const closeModal = () => {
+    modal.style.display = 'none';
+    currShelf = null;
+  };
+
+  cancelBtn.addEventListener('click', closeModal);
+  closeSpan.addEventListener('click', closeModal);
+  window.addEventListener('click', (e) => {
+    if(e.target === modal) closeModal();
+  });
+
+  confirmBtn.addEventListener('click', async () => {
+    if(currShelf) {
+      await clearShelfModal(currShelf);
+    }
+    closeModal();
+  });
+}
+
+async function clearShelf(currShelfBeingCleared) {
+  
 }
