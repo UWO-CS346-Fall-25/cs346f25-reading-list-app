@@ -436,6 +436,36 @@ Highlight drop zone
   transform: scale(1.1); 
 }
 
+/* Clear Shelf Modal Stylings */
+.modal-actions {
+  display: flex;           
+  justify-content: center; 
+  gap: 15px;               
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  width: auto;             
+  min-width: 100px;        
+  padding: 8px 20px;
+}
+
+/* Yes is Green, gets darked when hovered over */
+#confirm-clear-shelf {
+  background-color: #17d214; 
+}
+#confirm-clear-shelf:hover {
+  background-color: #198b0a;
+}
+
+/* No is Red, gets darker when hovered over */
+#cancel-clear-shelf {
+  background-color: #d91f0e; 
+}
+#cancel-clear-shelf:hover {
+  background-color: #a30d0d;
+}
+
 /* Footer */
 footer {
   width: 100%;

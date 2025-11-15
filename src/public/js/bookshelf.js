@@ -465,7 +465,7 @@ function clearShelfModal() {
 
   confirmBtn.addEventListener('click', async () => {
     if (currShelf) {
-      await clearShelfModal(currShelf);
+      await clearShelf(currShelf);
     }
     closeModal();
   });
