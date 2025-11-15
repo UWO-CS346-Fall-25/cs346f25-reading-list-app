@@ -205,10 +205,10 @@ class User {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
       const { data, error } = await supabase.supabase.from(databaseTable)
-                                                     .select('*')
-                                                     .eq('title', title)
-                                                     .contains('authors', authors)
-                                                     .eq('user_id', userId);
+        .select('*')
+        .eq('title', title)
+        .contains('authors', authors)
+        .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
         const { data, error } = await supabase.supabase.from(databaseTable).insert([{ title: title, authors: authors, user_id: userId }], { returning: 'representation' });
@@ -225,10 +225,10 @@ class User {
             idType = 'read_id';
           }
           const { data, error } = await supabase.supabase.from(databaseTable) // getting the id of the book inserted
-                                                         .select(idType)
-                                                         .eq('title', title)
-                                                         .contains('authors', authors)
-                                                         .eq('user_id', userId);
+            .select(idType)
+            .eq('title', title)
+            .contains('authors', authors)
+            .eq('user_id', userId);
           return data[0];
         }
       } else { // returning false - the addition failed because book already exists
@@ -319,17 +319,17 @@ class User {
     }
     try { // attempting database operations
       const { data, error } = await supabase.supabase.from(originTable) // grabbing the book details
-                                                     .select('title, authors')
-                                                     .eq(idType, bookId)
-                                                     .eq('user_id', userId);
+        .select('title, authors')
+        .eq(idType, bookId)
+        .eq('user_id', userId);
       const book = data; // restoring data for scope
       if (book.length === 1) { // confirming the book was located
         const { data, error } = await supabase.supabase.from(destinationTable) // attempting to insert the book into the destination table
-                                                       .insert([{ title: book[0].title, authors: book[0].authors, user_id: userId }]);
+          .insert([{ title: book[0].title, authors: book[0].authors, user_id: userId }]);
         if (!error) { // only attempting deletion if the insert worked
           const { data, error } = await supabase.supabase.from(originTable) // attempting to delete from the origin table
-                                                         .delete()
-                                                         .eq(idType, bookId);
+            .delete()
+            .eq(idType, bookId);
           if (!error) { // all operations worked
             return true;
           }
@@ -376,84 +376,111 @@ class User {
     }
   }
 
-  //   /**
-  //    * Find all users
-  //    * @returns {Promise<Array>} Array of users
-  //    */
-  //   static async findAll() {
-  //     const query =
-  //       'SELECT id, username, email, created_at FROM users ORDER BY created_at DESC';
-  //     const result = await db.query(query);
-  //     return result.rows;
-  //   }
+  /**
+   * Clear shelf looks for all books in the table that matches the user's id and deletes them
+   * @param {*} bookshelf user's bookshelf being cleared
+   * @param {*} userId their id
+   * @returns 
+   */
+  static async clearShelf(bookshelf, userId) {
+    try {
+      const table = this.getTableName(bookshelf);
 
-  //   /**
-  //    * Find user by ID
-  //    * @param {number} id - User ID
-  //    * @returns {Promise<object|null>} User object or null
-  //    */
-  //   static async findById(id) {
-  //     const query =
-  //       'SELECT id, username, email, created_at FROM users WHERE id = $1';
-  //     const result = await db.query(query, [id]);
-  //     return result.rows[0] || null;
-  //   }
+      const { error } = await supabase.supabase
+        .from(table)
+        .delete()
+        .eq('user_id', userId);
 
-  //   /**
-  //    * Find user by email (including password for authentication)
-  //    * @param {string} email - User email
-  //    * @returns {Promise<object|null>} User object or null
-  //    */
-  //   static async findByEmail(email) {
-  //     const query = 'SELECT * FROM users WHERE email = $1';
-  //     const result = await db.query(query, [email]);
-  //     return result.rows[0] || null;
-  //   }
+      if (error) {
+        console.error('Error clearing shelf:', error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Network error encountered in clearShelf:', error);
+      return false;
+    }
+  }
 
-  //   /**
-  //    * Create a new user
-  //    * @param {object} userData - User data { username, email, password }
-  //    * @returns {Promise<object>} Created user object
-  //    */
-  //   static async create(userData) {
-  //     const { username, email, password } = userData;
-  //     const query = `
-  //       INSERT INTO users (username, email, password)
-  //       VALUES ($1, $2, $3)
-  //       RETURNING id, username, email, created_at
-  //     `;
-  //     const result = await db.query(query, [username, email, password]);
-  //     return result.rows[0];
-  //   }
 
-  //   /**
-  //    * Update user
-  //    * @param {number} id - User ID
-  //    * @param {object} userData - User data to update
-  //    * @returns {Promise<object>} Updated user object
-  //    */
-  //   static async update(id, userData) {
-  //     const { username, email } = userData;
-  //     const query = `
-  //       UPDATE users
-  //       SET username = $1, email = $2, updated_at = CURRENT_TIMESTAMP
-  //       WHERE id = $3
-  //       RETURNING id, username, email, created_at, updated_at
-  //     `;
-  //     const result = await db.query(query, [username, email, id]);
-  //     return result.rows[0];
-  //   }
+    //   /**
+    //    * Find all users
+    //    * @returns {Promise<Array>} Array of users
+    //    */
+    //   static async findAll() {
+    //     const query =
+    //       'SELECT id, username, email, created_at FROM users ORDER BY created_at DESC';
+    //     const result = await db.query(query);
+    //     return result.rows;
+    //   }
 
-  //   /**
-  //    * Delete user
-  //    * @param {number} id - User ID
-  //    * @returns {Promise<boolean>} True if deleted, false otherwise
-  //    */
-  //   static async delete(id) {
-  //     const query = 'DELETE FROM users WHERE id = $1';
-  //     const result = await db.query(query, [id]);
-  //     return result.rowCount > 0;
-  //   }
-}
+    //   /**
+    //    * Find user by ID
+    //    * @param {number} id - User ID
+    //    * @returns {Promise<object|null>} User object or null
+    //    */
+    //   static async findById(id) {
+    //     const query =
+    //       'SELECT id, username, email, created_at FROM users WHERE id = $1';
+    //     const result = await db.query(query, [id]);
+    //     return result.rows[0] || null;
+    //   }
+
+    //   /**
+    //    * Find user by email (including password for authentication)
+    //    * @param {string} email - User email
+    //    * @returns {Promise<object|null>} User object or null
+    //    */
+    //   static async findByEmail(email) {
+    //     const query = 'SELECT * FROM users WHERE email = $1';
+    //     const result = await db.query(query, [email]);
+    //     return result.rows[0] || null;
+    //   }
+
+    //   /**
+    //    * Create a new user
+    //    * @param {object} userData - User data { username, email, password }
+    //    * @returns {Promise<object>} Created user object
+    //    */
+    //   static async create(userData) {
+    //     const { username, email, password } = userData;
+    //     const query = `
+    //       INSERT INTO users (username, email, password)
+    //       VALUES ($1, $2, $3)
+    //       RETURNING id, username, email, created_at
+    //     `;
+    //     const result = await db.query(query, [username, email, password]);
+    //     return result.rows[0];
+    //   }
+
+    //   /**
+    //    * Update user
+    //    * @param {number} id - User ID
+    //    * @param {object} userData - User data to update
+    //    * @returns {Promise<object>} Updated user object
+    //    */
+    //   static async update(id, userData) {
+    //     const { username, email } = userData;
+    //     const query = `
+    //       UPDATE users
+    //       SET username = $1, email = $2, updated_at = CURRENT_TIMESTAMP
+    //       WHERE id = $3
+    //       RETURNING id, username, email, created_at, updated_at
+    //     `;
+    //     const result = await db.query(query, [username, email, id]);
+    //     return result.rows[0];
+    //   }
+
+    //   /**
+    //    * Delete user
+    //    * @param {number} id - User ID
+    //    * @returns {Promise<boolean>} True if deleted, false otherwise
+    //    */
+    //   static async delete(id) {
+    //     const query = 'DELETE FROM users WHERE id = $1';
+    //     const result = await db.query(query, [id]);
+    //     return result.rowCount > 0;
+    //   }
+  }
 
 module.exports = User;

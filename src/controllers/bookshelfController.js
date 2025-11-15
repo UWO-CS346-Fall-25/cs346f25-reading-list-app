@@ -42,13 +42,13 @@ exports.postAddBook = async (req, res, next) => {
     //Verify user id
     const userId = req.session.user ? req.session.user.id : null;
 
-    if(!userId) {
-      return res.status(401).json({success: false, message: 'User not logged in.'});
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User not logged in.' });
     }
-    res.status(201).json({success: true});
+    res.status(201).json({ success: true });
 
   } catch (error) {
-    res.status(500).json({success: false, message: error.message});
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
@@ -58,13 +58,13 @@ exports.addBook = async (req, res) => {
     const userId = req.session.user.sub;
     const result = await User.addBook(author, title, bookshelfTable, userId);
     if (result) { // addition worked
-      res.status(201).json({success: true});
+      res.status(201).json({ success: true });
     }
     else { // addition failed
-      res.status(409).json({success: false});
+      res.status(409).json({ success: false });
     }
   } catch (error) { // network error
-    res.status(500).json({success: false});
+    res.status(500).json({ success: false });
   }
 }
 
@@ -165,7 +165,7 @@ exports.addBookToBookshelf = async (req, res) => {
         req.session.user.sub
       );
       if (result) { // insert worked
-        res.status(201).json({ success: true , data: result});
+        res.status(201).json({ success: true, data: result });
       } else { // book already exists in the table
         res.status(409).json({ success: false });
       }
@@ -249,4 +249,23 @@ exports.removeBook = async (req, res) => {
   catch (error) { // network error
     res.status(500).json({ success: false });
   }
+}
+
+exports.clearShelf = async (req, res) => {
+  try { //if the user is logged in, get the bookshelf they're targeting, their id, and perform the clear
+    if (!req.session.user) {
+      const { bookshelf } = req.body;
+      const userId = req.session.user.sub;
+
+      const result = await User.clearShelf(bookshelf, userId);
+
+      if (result) {
+        res.status(200).json({ success: true });
+      } else {
+        res.status(500).json({ success: false });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  };
 }
