@@ -9,7 +9,7 @@
 /**
  * Load the DOM content
  */
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
   await loadBooks();
   bookDropdown();
   dragBooks();
@@ -50,7 +50,7 @@ async function loadBooks() {
         alert('network error!');
       }
     }
-    catch(error) {
+    catch (error) {
       alert("network error!");
     }
   }
@@ -119,16 +119,16 @@ function loadList(bookShelf, bookList) {
  */
 function configureDeleteButton(button) {
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
-  button.addEventListener('click', async function() {
+  button.addEventListener('click', async function () {
     const bookId = (button.parentElement.previousSibling.firstChild.textContent).replace('BookID: ', '');
     const bookshelf = button.parentElement.parentElement.parentElement.parentElement;
     let response = await fetch('delete', { // attempting delete fetch
-                                        method: 'DELETE',
-                                        headers: {
-                                          'Content-Type': 'application/json',
-                                          'CSRF-Token': token,
-                                        },
-                                        body: JSON.stringify({ book_id: bookId, bookshelf: bookshelf.id }),
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': token,
+      },
+      body: JSON.stringify({ book_id: bookId, bookshelf: bookshelf.id }),
     });
     if (response.status === 201) { // removing book from DOM is delete worked
       const book = button.parentElement.parentElement.parentElement;
@@ -147,7 +147,7 @@ function configureDeleteButton(button) {
  */
 function calibrateModal() {
   const modalWindow = document.getElementById('popup');
-  modalWindow.addEventListener('click', function(e) { // empty space listener
+  modalWindow.addEventListener('click', function (e) { // empty space listener
     if (e.target == modalWindow) {
       modalWindow.style.display = 'none';
       document.getElementById("book-list").innerHTML = '';
@@ -206,12 +206,12 @@ function dragBooks() {
         shelf.append(draggedBook);
         const bookId = (draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent).replace('BookID: ', '');
         let response = await fetch('move', { // fetching for a move [insert -> delete]
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'CSRF-Token': token,
-            },
-            body: JSON.stringify({ book_id: bookId, start: originShelf.id, end: shelf.id }),
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': token,
+          },
+          body: JSON.stringify({ book_id: bookId, start: originShelf.id, end: shelf.id }),
         });
         if (response.status === 409) { // insert worked, but the delete failed
           alert('The move failed. The book may now appear on both shelves.');
@@ -277,13 +277,13 @@ function setupAddBookModal() {
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
     try {
       let response = await fetch('addtoselector', {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                    'CSRF-Token': token,
-                                  },
-                                  body: JSON.stringify({ title: title, author: author }),
-                                });
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': token,
+        },
+        body: JSON.stringify({ title: title, author: author }),
+      });
       if (response.status === 201) {
         // book added successfully
         const json = await response.json();
@@ -437,7 +437,7 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
 function clearShelfModal() {
   const modal = document.getElementById('clear-shelf-modal');
   const confirmBtn = document.getElementById('confirm-clear-shelf');
-  const cancelBtn = document.getElementById('cancel-clear-shelf'); 
+  const cancelBtn = document.getElementById('cancel-clear-shelf');
   const closeSpan = modal.querySelector('.close');
   const clearButtons = document.querySelector('.clear-shelf-btn');
 
@@ -459,17 +459,55 @@ function clearShelfModal() {
   cancelBtn.addEventListener('click', closeModal);
   closeSpan.addEventListener('click', closeModal);
   window.addEventListener('click', (e) => {
-    if(e.target === modal) closeModal();
+    if (e.target === modal) closeModal();
   });
 
   confirmBtn.addEventListener('click', async () => {
-    if(currShelf) {
+    if (currShelf) {
       await clearShelfModal(currShelf);
     }
     closeModal();
   });
 }
 
-async function clearShelf(currShelfBeingCleared) {
-  
+/**
+ * Helper function for clearShelfModal
+ * Performs the Delete call using the user's token and the shelf they wish to clear
+ * @param {*} currShelf 
+ */
+async function clearShelf(currShelf) {
+  const token = document.getElementsByName('csrf-token'[0].getAttribute('content'));
+
+  try {
+    const response = await fetch('clear', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'CSRF-Token': token,
+      },
+      body: JSON.stringify({ bookshelf: currShelf }),
+    });
+
+    if (response.status === 200) { //response is successful, assign the shelf
+      let listId = '';
+      if (currShelf === 'to-read') {
+        listId = 'to-read-books';
+      } else if (currShelf === 'reading') {
+        listId = 'reading-books';
+      } else {
+        listId = 'finished-books';
+      }
+
+      //set all lis to be empty
+      const listElement = document.getElementById(listId);
+      if (listElement) {
+        listElement.innerHTML = '';
+      } else { //if attempt to set the lis fails
+        alert('Attempt to clear shelf failed.');
+      }
+    }
+  } catch (error) {
+    console.error('Error clearing shelf:', error);
+    alert('Network error. Please try again.');
+  }
 }
