@@ -130,6 +130,7 @@ main {
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  display: block;
 }
 
 .books-dropdown-content {
@@ -138,10 +139,12 @@ main {
   top: 100%;
   left: 0;
   background-color: white;
-  min-width: 160px;
+  width: 100%;
+  min-width: 0;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   border-radius: 4px;
   flex-direction: column;
+  z-index: 2000;
 }
 
 /* Style each dropdown link */

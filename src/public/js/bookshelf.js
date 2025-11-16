@@ -443,11 +443,11 @@ function clearShelfModal() {
 
   let currShelf = null;
 
-
   clearButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       currShelf = btn.getAttribute('data-shelf');
+      console.log("Opening modal for shelf:", currShelf);
       modal.style.display = 'block';
     });
   });
@@ -480,7 +480,7 @@ async function clearShelf(currShelf) {
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
 
   try {
-    const response = await fetch('clear', {
+    const response = await fetch('/clear', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -489,26 +489,107 @@ async function clearShelf(currShelf) {
       body: JSON.stringify({ bookshelf: currShelf }),
     });
 
-    if (response.status === 200) { //response is successful, assign the shelf
-      let listId = '';
-      if (currShelf === 'to-read') {
-        listId = 'to-read-books';
-      } else if (currShelf === 'reading') {
-        listId = 'reading-books';
-      } else {
-        listId = 'finished-books';
-      }
+    if (!response.ok) { //failed to clear from DB
+      console.error('Failed to clear shelf:', response.status);
+      alert('Failed to clear shelf. Please try again.');
+      return;
+    }
 
-      //set all lis to be empty
-      const listElement = document.getElementById(listId);
-      if (listElement) {
-        listElement.innerHTML = '';
-      } else { //if attempt to set the lis fails
-        alert('Attempt to clear shelf failed.');
-      }
+    // At this point, DB delete succeeded, now clear the DOM
+    const listElement = document.getElementById(currShelf);
+
+    if (listElement) {
+      listElement.innerHTML = '';
+    } else {
+      alert('Attempt to clear shelf failed.');
     }
   } catch (error) {
     console.error('Error clearing shelf:', error);
     alert('Network error. Please try again.');
   }
 }
+/**
+ * Controls the clear shelf modal's buttons and interaction
+ */
+// function clearShelfModal() {
+//   const modal = document.getElementById('clear-shelf-modal');
+//   const confirmBtn = document.getElementById('confirm-clear-shelf');
+//   const cancelBtn = document.getElementById('cancel-clear-shelf');
+//   const closeSpan = modal.querySelector('.close');
+//   const clearButtons = document.querySelectorAll('.clear-shelf-btn');
+
+//   let currShelf = null;
+
+//   // === INTERNAL HELPER FUNCTION ===
+//   // Defined inside to ensure the "Yes" button can always find it
+//   async function performClearShelf(shelfId) {
+//     const tokenMeta = document.getElementsByName('csrf-token')[0];
+//     const token = tokenMeta ? tokenMeta.getAttribute('content') : '';
+
+//     console.log("Attempting to delete shelf:", shelfId);
+
+//     try {
+//       const response = await fetch('clear', {
+//         method: 'DELETE',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'CSRF-Token': token,
+//         },
+//         body: JSON.stringify({ bookshelf: shelfId }),
+//       });
+
+//       if (response.status === 200) {
+//         // Logic to find the correct UL ID
+//         let listId = '';
+//         if (shelfId === 'to-read') listId = 'to-read-books';
+//         else if (shelfId === 'reading') listId = 'reading-books';
+//         else if (shelfId === 'read') listId = 'finished-books';
+
+//         // Clear the list visually
+//         const listElement = document.getElementById(listId);
+//         if (listElement) {
+//           listElement.innerHTML = '';
+//         }
+//         console.log("Shelf cleared successfully");
+//       } else {
+//         console.error('Failed to clear. Status:', response.status);
+//         alert('Failed to clear shelf. Please try again.');
+//       }
+//     } catch (error) {
+//       console.error('Error clearing shelf:', error);
+//       alert('Network error. Please try again.');
+//     }
+//   }
+//   // ================================
+
+//   // Open Modal Listener
+//   clearButtons.forEach(btn => {
+//     btn.addEventListener('click', (e) => {
+//       e.preventDefault();
+//       currShelf = btn.getAttribute('data-shelf');
+//       console.log("Opening modal for shelf:", currShelf);
+//       modal.style.display = 'block';
+//     });
+//   });
+
+//   // Close Modal Helper
+//   const closeModal = () => {
+//     modal.style.display = 'none';
+//     currShelf = null;
+//   };
+
+//   cancelBtn.addEventListener('click', closeModal);
+//   closeSpan.addEventListener('click', closeModal);
+//   window.addEventListener('click', (e) => {
+//     if (e.target === modal) closeModal();
+//   });
+
+//   // Yes Button Listener
+//   confirmBtn.addEventListener('click', async () => {
+//     if (currShelf) {
+//       // Now calls the internal function which is guaranteed to be in scope
+//       await performClearShelf(currShelf);
+//     }
+//     closeModal();
+//   });
+// }

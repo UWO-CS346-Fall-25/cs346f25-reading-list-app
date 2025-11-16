@@ -251,19 +251,30 @@ exports.removeBook = async (req, res) => {
   }
 }
 
+/**
+ * DELETE /
+ * Clear all books from the requested shelf
+ * @param {} req 
+ * @param {*} res 
+ * @returns 
+ */
 exports.clearShelf = async (req, res) => {
-  try { //if the user is logged in, get the bookshelf they're targeting, their id, and perform the clear
+  try { 
+    //if the user is logged in, get the bookshelf they're targeting, 
+    //their id, and perform the clear
     if (!req.session.user) {
-      const { bookshelf } = req.body;
-      const userId = req.session.user.sub;
+      return res.status(403).json({ success: false, message: 'User not logged in.' });
+    }
 
-      const result = await User.clearShelf(bookshelf, userId);
+    const { bookshelf } = req.body;
+    const userId = req.session.user.sub;
 
-      if (result) {
-        res.status(200).json({ success: true });
-      } else {
-        res.status(500).json({ success: false });
-      }
+    const result = await User.clearShelf(bookshelf, userId);
+
+    if (result) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(500).json({ success: false });
     }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
