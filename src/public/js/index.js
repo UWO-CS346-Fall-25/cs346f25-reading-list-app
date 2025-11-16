@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 function calibrateModal() {
   const modalWindow = document.getElementById('popup');
-  modalWindow.addEventListener('click', function(e) { // empty space listener
+  modalWindow.addEventListener('click', function (e) { // empty space listener
     if (e.target == modalWindow) {
       modalWindow.style.display = 'none';
       document.getElementById("book-list").innerHTML = '';
@@ -57,7 +57,7 @@ async function fetchOptions(requestType) {
       addOptions(true);
     }
   }
-  catch(error) {// loading default options if fetch request could not be completed
+  catch (error) {// loading default options if fetch request could not be completed
     addOptions(true);
   }
 }
@@ -103,7 +103,7 @@ async function fetchFilterRadios() {
       buildRadios(1500);
     }
   }
-  catch(error) { // picking default value
+  catch (error) { // picking default value
     buildRadios(1500);
   }
 }
@@ -116,7 +116,7 @@ async function fetchFilterRadios() {
 function buildRadios(maxNumPages) {
   let radioValue = 150;
   const radioList = document.getElementById('radio-list');
-  while(radioValue < maxNumPages) {
+  while (radioValue < maxNumPages) {
     const button = document.createElement('span');
     const radio = document.createElement('input');
     radio.type = 'radio';
@@ -139,10 +139,10 @@ function buildRadios(maxNumPages) {
 function initFormValidation() {
   const form = document.querySelector('form');
   form.addEventListener('submit', function (e) {
-      if (validateForm(form)) {
-        processForm();
-      }
-      e.preventDefault();
+    if (validateForm(form)) {
+      processForm();
+    }
+    e.preventDefault();
   });
 }
 
@@ -159,7 +159,7 @@ function validateForm(form) {
       const options = filter.nextElementSibling.childNodes;
       let index = 0;
       let validEntry = false
-      while(!validEntry && index < options.length) {
+      while (!validEntry && index < options.length) {
         if (options[index].value === filter.value) {
           validEntry = true;
           clearError(filter);
@@ -225,9 +225,11 @@ async function processForm() {
     if (pageFilter.length === 5) {
       pageFilter = pageFilter.replace('+', '');
     }
-    const filters = { author: document.getElementById('author-input').value,
-                      genre: document.getElementById('genre-input').value,
-                      page_count: pageFilter};
+    const filters = {
+      author: document.getElementById('author-input').value,
+      genre: document.getElementById('genre-input').value,
+      page_count: pageFilter
+    };
     let response = await fetch('/filter?' + new URLSearchParams(filters).toString());
     if (response.status === 201) { // successful filter
       clearList(); // clearing the existing list
@@ -243,7 +245,7 @@ async function processForm() {
       alert("Unable to connect to the database.");
     }
   }
-  catch(error) { // unable to find route to register
+  catch (error) { // unable to find route to register
     alert("Unable to connect to the database.");
   }
 }
@@ -269,7 +271,7 @@ async function fetchRecommendations() {
       loadList(true);
     }
   }
-  catch(error) { // loading default list if fetch request could not be completed
+  catch (error) { // loading default list if fetch request could not be completed
     loadList(true);
   }
 }
@@ -283,7 +285,7 @@ async function fetchRecommendations() {
  */
 function loadList(error, recommendations) {
   if (error) { // loading default list
-    list = [{title: "Book", author: "Arthur Waldman"}];
+    recommendations = [{ title: 'Book', author: 'Arthur Waldman' }];
   }
   const recommendedList = document.getElementById("books");
   recommendations.forEach(element => { // building a visual book object
@@ -316,7 +318,7 @@ function loadList(error, recommendations) {
     li.append(book);
     recommendedList.append(li);
   });
-  configureAddButtons();
+  configureOuterAddButtons();
 }
 
 /**
@@ -326,25 +328,27 @@ function loadList(error, recommendations) {
 function clearList() {
   document.getElementById("books").innerHTML = '';
 }
- /**
-  * A function that adds a listener to the add button
-  * on each book in the user recommendations sections
-  */
-function configureAddButtons() {
+/**
+ * A function that adds a listener to the add button
+ * on each book in the user recommendations sections
+ */
+function configureOuterAddButtons() {
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
   const buttonList = document.querySelectorAll('.add-button');
   buttonList.forEach(button => {
-    button.addEventListener('click', async function() {
-      try{
+    button.addEventListener('click', async function () {
+      try {
         const title = button.parentNode.previousSibling.firstChild.textContent;
         const author = button.parentNode.previousSibling.lastChild.textContent;
         let response = await fetch('add',
-                                  { method: 'POST',
-                                    headers: {
-                                    'Content-Type': 'application/json',
-                                    'CSRF-Token': token},
-                                    body: JSON.stringify({ title: title, author: author })
-                                  });
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'CSRF-Token': token
+            },
+            body: JSON.stringify({ title: title, author: author })
+          });
         if (response.status === 201) { // book added successfully
           const json = await response.json();
           if (json.success) { // validating json translation
@@ -363,7 +367,7 @@ function configureAddButtons() {
           alert("Network error. Please try again later");
         }
       }
-      catch(error) { // unable to access the database
+      catch (error) { // unable to access the database
         alert("Network error. Please try again later");
       }
     });
@@ -378,7 +382,6 @@ function configureAddButtons() {
 function buildBookSelector(books) {
   const targetLocation = document.getElementById('book-list');
   books.forEach(book => {
-    console.log(book);
     const bookItem = document.createElement('li');
     const displayBook = document.createElement('div');
     displayBook.classList.add('display-book');
@@ -423,10 +426,57 @@ function buildBookSelector(books) {
     const button = document.createElement('button');
     button.textContent = 'Add';
     button.id = 'add-button'
+    configureInnerAddButton(bookTitle.textContent, book.authors, button);
     buttonSection.append(button);
     displayBook.append(buttonSection);
     // putting everything together
     bookItem.append(displayBook);
     targetLocation.append(bookItem);
   });
+}
+
+/**
+ * A function that adds a selected book to the users
+ * to-read bookshelf
+ * @param {object} title
+ * @param {object} authors
+ * @param {object} addButton
+ */
+function configureInnerAddButton(title, authors, addButton) {
+  const modalWindow = document.getElementById('popup');
+  try {
+    const token = document
+      .getElementsByName('csrf-token')[0]
+      .getAttribute('content');
+    addButton.addEventListener('click', async function () {
+      let response = await fetch('addbook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': token,
+        },
+        body: JSON.stringify({
+          title: title,
+          authors: authors,
+        }),
+      });
+      if (response.status === 201) {
+        alert(`${title} was added to your bookshelf`);
+        document.getElementById('book-list').innerHTML = '';
+        modalWindow.style.display = 'none';
+      }
+      else if (response.status === 403) {
+        alert("Please log in to add books to your bookshelf");
+      }
+      else if (response.status === 409) {
+        alert(`${title} is already on your bookshelf`);
+      }
+      else {
+        alert('Network error! Please try again');
+      }
+    });
+  }
+  catch (error) {
+    alert("Network error! Please try again");
+  }
 }

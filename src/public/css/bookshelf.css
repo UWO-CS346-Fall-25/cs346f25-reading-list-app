@@ -11,28 +11,14 @@
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, sans-serif;
   --border-radius: 4px;
-  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
 }
 
 /* Reset/Base Styles */
 * {
   margin: 0;
-  padding: 0; 
-  box-sizing: border-box; 
-}
-
-@font-face {
-  font-family: 'Style Script';
-  src: url('../fonts/Style_Script/StyleScript-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Book Title';
-  src: url('../fonts/GreatVibes-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -65,7 +51,8 @@ header {
   color: white;
   padding: 1rem 0;
   box-shadow: var(--box-shadow);
-  background-image: url('../images/bookshelf_footer.jpg');
+  /* background-image: url('../images/bookshelf_footer.jpg'); */
+  background-image: var(--dark-color);
   background-repeat: repeat;
   background-size: 50%;
   /* background-size: cover; */
@@ -121,12 +108,6 @@ main {
   min-height: calc(100vh - 200px);
   padding: 2rem 0;
   display: flex;
-  background-position: 0 0, 100px 100px;
-  /* background-image:
-  url('../images/new_bookshelf_header');
-  background-repeat: repeat;
-  background-size: 400px 400px;
-  background-blend-mode: multiply; */
 }
 
 /* New Stylings for Nav bar and main content */
@@ -149,6 +130,7 @@ main {
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  display: block;
 }
 
 .books-dropdown-content {
@@ -157,12 +139,13 @@ main {
   top: 100%;
   left: 0;
   background-color: white;
-  min-width: 160px;
+  width: 100%;
+  min-width: 0;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   border-radius: 4px;
   flex-direction: column;
+  z-index: 2000;
 }
-
 
 /* Style each dropdown link */
 .books-dropdown-content a {
@@ -189,81 +172,113 @@ main {
   margin: 0 auto;
 }
 
+h2 {
+  text-align: center;
+}
 
 /* Stylings for the books columns */
 .book-column {
   flex: 1;
-    /* background: radial-gradient(circle at top, rgba(222, 104, 19, 0.95) 0%, rgba(170, 86, 13, 0.999)); */
-    background: radial-gradient(circle at top, rgba(0, 0, 0, 0.75));
-  /* background: linear-gradient(180deg, rgba(222, 104, 19, 0.95) 0%, rgba(134, 65, 20, 0.95) 100%); */
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    /* border-top: 20px solid rgba(193, 91, 36, 0.858);
-    border-right: 20px solid rgba(130, 51, 8, 0.858); */
-    /* border-left: 20px solid rgba(130, 51, 8, 0.858); */
-    padding: 1rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    max-height: 75vh;
-    min-width: 25%;
-    transition: flex-basis 0.3s ease, width 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.book-column p {
-  font-family: 'Style Script', cursive;
-  text-decoration: underline;
-  font-optical-sizing: auto;
-  font-weight: 900;
-  font-style: normal;
-  font-size: 125%;
-  color: black;
-  margin-bottom: 0.5rem;
+.bookshelf {
+  flex: 1;
+  gap: 10px;
+  height: 100%;
+  display: flex;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 635px;
+  min-height: 635px;
+  flex-direction: column;
+}
+
+.book {
+  display: flex;
+  height: 100px;
+  width: 95%;
+  cursor: grab;
+  margin: 0 auto;
+  list-style: none;
+  border-radius: 2px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--dark-color);
+}
+
+.book:active {
+  cursor: grabbing;
+}
+
+.delete-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border-style: none;
+  background-color: var(--dark-color);
+}
+
+.delete-button:hover {
+  background-color: var(--secondary-color);
+}
+
+.delete-button:active {
+  background-color: var(--dark-color);
+}
+
+.left-spacer {
+  flex: 1;
+  border-right: 20px double var(--warning-color);
+}
+
+.center {
+  flex: 5;
+  display: flex;
+  color: white;
+  padding-bottom: 10px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.center > :first-child {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
+.center p {
+  font-size: 14px;
   text-align: center;
 }
 
-
-#book-sections ul li p {
-    list-style-type: none;
-    padding-left: 0;
-    text-align: center;
-    font-family: 'Style-Script';
-    font-size: 115%;
-    text-decoration: none;
-    /* font-weight: 800; */
-    font-style: normal;
-    color: white;
+.right-spacer {
+  flex: 1;
+  border-left: 20px double var(--warning-color);
 }
 
-.book-column li {
-    padding: 20px;
-    border-bottom: 2px ridge black;
-}
-
-.book-column li p {
-  margin: 0;
-}
-
-/* Highlight book when dragging */
+/* Highlight book when dragging
 .book-column li.dragging {
   opacity: 0.5;
   background-color: #d3d3d3;
 }
 
-/* Highlight drop zone */
+Highlight drop zone
 .book-column ul.over {
   background-color: rgba(0, 123, 255, 0.1);
   border: 2px dashed #007bff;
   transition: background-color 0.2s;
-}
+} */
 
 .modal {
   display: none;
   position: fixed;
   z-index: 5;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0,0,0,0.6);
 }
 
@@ -297,6 +312,163 @@ main {
   cursor: pointer;
 }
 
+#popup {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 1000;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+}
+
+#popup > div {
+  width: 600px;
+  display: flex;
+  max-height: 600px;
+  margin: 100px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#close {
+  width: 50px;
+  color: black;
+  align-self: end;
+  min-height: 50px;
+  max-height: 50px;
+  background-color: transparent;
+}
+
+#close:hover {
+  background-color: var(--danger-color);
+}
+
+#book-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.display-book {
+  width: 100%;
+  display: flex;
+  height: 100px;
+  list-style: none;
+  border-bottom: 2px solid black;
+}
+
+.image-section {
+  width: 100px;
+}
+
+.image-section img {
+  display: block;
+  margin: 0 auto;
+  padding-top: 3px;
+}
+
+.title-section {
+  display: flex;
+  width: 200px;
+  text-align: center;
+  overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.author-section {
+  display: flex;
+  width: 200px;
+  text-align: center;
+  overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.button-section {
+  display: flex;
+  width: 100px;
+  justify-content: center;
+  align-items: center;
+}
+
+#add-button {
+  width: 75px;
+  height: 50px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+#add-button:hover {
+  background-color: var(--secondary-color);
+}
+
+#add-button:active {
+  background-color: var(--dark-color);
+}
+
+/* Clear Shelf Button stylings */
+.shelf-header {
+  display: flex;
+  justify-content: space-evenly; 
+  align-items: center;            
+  border-bottom: 2px solid #eee;  
+  margin-bottom: 15px;
+}
+
+.shelf-header h2 {
+  margin: 0; 
+}
+
+.clear-shelf-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  display: flex; 
+}
+
+.clear-shelf-btn:hover {
+  opacity: 1.0; 
+  transform: scale(1.1); 
+}
+
+/* Clear Shelf Modal Stylings */
+.modal-actions {
+  display: flex;           
+  justify-content: center; 
+  gap: 15px;               
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  width: auto;             
+  min-width: 100px;        
+  padding: 8px 20px;
+}
+
+/* Yes is Green, gets darked when hovered over */
+#confirm-clear-shelf {
+  background-color: #17d214; 
+}
+#confirm-clear-shelf:hover {
+  background-color: #198b0a;
+}
+
+/* No is Red, gets darker when hovered over */
+#cancel-clear-shelf {
+  background-color: #d91f0e; 
+}
+#cancel-clear-shelf:hover {
+  background-color: #a30d0d;
+}
+
 /* Footer */
 footer {
   width: 100%;
@@ -304,7 +476,7 @@ footer {
   color: white;
   text-align: center;
   padding: 2rem 0;
-  
+  margin-top: 3rem;
 }
 
 /* Responsive Design */

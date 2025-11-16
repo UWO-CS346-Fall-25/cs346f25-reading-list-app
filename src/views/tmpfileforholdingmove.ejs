@@ -1,0 +1,108 @@
+  <!-- /**
+   * Moves a book from one shelf to another
+   * @param {string} title - title of the book
+   * @param {string} fromStatus - status/shelf moving FROM ('to-read', 'reading', 'read')
+   * @param {string} toStatus - status/shelf moving TO ('to-read', 'reading', 'read')
+   * @param {string} userId - user's ID
+   * @returns {Promise<boolean>} - True if successful, False if failed
+   */
+  static async moveBook(title, fromStatus, toStatus, userId) {
+    try {
+      //Get the table names
+      const getTableName = (status) => {
+        if (status === 'to-read') return 'books_to_read';
+        if (status === 'reading') return 'books_being_read';
+        if (status === 'read') return 'books_read';
+        return null;
+      };
+
+      const fromTable = getTableName(fromStatus);
+      const toTable = getTableName(toStatus);
+
+      //create the from and to tables
+      const { data: bookData, error: fetchError } = await supabase.supabase
+        .from(fromTable)
+        .select('id, title, authors') 
+        .ilike('title', title.trim())
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (fetchError || !bookData) {
+        console.log('DEBUG: Book NOT found in source table.');
+        return false;
+      }
+
+      const realTitle = bookData.title;
+      const authors = bookData.authors; 
+      const sourceId = bookData.id; // <--- CAPTURE THE ID
+
+      // STEP 2: INSERT (Copy to new table)
+      const { error: insertError } = await supabase.supabase
+        .from(toTable)
+        .insert([{ title: realTitle, authors: authors, user_id: userId }]);
+
+      if (insertError) {
+        console.log('DEBUG: Insert failed (duplicate?).', insertError);
+        return false;
+      }
+
+      // STEP 3: DELETE (Remove from old table using ID)
+      // This is much safer than matching title/authors
+      const { error: deleteError } = await supabase.supabase
+        .from(fromTable)
+        .delete()
+        .eq('id', sourceId); // <--- USE ID HERE
+
+      if (deleteError) {
+        console.log('DEBUG: Delete failed:', deleteError);
+        return false;
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('DEBUG: Exception:', error);
+      return false;
+    }
+  } -->
+
+  <!-- Add a grey out div around the To and Book categories since the user needs to input the chosen bookshelf before those are active -->
+  <!-- <div id="moveModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Move Book</h2>
+      <form id="moveBookForm"> -->
+
+        <!-- <div>
+          <label for="move-from-shelf">From:</label>
+          <select id="move-from-shelf" name="fromStatus" required>
+            <option value="" disabled selected>Select source shelf...</option>
+            <option value="to-read">To Read</option>
+            <option value="reading">Reading</option>
+            <option value="read">Finished</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="move-to-shelf">To:</label>
+          <select id="move-to-shelf" name="toStatus" required disabled>
+            <option value="" disabled selected>Select destination...</option>
+            <option value="to-read">To Read</option>
+            <option value="reading">Reading</option>
+            <option value="read">Finished</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="move-book-select">Select Book:</label>
+          <select id="move-book-select" name="bookId" required disabled>
+            <option value="" disabled selected>-- First select a shelf above --</option>
+          </select>
+        </div>
+
+        <button type="submit">Move Book</button>
+      </form>
+    </div>
+  </div> -->
+
+  

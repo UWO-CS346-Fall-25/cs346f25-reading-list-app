@@ -292,10 +292,6 @@ input[list="authors"], input[list="genres"] {
   flex-direction: column;
 }
 
-#books li:nth-child(2) {
-  animation-delay: 3s;
-}
-
 .book {
   display: flex;
   flex-shrink: 0;

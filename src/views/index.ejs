@@ -12,6 +12,9 @@
     <nav>
       <div class="container">
         <a href="/index" class="logo">Bookshelf</a>
+        <% if (user) { %>
+          <span>Welcome back <%= user.display_name %>!</span>
+        <% } %>
         <ul class="nav-links">
           <% if (user) { %>
             <li><a href="/bookshelf">Profile</a></li>

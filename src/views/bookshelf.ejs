@@ -3,9 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="csrf-token" content="<%= csrfToken %>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>
-    <%= title %> - Bookshelf -
+    <%= title %> - Bookshelf
   </title>
   <link rel="stylesheet" href="/css/bookshelf.css">
 </head>
@@ -14,17 +15,15 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/home" class="logo">Bookshelf</a>
+        <a href="/home" class="logo">
+          <%= user.display_name %>'s Bookshelf
+        </a>
         <ul class="nav-links">
-
-
           <li class="dropdown">
             <button id="manage-books" class="managebooks">Manage Books</button>
             <div class="books-dropdown-content" id="books-dropdown-menu">
               <a href="#" class="dropdown-link">Add</a>
-              <a href="#" class="dropdown-link">Edit</a>
               <a href="#" class="dropdown-link">Move</a>
-              <a href="#" class="dropdown-link" id="delete-book-btn">Delete</a>
             </div>
           </li>
           <li><a href="/logout">Sign Out</a></li>
@@ -35,72 +34,128 @@
 
   <main class="container">
     <div id="book-sections">
-      
-      <div class="book-column" id="already-read">
-        <p>Successfully Read</p>
-        <ul>
-             
-        </ul>
-      </div>
 
-      <div class="book-column" id="currently-reading">
-        <p>Currently Reading</p>
-        <ul>
-          
-              
-           
-        </ul>
-      </div>
+      <section class="book-column" id="to-read">
+        <div class="shelf-header">
+          <h2>To Read</h2>
+          <button class="clear-shelf-btn" data-shelf="to-read-books" title="Clear Shelf">
+            <img src="/images/trash_can.png" alt="Clear Shelf Trash Icon" width="20">
+          </button>
+        </div>
+        <ul id="to-read-books" class="bookshelf"></ul>
+      </section>
 
-      <div class="book-column" id="will-read">
-        <p>Will Read</p>
-        <ul>
-          
-              
-        </ul>
-      </div>
+      <section class="book-column" id="reading">
+        <div class="shelf-header">
+          <h2>Reading</h2>
+          <button class="clear-shelf-btn" data-shelf="reading-books" title="Clear Shelf">
+            <img src="/images/trash_can.png" alt="Clear Shelf Trash Icon" width="20">
+          </button>
+        </div>
+        <ul id="reading-books" class="bookshelf"></ul>
+      </section>
 
-    </div>
+      <section class="book-column" id="read">
+        <div class="shelf-header">
+          <h2>Finished</h2>
+          <button class="clear-shelf-btn" data-shelf="finished-books" title="Clear Shelf">
+            <img src="/images/trash_can.png" alt="Clear Shelf Trash Icon" width="20">
+          </button>
+        </div>
+        <ul id="finished-books" class="bookshelf"></ul>
+      </section>
+
     </div>
   </main>
 
   <!-- Add Book Modal -->
   <div id="addBookModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Add a New Book</h2>
-    <form id="addBookForm">
-      
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add a New Book</h2>
+      <form id="addBookForm">
 
-      <div>
-        <label for="book-title">Title:</label>
-        <input type="text" id="book-title" name="title" required>
-      </div>
-      <div>
-        <label for="book-author">Author:</label>
-        <input type="text" id="book-author" name="author" required>
-      </div>
-      
-      <div>
-        <label for="book-status">Add to Shelf:</label>
-        <select id="book-status" name="status" required>
-          <option value="to-read">Want to Read</option>
-          <option value="reading">Currently Reading</option>
-          <option value="read">Read</option>
-        </select>
-      </div>
+        <div>
+          <label for="book-title">Title:</label>
+          <input type="text" id="book-title" name="title" required>
+        </div>
+        <div>
+          <label for="book-author">Author:</label>
+          <input type="text" id="book-author" name="author" required>
+        </div>
+        <div>
+          <label for="book-status">Add to Shelf:</label>
+          <select id="book-status" name="status" required>
+            <option value="to-read-books">To Read</option>
+            <option value="reading-books">Reading</option>
+            <option value="finished-books">Finished</option>
+          </select>
+        </div>
 
-      <button type="submit">Add Book</button>
-    </form>
+        <button type="submit">Search</button>
+      </form>
+    </div>
   </div>
-</div>
 
+  <!-- Add a grey out div around the To and Book categories since the user needs to input the chosen bookshelf before those are active -->
+  <div id="move-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Move Book</h2>
+      <form id="move-book-form">
+
+        <div>
+          <label for="book-from-column">From:</label>
+          <input type="text" id="from-book-column" name="From" required>
+          <select id="book-status" name="status" required>
+            <option value="to-read">Will Read</option>
+            <option value="reading">Reading</option>
+            <option value="read">Read</option>
+          </select>
+
+          <label for="book-to-column">To:</label>
+          <input type="text" id="to-book-title" name="To" required>
+          <select id="book-status" name="status" required>
+            <option value="to-read">Will Read</option>
+            <option value="reading">Reading</option>
+            <option value="read">Read</option>
+          </select>
+        </div>
+        <div>
+          <label for="book-title">Title:</label>
+          <input type="text" id="book-title" name="title" required>
+        </div>
+
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+
+
+  <div id="popup" class="modal">
+    <div class="modal-content">
+      <button id="close">X</button>
+      <ul id="book-list"></ul>
+    </div>
+  </div>
+
+  <!-- Clear Shelf modal for the each column's button -->
+  <div id="clear-shelf-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Clear Bookshelf</h2>
+      <p>Are you sure you want to clear all books from this column?</p>
+      <div class="modal-actions">
+        <button id="confirm-clear-shelf">Yes</button>
+        <button id="cancel-clear-shelf">No</button>
+      </div>
+    </div>
+  </div>
 
 
   <footer>
     <div class="container">
-      <p>&copy; 2024 CS346 Project. All rights reserved.</p>
+      <p>&copy; 2025 CS346 Project. All rights reserved.</p>
     </div>
   </footer>
 

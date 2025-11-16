@@ -1,11 +1,32 @@
-# Feature/week10-Database-Integration
+## Feature/week11/deliverable4_auth
+
+Updates to Landing page:
+   -When signed in and navigating to the landing page, it will display in the center of the header: Welcome back User!
+
+Updates to Bookshelf page:
+   -The user's chosen name in the top left corner: User's Bookshelf.
+   -All books the user has added to any of the three bookshelves.
+
+Updates to Bookshelf column:
+   -By clicking on the trash icon next to the column's name, users can Clear/Delete all books from a given column.
+
+Updates to Books
+   -Books can be dragged from column to column and the database will update with each drag. Don't move too fast as the DB and DOM take a bit to update.
+   -By clicking on the trash icon attached to the right end of a book, users can manually delete books from each column.
+   -Books now match the styling of the recommendation page's books.
+
+Updates to Manage Books:
+   -Add: Uses the Library API, similar to the recommended books page. Users can search based on title and author
+   -Move: Still in progress, will be finished by next submission
+
+## Feature/week10-Database-Integration
 
 Small updates added to index.ejs to ensure filter works correctly.
 Login processes now checks auth table in database to log in users.
 The '+' button on index.ejs is now hooked up to an external API,
 allowing users to select the edition of the book they want to add.
 
--Bookshelf now displays a user's books, and inside of Manage Books, add is partially functional. 
+-Bookshelf now displays a user's books, and inside of Manage Books, add is partially functional.
 -Working on modifiying the existing code for fetching the books for the page.
 -Delete is also partially completed
 
