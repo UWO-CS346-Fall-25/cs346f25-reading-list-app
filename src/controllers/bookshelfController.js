@@ -13,6 +13,7 @@
 
 // Import models if needed
 const User = require('../models/User');
+const Api = require('../models/Api');
 
 /**
  * GET /
@@ -120,7 +121,7 @@ exports.logout = async (req, res, next) => {
  */
 exports.addBooksToSelector = async (req, res) => {
   try {
-    const result = await User.getBookList(req.body.title, req.body.author);
+    const result = await Api.getBookList(req.body.title, req.body.author);
     if (result.ok) {
       const books = await result.json();
       let bookList = [];
@@ -254,13 +255,13 @@ exports.removeBook = async (req, res) => {
 /**
  * DELETE /
  * Clear all books from the requested shelf
- * @param {} req 
- * @param {*} res 
- * @returns 
+ * @param {} req
+ * @param {*} res
+ * @returns
  */
 exports.clearShelf = async (req, res) => {
-  try { 
-    //if the user is logged in, get the bookshelf they're targeting, 
+  try {
+    //if the user is logged in, get the bookshelf they're targeting,
     //their id, and perform the clear
     if (!req.session.user) {
       return res.status(403).json({ success: false, message: 'User not logged in.' });

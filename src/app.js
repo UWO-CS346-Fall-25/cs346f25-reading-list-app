@@ -85,6 +85,9 @@ app.use('/', csrfProtection, registerRouter);
 const bookshelfRouter = require('./routes/bookshelf');
 app.use('/', csrfProtection, bookshelfRouter);
 
+// const apiRouter = require('./routes/api');
+// app.use('/', csrfProtection, apiRouter);
+
 // Placeholder home route
 app.get('/', csrfProtection, (req, res) => {
   res.render('index', {

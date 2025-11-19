@@ -11,6 +11,24 @@ const supabase = require('../models/db');
  * The class that communicates directly with the database
  */
 class User {
+  /**
+   * A function that takes a bookshelf id
+   * and get the name of the database table
+   * associated with it
+   * @param {object} shelfId
+   * @returns string containing the table name
+   */
+  static getTableName(shelfId) {
+    let databaseTable = null;
+    if (shelfId === 'to-read-books') {
+      databaseTable = 'books_to_read';
+    } else if (shelfId === 'reading-books') {
+      databaseTable = 'books_being_read';
+    } else {
+      databaseTable = 'books_read';
+    }
+    return databaseTable;
+  }
 
   /**
    * A function that takes a bookshelf id
@@ -181,60 +199,52 @@ class User {
   }
 
   /**
-   * A function that gets all books that match
-   * the book a user wants to add
-   * @param {object} title book title
-   * @param {object} author book author
-   * @returns {Promise<object>} user entry if valid, else empty
-   */
-  static async getBookList(title, author) {
-    try {
-      // attempting to get book list from Open Library API
-      const query = new URLSearchParams({ title, author });
-      return await fetch(`https://openlibrary.org/search.json?${query}`);
-    } catch (networkError) {
-      // throwing an error if an error occurred
-      throw new Error();
-    }
-  }
-
-  /**
    * Add
    */
   static async addBook(title, authors, bookshelfTable, userId) {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
-      const { data, error } = await supabase.supabase.from(databaseTable)
+      const { data, error } = await supabase.supabase
+        .from(databaseTable)
         .select('*')
         .eq('title', title)
         .contains('authors', authors)
         .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
-        const { data, error } = await supabase.supabase.from(databaseTable).insert([{ title: title, authors: authors, user_id: userId }], { returning: 'representation' });
-        if (error) { // addition did not work - network issue
+        const { data, error } = await supabase.supabase
+          .from(databaseTable)
+          .insert([{ title: title, authors: authors, user_id: userId }], {
+            returning: 'representation',
+          });
+        if (error) {
+          // addition did not work - network issue
           throw new Error();
-        }
-        else { // addition worked
+        } else {
+          // addition worked
           let idType = null;
-          if (databaseTable === 'books_to_read') { // determining which column contains the bookId
+          if (databaseTable === 'books_to_read') {
+            // determining which column contains the bookId
             idType = 'to_read_id';
           } else if (databaseTable === 'books_being_read') {
             idType = 'being_read_id';
           } else {
             idType = 'read_id';
           }
-          const { data, error } = await supabase.supabase.from(databaseTable) // getting the id of the book inserted
+          const { data, error } = await supabase.supabase
+            .from(databaseTable) // getting the id of the book inserted
             .select(idType)
             .eq('title', title)
             .contains('authors', authors)
             .eq('user_id', userId);
           return data[0];
         }
-      } else { // returning false - the addition failed because book already exists
+      } else {
+        // returning false - the addition failed because book already exists
         return false;
       }
-    } catch (networkError) { // throwing an error if a network error occurred
+    } catch (networkError) {
+      // throwing an error if a network error occurred
       throw new Error();
     }
   }
@@ -308,44 +318,52 @@ class User {
     let originTable = this.getTableName(originShelf);
     let destinationTable = this.getTableName(destinationShelf);
     let idType = null;
-    if (originTable === 'books_to_read') { // determining which column contains the bookId
+    if (originTable === 'books_to_read') {
+      // determining which column contains the bookId
       idType = 'to_read_id';
-    }
-    else if (originTable === 'books_being_read') {
+    } else if (originTable === 'books_being_read') {
       idType = 'being_read_id';
-    }
-    else {
+    } else {
       idType = 'read_id';
     }
-    try { // attempting database operations
-      const { data, error } = await supabase.supabase.from(originTable) // grabbing the book details
+    try {
+      // attempting database operations
+      const { data, error } = await supabase.supabase
+        .from(originTable) // grabbing the book details
         .select('title, authors')
         .eq(idType, bookId)
         .eq('user_id', userId);
       const book = data; // restoring data for scope
-      if (book.length === 1) { // confirming the book was located
-        const { data, error } = await supabase.supabase.from(destinationTable) // attempting to insert the book into the destination table
-          .insert([{ title: book[0].title, authors: book[0].authors, user_id: userId }]);
-        if (!error) { // only attempting deletion if the insert worked
-          const { data, error } = await supabase.supabase.from(originTable) // attempting to delete from the origin table
+      if (book.length === 1) {
+        // confirming the book was located
+        const { data, error } = await supabase.supabase
+          .from(destinationTable) // attempting to insert the book into the destination table
+          .insert([
+            { title: book[0].title, authors: book[0].authors, user_id: userId },
+          ]);
+        if (!error) {
+          // only attempting deletion if the insert worked
+          const { data, error } = await supabase.supabase
+            .from(originTable) // attempting to delete from the origin table
             .delete()
             .eq(idType, bookId);
-          if (!error) { // all operations worked
+          if (!error) {
+            // all operations worked
             return true;
-          }
-          else { // insert worked, but deletion failed
+          } else {
+            // insert worked, but deletion failed
             return null;
           }
-        }
-        else { // insert failed
+        } else {
+          // insert failed
           return false;
         }
-      }
-      else { // not able to verify the book details
+      } else {
+        // not able to verify the book details
         return false;
       }
-    }
-    catch (error) { // initial select failed, network error
+    } catch (error) {
+      // initial select failed, network error
       return false;
     }
   }
@@ -361,17 +379,21 @@ class User {
     try {
       const table = this.getTableName(bookshelf);
       let idType = null;
-      if (table === 'books_to_read') { // determining which column contains the bookId
+      if (table === 'books_to_read') {
+        // determining which column contains the bookId
         idType = 'to_read_id';
       } else if (table === 'books_being_read') {
         idType = 'being_read_id';
       } else {
         idType = 'read_id';
       }
-      const { data, error } = await supabase.supabase.from(table).delete().eq(idType, bookId)
+      const { data, error } = await supabase.supabase
+        .from(table)
+        .delete()
+        .eq(idType, bookId);
       return true;
-    }
-    catch (error) { // network error
+    } catch (error) {
+      // network error
       throw new Error();
     }
   }
@@ -380,7 +402,7 @@ class User {
    * Clear shelf looks for all books in the table that matches the user's id and deletes them
    * @param {*} bookshelf user's bookshelf being cleared
    * @param {*} userId their id
-   * @returns 
+   * @returns
    */
   static async clearShelf(bookshelf, userId) {
     try {

@@ -432,7 +432,7 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
 }
 
 /**
- * Controls the clear shelf modal's buttons and interaction 
+ * Controls the clear shelf modal's buttons and interaction
  */
 function clearShelfModal() {
   const modal = document.getElementById('clear-shelf-modal');
@@ -474,7 +474,7 @@ function clearShelfModal() {
 /**
  * Helper function for clearShelfModal
  * Performs the Delete call using the user's token and the shelf they wish to clear
- * @param {*} currShelf 
+ * @param {*} currShelf
  */
 async function clearShelf(currShelf) {
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
