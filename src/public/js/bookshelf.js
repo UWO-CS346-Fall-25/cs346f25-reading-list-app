@@ -12,7 +12,7 @@
 document.addEventListener('DOMContentLoaded', async function () {
   await loadBooks();
   bookDropdown();
-  dragBooks();
+  // dragBooks();
   handleBookSelection();
   setupAddBookModal();
   calibrateModal();
@@ -110,6 +110,7 @@ function loadList(bookShelf, bookList) {
     bookShelf.append(li);
     configureDeleteButton(button);
   });
+  dragBooks();
 }
 
 /**
@@ -213,11 +214,21 @@ function dragBooks() {
           },
           body: JSON.stringify({ book_id: bookId, start: originShelf.id, end: shelf.id }),
         });
-        if (response.status === 409) { // insert worked, but the delete failed
+        if (response.status === 201) { // replacing book id if the move worked
+          const json = await response.json();
+          if (json.success) { // parsing new book id
+            console.log(json.data);
+            draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent = `BookID: ${json.data}`;
+          }
+          else { // could not parse new id, reloading page so the id updates
+            window.location.reload();
+          }
+        }
+        else if (response.status === 409) { // insert worked, but the delete failed
           alert('The move failed. The book may now appear on both shelves.');
           window.location.reload();
         }
-        else if (response.status === 500) { // failed to locate book or insert
+        else  { // failed to locate book or insert
           alert('Could not complete the move. Please try again later.');
           window.location.reload();
         }

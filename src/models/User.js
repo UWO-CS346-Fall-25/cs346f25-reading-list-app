@@ -31,25 +31,6 @@ class User {
   }
 
   /**
-   * A function that takes a bookshelf id
-   * and get the name of the database table
-   * associated with it
-   * @param {object} shelfId
-   * @returns string containing the table name
-   */
-  static getTableName(shelfId) {
-    let databaseTable = null;
-    if (shelfId === 'to-read-books') {
-      databaseTable = 'books_to_read';
-    } else if (shelfId === 'reading-books') {
-      databaseTable = 'books_being_read';
-    } else {
-      databaseTable = 'books_read';
-    }
-    return databaseTable;
-  }
-
-  /**
    * Returns a list of all authors
    * from the books table
    * @returns {Promise<object>} the author list
@@ -312,7 +293,7 @@ class User {
    * @param {object} originShelf - the origin shelf
    * @param {object} destinationShelf - the shelf being moved to
    * @param {object} userId - the user's id
-   * @returns {Promise<object>} true if success, false if not, null if partially worked
+   * @returns {Promise<object>} new book id, false if could not move, null if partially worked
    */
   static async moveBook(bookId, originShelf, destinationShelf, userId) {
     let originTable = this.getTableName(originShelf);
@@ -340,7 +321,8 @@ class User {
           .from(destinationTable) // attempting to insert the book into the destination table
           .insert([
             { title: book[0].title, authors: book[0].authors, user_id: userId },
-          ]);
+          ]).select();
+          const newId = data.length === 1 ? Object.values(data[0])[0] : null;
         if (!error) {
           // only attempting deletion if the insert worked
           const { data, error } = await supabase.supabase
@@ -349,7 +331,7 @@ class User {
             .eq(idType, bookId);
           if (!error) {
             // all operations worked
-            return true;
+            return newId;
           } else {
             // insert worked, but deletion failed
             return null;

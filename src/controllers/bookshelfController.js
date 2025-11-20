@@ -70,30 +70,6 @@ exports.addBook = async (req, res) => {
 }
 
 /**
- * Handle book deletion
- */
-exports.postDeleteBook = async (req, res) => {
-  // try {
-  //   const { bookId, status } = req.body;
-
-  //   const userId = req.session.user.user.id ? req.session.user.user.id : null;
-
-  //   if(!userId) {
-  //     return res.status(401).json({success: false, message: 'User not logged in.'});
-  //   }
-
-  //   await Book.deleteBook({
-  //     bookId, status, userId
-  //   });
-
-  //   res.status(200).json({success: true, message: 'Book successfully deleted!'});
-
-  // } catch (error) {
-  //   res.status(500).json({success: false, message: error.message});
-  // }
-}
-
-/**
  * GET /logout
  * Display the home page with cleared session
  */
@@ -227,13 +203,13 @@ exports.getReadShelf = async (req, res) => {
  */
 exports.moveBook = async (req, res) => {
   let result = await User.moveBook(req.body.book_id, req.body.start, req.body.end, req.session.user.sub);
-  if (result === null) { // the insert worked, but the delete failed
+  if (result) { // the insert worked
+    res.status(201).json({ success: true, data: result });
+  }
+  else if (result === null) { // the insert worked, but the delete failed
     res.status(409).json({ success: false });
-  }
-  else if (result) { // the insert and the delete failed
-    res.status(201).json({ success: true });
-  }
-  else { // the initial select failed, or the insert failed
+  } else {
+    // the initial select failed, or the insert failed
     res.status(500).json({ success: false });
   }
 }
