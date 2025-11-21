@@ -6,13 +6,14 @@
  *
  */
 
+var draggedBook; // global book used for drag and drop event handler
+
 /**
  * Load the DOM content
  */
 document.addEventListener('DOMContentLoaded', async function () {
   await loadBooks();
   bookDropdown();
-  // dragBooks();
   handleBookSelection();
   setupAddBookModal();
   calibrateModal();
@@ -54,6 +55,7 @@ async function loadBooks() {
       alert("network error!");
     }
   }
+  dragBooks();
 }
 
 /**
@@ -77,6 +79,7 @@ function loadList(bookShelf, bookList) {
     const bookId = document.createElement('p');
     bookId.textContent = 'BookID: ' + element[Object.keys(element)[0]];
     bookId.style.fontSize = '7px';
+    bookId.style.display = "none";
     center.append(bookId);
     const title = document.createElement('p');
     title.textContent = element.title;
@@ -109,8 +112,10 @@ function loadList(bookShelf, bookList) {
     li.draggable = true;
     bookShelf.append(li);
     configureDeleteButton(button);
+    li.addEventListener('dragstart', function () {
+      draggedBook = li;
+    });
   });
-  dragBooks();
 }
 
 /**
@@ -190,13 +195,7 @@ function bookDropdown() {
 function dragBooks() {
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
   const bookshelves = document.getElementsByClassName('bookshelf');
-  let draggedBook = null;
   for (const shelf of bookshelves) { // targeting all bookshelves
-    for (const book of shelf.childNodes) { // targeting all books
-      book.addEventListener('dragstart', function () { // storing pointer to each book when dragged
-        draggedBook = book;
-      });
-    }
     shelf.addEventListener('dragover', function (e) { // forcing drag over action on bookshelves
       e.preventDefault();
     });
@@ -217,7 +216,6 @@ function dragBooks() {
         if (response.status === 201) { // replacing book id if the move worked
           const json = await response.json();
           if (json.success) { // parsing new book id
-            console.log(json.data);
             draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent = `BookID: ${json.data}`;
           }
           else { // could not parse new id, reloading page so the id updates
