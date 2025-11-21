@@ -83,6 +83,10 @@ function loadList(bookShelf, bookList) {
     center.append(bookId);
     const title = document.createElement('p');
     title.textContent = element.title;
+    title.style.maxWidth = '25ch';
+    title.style.whiteSpace = 'nowrap';
+    title.style.overflow = 'hidden';
+    title.style.textOverflow = 'ellipsis';
     center.append(title);
     const authors = element.authors;
     const numAuthors = authors.length;
@@ -203,6 +207,11 @@ function dragBooks() {
       e.preventDefault();
       const originShelf = draggedBook.parentElement;
       if (originShelf.id !== shelf.id) { // only acting if a book was dragged from one shelf to another
+        const spinner = document.getElementsByClassName('spinner-container')[0];
+        const shelvesContainer = shelf.parentElement.parentElement;
+        shelvesContainer.style.opacity = 0.5;
+        shelvesContainer.style.pointerEvents = 'none';
+        spinner.style.display = 'block';
         shelf.append(draggedBook);
         const bookId = (draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent).replace('BookID: ', '');
         let response = await fetch('move', { // fetching for a move [insert -> delete]
@@ -217,6 +226,9 @@ function dragBooks() {
           const json = await response.json();
           if (json.success) { // parsing new book id
             draggedBook.childNodes[0].childNodes[1].childNodes[0].textContent = `BookID: ${json.data}`;
+            shelvesContainer.style.opacity = 1;
+            shelvesContainer.style.pointerEvents = 'all';
+            spinner.style.display = 'none';
           }
           else { // could not parse new id, reloading page so the id updates
             window.location.reload();

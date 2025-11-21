@@ -51,11 +51,9 @@ header {
   color: white;
   padding: 1rem 0;
   box-shadow: var(--box-shadow);
-  /* background-image: url('../images/bookshelf_footer.jpg'); */
   background-image: var(--dark-color);
   background-repeat: repeat;
   background-size: 50%;
-  /* background-size: cover; */
   background-attachment: fixed;
 }
 
@@ -108,6 +106,22 @@ main {
   min-height: calc(100vh - 200px);
   padding: 2rem 0;
   display: flex;
+}
+
+.spinner-container {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
 /* New Stylings for Nav bar and main content */
@@ -414,14 +428,14 @@ Highlight drop zone
 /* Clear Shelf Button stylings */
 .shelf-header {
   display: flex;
-  justify-content: space-evenly; 
-  align-items: center;            
-  border-bottom: 2px solid #eee;  
+  justify-content: space-evenly;
+  align-items: center;
+  border-bottom: 2px solid #eee;
   margin-bottom: 15px;
 }
 
 .shelf-header h2 {
-  margin: 0; 
+  margin: 0;
 }
 
 .clear-shelf-btn {
@@ -431,31 +445,31 @@ Highlight drop zone
   padding: 5px;
   opacity: 0.6;
   transition: opacity 0.2s ease;
-  display: flex; 
+  display: flex;
 }
 
 .clear-shelf-btn:hover {
-  opacity: 1.0; 
-  transform: scale(1.1); 
+  opacity: 1.0;
+  transform: scale(1.1);
 }
 
 /* Clear Shelf Modal Stylings */
 .modal-actions {
-  display: flex;           
-  justify-content: center; 
-  gap: 15px;               
+  display: flex;
+  justify-content: center;
+  gap: 15px;
   margin-top: 20px;
 }
 
 .modal-actions button {
-  width: auto;             
-  min-width: 100px;        
+  width: auto;
+  min-width: 100px;
   padding: 8px 20px;
 }
 
 /* Yes is Green, gets darked when hovered over */
 #confirm-clear-shelf {
-  background-color: #17d214; 
+  background-color: #17d214;
 }
 #confirm-clear-shelf:hover {
   background-color: #198b0a;
@@ -463,7 +477,7 @@ Highlight drop zone
 
 /* No is Red, gets darker when hovered over */
 #cancel-clear-shelf {
-  background-color: #d91f0e; 
+  background-color: #d91f0e;
 }
 #cancel-clear-shelf:hover {
   background-color: #a30d0d;
@@ -477,6 +491,13 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Move Indicator */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

@@ -75,6 +75,7 @@ exports.addBook = async (req, res) => {
  */
 exports.logout = async (req, res, next) => {
   try {
+    const csrfToken = req.csrfToken();
     req.session.destroy(error => {
       if (error) {
         next(error);
@@ -82,7 +83,7 @@ exports.logout = async (req, res, next) => {
       res.clearCookie('connect.sid');
       res.render('index', {
         title: 'Bookshelf',
-        csrfToken: req.csrfToken(),
+        csrfToken: csrfToken,
         user: null, //reassign user to null and clear the columns
       });
     });
