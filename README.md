@@ -1,3 +1,16 @@
+# Feature/week12/deliverable5_api
+
+Updates to the bookshelf page:
+  - Books can now be dragged right after being added on the bookshelf page
+  - Fixed issues where multiple event handlers were being added to each book, causing double drag
+  - Added loading spinner to ensure a book is properly moved before the user can move another book
+  - Set bookId to display none, allowing for an anonymous database hook when moving books
+
+Updates for external API (Open Library):
+  - New model created to only fatch from API, separating the API model from the database model
+  - Did not add routes or controllers for API calls, instead imported new model into existing
+    controllers that need to call to the API
+
 ## Feature/week11/deliverable4_auth
 
 Updates to Landing page:
