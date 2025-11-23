@@ -13,6 +13,7 @@
 
 // Import models if needed
 const User = require('../models/User');
+const Api = require('../models/Api');
 
 /**
  * GET /
@@ -69,35 +70,12 @@ exports.addBook = async (req, res) => {
 }
 
 /**
- * Handle book deletion
- */
-exports.postDeleteBook = async (req, res) => {
-  // try {
-  //   const { bookId, status } = req.body;
-
-  //   const userId = req.session.user.user.id ? req.session.user.user.id : null;
-
-  //   if(!userId) {
-  //     return res.status(401).json({success: false, message: 'User not logged in.'});
-  //   }
-
-  //   await Book.deleteBook({
-  //     bookId, status, userId
-  //   });
-
-  //   res.status(200).json({success: true, message: 'Book successfully deleted!'});
-
-  // } catch (error) {
-  //   res.status(500).json({success: false, message: error.message});
-  // }
-}
-
-/**
  * GET /logout
  * Display the home page with cleared session
  */
 exports.logout = async (req, res, next) => {
   try {
+    const csrfToken = req.csrfToken();
     req.session.destroy(error => {
       if (error) {
         next(error);
@@ -105,7 +83,7 @@ exports.logout = async (req, res, next) => {
       res.clearCookie('connect.sid');
       res.render('index', {
         title: 'Bookshelf',
-        csrfToken: req.csrfToken(),
+        csrfToken: csrfToken,
         user: null, //reassign user to null and clear the columns
       });
     });
@@ -120,7 +98,7 @@ exports.logout = async (req, res, next) => {
  */
 exports.addBooksToSelector = async (req, res) => {
   try {
-    const result = await User.getBookList(req.body.title, req.body.author);
+    const result = await Api.getBookList(req.body.title, req.body.author);
     if (result.ok) {
       const books = await result.json();
       let bookList = [];
@@ -226,16 +204,69 @@ exports.getReadShelf = async (req, res) => {
  */
 exports.moveBook = async (req, res) => {
   let result = await User.moveBook(req.body.book_id, req.body.start, req.body.end, req.session.user.sub);
-  if (result === null) { // the insert worked, but the delete failed
+  if (result) { // the insert worked
+    res.status(201).json({ success: true, data: result });
+  }
+  else if (result === null) { // the insert worked, but the delete failed
     res.status(409).json({ success: false });
-  }
-  else if (result) { // the insert and the delete failed
-    res.status(201).json({ success: true });
-  }
-  else { // the initial select failed, or the insert failed
+  } else {
+    // the initial select failed, or the insert failed
     res.status(500).json({ success: false });
   }
 }
+
+/**
+ * DELETE /move-btn
+ * Moves a book from one shelf to another using the Move Book modal (by title)
+ */
+exports.moveBookBtn = async (req, res) => {
+  // must be logged in
+  if (!req.session.user) {
+    return res
+      .status(403)
+      .json({ success: false, message: 'User not logged in.' });
+  }
+
+  const userId = req.session.user.sub;
+  const { title, start, end } = req.body;
+
+  if (!title || !start || !end) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Missing title/start/end.' });
+  }
+
+  if (start === end) {
+    return res.status(400).json({
+      success: false,
+      message: 'Start and end shelves must be different.',
+    });
+  }
+
+  try {
+    const result = await User.moveBookByTitle(title, start, end, userId);
+
+    if (result === 'NOT_FOUND') {
+      // no book with that title in the origin shelf
+      return res.status(404).json({
+        success: false,
+        message: 'Book not found on the origin shelf.',
+      });
+    } else if (result === null) {
+      // insert worked, delete failed
+      return res.status(409).json({ success: false });
+    } else if (result) {
+      // everything worked
+      return res.status(201).json({ success: true, data: result });
+    } else {
+      // DB error
+      return res.status(500).json({ success: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false });
+  }
+};
+
 
 /**
  * DELETE /
@@ -254,13 +285,13 @@ exports.removeBook = async (req, res) => {
 /**
  * DELETE /
  * Clear all books from the requested shelf
- * @param {} req 
- * @param {*} res 
- * @returns 
+ * @param {} req
+ * @param {*} res
+ * @returns
  */
 exports.clearShelf = async (req, res) => {
-  try { 
-    //if the user is logged in, get the bookshelf they're targeting, 
+  try {
+    //if the user is logged in, get the bookshelf they're targeting,
     //their id, and perform the clear
     if (!req.session.user) {
       return res.status(403).json({ success: false, message: 'User not logged in.' });

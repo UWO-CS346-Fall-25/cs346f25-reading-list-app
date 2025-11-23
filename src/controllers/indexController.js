@@ -2,6 +2,7 @@
  * Index Controller
  */
 const User = require('../models/User');
+const Api = require('../models/Api');
 
 /**
  * GET /
@@ -187,7 +188,7 @@ exports.getFilter = async (req, res) => {
  */
 exports.addBook = async (req, res) => {
   try { // attempting to contact Open Library
-    const result = await User.getBookList(req.body.title, req.body.author);
+    const result = await Api.getBookList(req.body.title, req.body.author);
     if (result.ok) { // determining if the fetch worked
       const books = await result.json();
       let bookList = []; // building a list of all editions for a given title

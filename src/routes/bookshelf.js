@@ -36,6 +36,7 @@ router.get('/read', bookshelfController.getReadShelf);
 
 // routes for deleting bookshelves
 router.delete('/move', bookshelfController.moveBook);
+router.delete('/move-btn', bookshelfController.moveBookBtn);
 router.delete('/delete', bookshelfController.removeBook);
 router.delete('/clear', bookshelfController.clearShelf);
 
