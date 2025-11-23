@@ -515,6 +515,10 @@ Highlight drop zone
   background-color: #eee;
 }
 
+/* Lines up the From and To input forms for the move modal */
+#move-to-shelf {
+  margin-left: 20px;   
+}
 
 /* Footer */
 footer {
