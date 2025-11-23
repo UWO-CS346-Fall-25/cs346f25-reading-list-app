@@ -405,6 +405,79 @@ class User {
       return false;
     }
   }
+
+    /**
+   * Moves a book from one shelf to another using its title instead of ID.
+   * @param {string} title - the book's title
+   * @param {string} originShelf - origin shelf 
+   * @param {string} destinationShelf - destination shelf
+   * @param {string} userId - user's id
+   * @returns {Promise<object>} new book id, false if could not move, null if partially worked
+   */
+  static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
+    const originTable = this.getTableName(originShelf);
+    const destinationTable = this.getTableName(destinationShelf);
+
+    let idType = null;
+    if (originTable === 'books_to_read') {
+      idType = 'to_read_id';
+    } else if (originTable === 'books_being_read') {
+      idType = 'being_read_id';
+    } else {
+      idType = 'read_id';
+    }
+
+    try {
+      //find one matching book on the origin shelf
+      const { data, error } = await supabase.supabase
+        .from(originTable)
+        .select(`${idType}, title, authors`)
+        .eq('title', title)
+        .eq('user_id', userId)
+        .limit(1);
+
+      if (error || !data || data.length === 0) {
+        // couldn't find the book or query failed
+        return false;
+      }
+
+      const book = data[0];
+
+      //insert into destination shelf
+      const insertResult = await supabase.supabase
+        .from(destinationTable)
+        .insert([{ title: book.title, authors: book.authors, user_id: userId }])
+        .select();
+
+      if (insertResult.error) {
+        // insert failed
+        return false;
+      }
+
+      const newData = insertResult.data || [];
+      const newId =
+        newData.length === 1 ? Object.values(newData[0])[0] : null;
+
+      //delete from origin shelf
+      const deleteResult = await supabase.supabase
+        .from(originTable)
+        .delete()
+        .eq(idType, book[idType])
+        .eq('user_id', userId);
+
+      if (deleteResult.error) {
+        // insert worked, but delete failed -> partial success
+        return null;
+      }
+
+      // everything worked
+      return newId;
+    } catch (error) {
+      // network or unexpected error
+      return false;
+    }
+  }
+
   //   /**
   //    * Find all users
   //    * @returns {Promise<Array>} Array of users

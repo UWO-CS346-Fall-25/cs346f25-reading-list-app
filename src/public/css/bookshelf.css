@@ -126,9 +126,9 @@ main {
 
 /* New Stylings for Nav bar and main content */
 .nav-links {
-    display: flex;
-    flex-direction: row;
-    list-style: none;
+  display: flex;
+  flex-direction: row;
+  list-style: none;
 }
 
 /* Manage Books Button Stylings */
@@ -155,7 +155,7 @@ main {
   background-color: white;
   width: 100%;
   min-width: 0;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   flex-direction: column;
   z-index: 2000;
@@ -257,7 +257,7 @@ h2 {
   justify-content: center;
 }
 
-.center > :first-child {
+.center> :first-child {
   margin-top: 0;
   margin-bottom: auto;
 }
@@ -293,7 +293,7 @@ Highlight drop zone
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .modal-content {
@@ -334,10 +334,10 @@ Highlight drop zone
   display: none;
   z-index: 1000;
   position: fixed;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-#popup > div {
+#popup>div {
   width: 600px;
   display: flex;
   max-height: 600px;
@@ -471,6 +471,7 @@ Highlight drop zone
 #confirm-clear-shelf {
   background-color: #17d214;
 }
+
 #confirm-clear-shelf:hover {
   background-color: #198b0a;
 }
@@ -479,9 +480,41 @@ Highlight drop zone
 #cancel-clear-shelf {
   background-color: #d91f0e;
 }
+
 #cancel-clear-shelf:hover {
   background-color: #a30d0d;
 }
+
+/* Move Modal, Title displays all books in a fixed, scrollable box */
+.title-input-wrapper {
+  position: relative;
+}
+
+.title-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.title-dropdown.hidden {
+  display: none;
+}
+
+.title-dropdown-item {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.title-dropdown-item:hover {
+  background-color: #eee;
+}
+
 
 /* Footer */
 footer {
@@ -518,14 +551,13 @@ footer {
 
 /* 500px or less and only Currently Reading column will be on display */
 @media (max-width: 500px) {
-    .book-column {
-        display: none;
-    }
+  .book-column {
+    display: none;
+  }
 
-    .book-column:nth-child(2) {
-        display: block;
-    }
+  .book-column:nth-child(2) {
+    display: block;
+  }
 }
 
 /* Add animations for books being dragged from Currently Reading to Read and Will Read to Currently Reading */
-
