@@ -216,6 +216,59 @@ exports.moveBook = async (req, res) => {
 }
 
 /**
+ * DELETE /move-btn
+ * Moves a book from one shelf to another using the Move Book modal (by title)
+ */
+exports.moveBookBtn = async (req, res) => {
+  // must be logged in
+  if (!req.session.user) {
+    return res
+      .status(403)
+      .json({ success: false, message: 'User not logged in.' });
+  }
+
+  const userId = req.session.user.sub;
+  const { title, start, end } = req.body;
+
+  if (!title || !start || !end) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Missing title/start/end.' });
+  }
+
+  if (start === end) {
+    return res.status(400).json({
+      success: false,
+      message: 'Start and end shelves must be different.',
+    });
+  }
+
+  try {
+    const result = await User.moveBookByTitle(title, start, end, userId);
+
+    if (result === 'NOT_FOUND') {
+      // no book with that title in the origin shelf
+      return res.status(404).json({
+        success: false,
+        message: 'Book not found on the origin shelf.',
+      });
+    } else if (result === null) {
+      // insert worked, delete failed
+      return res.status(409).json({ success: false });
+    } else if (result) {
+      // everything worked
+      return res.status(201).json({ success: true, data: result });
+    } else {
+      // DB error
+      return res.status(500).json({ success: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false });
+  }
+};
+
+
+/**
  * DELETE /
  * Removes a book from the requested shelf
  */

@@ -119,7 +119,7 @@
           </select>
         </div>
 
-        <!--To shelf -->
+        <!-- To shelf -->
         <div class="form-row">
           <label for="move-to-shelf">To shelf:</label>
           <select id="move-to-shelf" name="toShelf" required disabled>
@@ -128,7 +128,7 @@
           </select>
         </div>
 
-        <!-- 3. Title-->
+        <!-- Title -->
         <div class="form-row">
           <label for="move-book-title">Title:</label>
           <div class="title-input-wrapper">
@@ -137,36 +137,42 @@
           </div>
         </div>
 
-
-
-        <div id="popup" class="modal">
-          <div class="modal-content">
-            <button id="close">X</button>
-            <ul id="book-list"></ul>
-          </div>
+        <!-- Submit button -->
+        <div class="form-row">
+          <button type="submit">Move Book</button>
         </div>
+      </form>
+    </div>
+  </div>
 
-        <!-- Clear Shelf modal for the each column's button -->
-        <div id="clear-shelf-modal" class="modal">
-          <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Clear Bookshelf</h2>
-            <p>Are you sure you want to clear all books from this column?</p>
-            <div class="modal-actions">
-              <button id="confirm-clear-shelf">Yes</button>
-              <button id="cancel-clear-shelf">No</button>
-            </div>
-          </div>
-        </div>
+  <div id="popup" class="modal">
+    <div class="modal-content">
+      <button id="close">X</button>
+      <ul id="book-list"></ul>
+    </div>
+  </div>
+
+  <!-- Clear Shelf modal for the each column's button -->
+  <div id="clear-shelf-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Clear Bookshelf</h2>
+      <p>Are you sure you want to clear all books from this column?</p>
+      <div class="modal-actions">
+        <button id="confirm-clear-shelf">Yes</button>
+        <button id="cancel-clear-shelf">No</button>
+      </div>
+    </div>
+  </div>
 
 
-        <footer>
-          <div class="container">
-            <p>&copy; 2025 CS346 Project. All rights reserved.</p>
-          </div>
-        </footer>
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 CS346 Project. All rights reserved.</p>
+    </div>
+  </footer>
 
-        <script src="/js/bookshelf.js"></script>
+  <script src="/js/bookshelf.js"></script>
 </body>
 
 </html>

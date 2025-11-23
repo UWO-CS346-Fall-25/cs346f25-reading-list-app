@@ -611,19 +611,29 @@ function setupMoveBookModal() {
 
   // Helper: get all book titles from a shelf (assumes <ul id="..."> with <li>Book Title</li>)
   function getTitlesForShelf(shelfId) {
-    const shelf = document.getElementById(shelfId);
-    if (!shelf) return [];
+  const shelf = document.getElementById(shelfId);
+  if (!shelf) return [];
 
-    const titles = [];
-    const items = shelf.querySelectorAll('li');
-    items.forEach((li) => {
-      const text = li.textContent.trim();
-      if (text && !titles.includes(text)) {
-        titles.push(text);
+  const titles = [];
+
+  // each li has a div.book > div.center with several <p> tags
+  const centers = shelf.querySelectorAll('.book .center');
+
+  centers.forEach((center) => {
+    const ps = center.querySelectorAll('p');
+    // ps[0] = "BookID: ...", ps[1] = title
+    if (ps.length >= 2) {
+      const titleText = ps[1].textContent.trim();
+      if (titleText && !titles.includes(titleText)) {
+        titles.push(titleText);
       }
-    });
-    return titles;
-  }
+    }
+  });
+
+  return titles;
+}
+
+
 
   //show the list of books ---
   titleInput.addEventListener('focus', () => {
@@ -691,7 +701,7 @@ function setupMoveBookModal() {
       .getAttribute('content');
 
     try {
-      const response = await fetch('move', {
+      const response = await fetch('move-btn', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -322,7 +322,7 @@ class User {
           .insert([
             { title: book[0].title, authors: book[0].authors, user_id: userId },
           ]).select();
-          const newId = data.length === 1 ? Object.values(data[0])[0] : null;
+        const newId = data.length === 1 ? Object.values(data[0])[0] : null;
         if (!error) {
           // only attempting deletion if the insert worked
           const { data, error } = await supabase.supabase
@@ -406,14 +406,14 @@ class User {
     }
   }
 
-    /**
-   * Moves a book from one shelf to another using its title instead of ID.
-   * @param {string} title - the book's title
-   * @param {string} originShelf - origin shelf 
-   * @param {string} destinationShelf - destination shelf
-   * @param {string} userId - user's id
-   * @returns {Promise<object>} new book id, false if could not move, null if partially worked
-   */
+  /**
+ * Moves a book from one shelf to another using its title instead of ID.
+ * @param {string} title - the book title
+ * @param {string} originShelf - origin shelf )
+ * @param {string} destinationShelf - destination shelf 
+ * @param {string} userId - user's id
+ * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
+ */
   static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
     const originTable = this.getTableName(originShelf);
     const destinationTable = this.getTableName(destinationShelf);
@@ -428,7 +428,7 @@ class User {
     }
 
     try {
-      //find one matching book on the origin shelf
+      //find a matching book in the origin shelf
       const { data, error } = await supabase.supabase
         .from(originTable)
         .select(`${idType}, title, authors`)
@@ -436,9 +436,12 @@ class User {
         .eq('user_id', userId)
         .limit(1);
 
-      if (error || !data || data.length === 0) {
-        // couldn't find the book or query failed
-        return false;
+      if (error) {
+        return false;        // DB error
+      }
+
+      if (!data || data.length === 0) {
+        return 'NOT_FOUND';  // no book with that title on this shelf
       }
 
       const book = data[0];
@@ -446,37 +449,35 @@ class User {
       //insert into destination shelf
       const insertResult = await supabase.supabase
         .from(destinationTable)
-        .insert([{ title: book.title, authors: book.authors, user_id: userId }])
+        .insert([
+          { title: book.title, authors: book.authors, user_id: userId },
+        ])
         .select();
 
       if (insertResult.error) {
-        // insert failed
-        return false;
+        return false;        // insert failed
       }
 
-      const newData = insertResult.data || [];
+      const insertedRows = insertResult.data || [];
       const newId =
-        newData.length === 1 ? Object.values(newData[0])[0] : null;
+        insertedRows.length === 1 ? Object.values(insertedRows[0])[0] : null;
 
       //delete from origin shelf
       const deleteResult = await supabase.supabase
         .from(originTable)
         .delete()
-        .eq(idType, book[idType])
-        .eq('user_id', userId);
+        .eq(idType, book[idType]);
 
       if (deleteResult.error) {
-        // insert worked, but delete failed -> partial success
-        return null;
+        return null;         // insert worked, delete failed
       }
 
-      // everything worked
-      return newId;
+      return newId;          // everything worked
     } catch (error) {
-      // network or unexpected error
-      return false;
+      return false;          // network / unexpected
     }
   }
+
 
   //   /**
   //    * Find all users
