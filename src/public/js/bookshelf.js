@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   setupAddBookModal();
   calibrateModal();
   clearShelfModal();
+  setupMoveBookModal();
 
   // Find and attach the delete button listener
   // We need to give your delete link an ID
