@@ -531,3 +531,111 @@ async function clearShelf(currShelf) {
   }
 }
 
+function setupMoveBookModal() {
+  const modal = document.getElementById('move-modal');        
+  const form = document.getElementById('move-book-form');     
+  const closeBtn = modal.querySelector('.close');     
+
+  const fromSelect = document.getElementById('move-from-shelf');
+  const toSelect = document.getElementById('move-to-shelf');
+  const titleInput = document.getElementById('move-book-title');
+
+  // Adjust the selector depending on how your dropdown <a> tags are set up:
+  // here we assume .dropdown-link elements in order: Add, Edit, Move, Delete
+  const moveLink = document.getElementById('move-book-link');
+  if (moveLink) {
+    moveLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = 'block';
+    });
+  }
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    form.reset();
+    toSelect.disabled = true;
+    titleInput.disabled = true;
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      form.reset();
+      toSelect.disabled = true;
+      titleInput.disabled = true;
+    }
+  });
+
+  fromSelect.addEventListener('change', () => {
+    if (fromSelect.value) {
+      toSelect.disabled = false;
+      titleInput.disabled = false;
+    } else {
+      toSelect.disabled = true;
+      titleInput.disabled = true;
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const start = fromSelect.value;
+    const end = toSelect.value;
+    const title = titleInput.value.trim();
+
+    if (!start || !end || !title) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    if (start === end) {
+      alert('The starting and ending shelf must be different.');
+      return;
+    }
+
+    const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
+
+    try {
+      const response = await fetch('move', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': token,
+        },
+        body: JSON.stringify({
+          title: title,
+          start: start,
+          end: end,
+        }),
+      });
+
+      if (response.status === 201) {
+        // Move succeeded
+        const json = await response.json();
+        if (json.success) {
+          alert(`"${title}" was moved successfully.`);
+        } else {
+          // backend responded but no success flag – safest to reload
+          alert('Move completed, reloading your bookshelf.');
+        }
+        window.location.reload();
+      } else if (response.status === 404) {
+        alert('Could not find that book on the specified starting shelf.');
+      } else if (response.status === 409) {
+        alert('Move failed due to a conflict. The book may exist on both shelves now.');
+        window.location.reload();
+      } else {
+        alert('Could not complete the move. Please try again');
+      }
+    } catch (error) {
+      console.error('Error moving book:', error);
+      alert('Network error. Please try again later.');
+    } finally {
+      modal.style.display = 'none';
+      form.reset();
+      toSelect.disabled = true;
+      titleInput.disabled = true;
+    }
+  });
+}
+
