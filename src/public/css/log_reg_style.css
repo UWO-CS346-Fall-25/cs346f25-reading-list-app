@@ -135,7 +135,21 @@ main::before {
   background-image: url("/images/sign_in_background.jpg");
 }
 
-/* Maybe we can add something like input:invalid { border: 2px solid red; } for incorrectly formatted email and password AND keep your alert on button click */
+.spinner-container {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
 
 form {
   width: 300px;
@@ -217,6 +231,13 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Move Indicator */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

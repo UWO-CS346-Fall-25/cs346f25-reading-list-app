@@ -1,16 +1,14 @@
 /**
- * Main JavaScript File
+ * Register JavaScript File
  *
- * This file contains client-side JavaScript for your application.
- * Use vanilla JavaScript (no frameworks) for DOM manipulation and interactions.
+ * This file contains functions used by the register view
+ * to validate the form for registering a user
  *
- * Common tasks:
- * - Form validation
- * - Interactive UI elements
- * - AJAX requests
- * - Event handling
+ * Primary task:
+ * - use the username, email, and password to register a user account
  */
-// Wait for DOM to be fully loaded
+
+// Adding listeners to the register form when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
   initFormValidation();
 });
@@ -19,46 +17,48 @@ document.addEventListener('DOMContentLoaded', function () {
  * Initialize form validation
  */
 function initFormValidation() {
-  const form = document.querySelector('form');
-  form.addEventListener('submit', function (e) {
-      if (validateForm(form)) {
-        processForm();
+  const form = document.querySelector('form'); // retrieving the form
+  form.addEventListener('submit', function (e) { // adding submit listener
+      if (validateForm(form)) { // validate the form before processing it
+        processForm(); // processing the form
       }
-      e.preventDefault();
+      e.preventDefault(); // preventing the page from reloading
   });
 }
 
 /**
- * Validate a form
+ * Validating the registration form
  * @param {HTMLFormElement} form - Form element to validate
  * @returns {boolean} - True if form is valid
  */
 function validateForm(form) {
-  let isValid = true;
-  const requiredFields = form.querySelectorAll('[required]');
-  requiredFields.forEach((field) => {
-    if (!field.value.trim()) {
-      showError(field, 'This field is required');
-      isValid = false;
+  let isValid = true; // local bool to support one-way-in one-way-out structure
+  const requiredFields = form.querySelectorAll('[required]'); // retrieving required fields
+  requiredFields.forEach((field) => { // validating each required field
+    if (!field.value.trim()) { // verifying the field contains data
+      showError(field, 'This field is required'); // displaying error if the field contains no data
+      isValid = false; // marking the form as invalid
     }
-    else if (!field.checkValidity()) {
-      if (field.type === 'email') {
+    else if (!field.checkValidity()) { // verifying each field meets requirements
+      if (field.type === 'email') { // if email field, displaying invalid email error
         showError(field, 'Please enter a valid Email Address');
-      }
-      else {
+      } else if (field.type === 'password') { // if password field, displaying password too short error
         showError(field, 'Password must be at least 10 characters long');
       }
-      isValid = false;
+      else { // if username field, displaying username too short error
+        showError(field, 'Username must be at least 5 characters long');
+      }
+      isValid = false; // marking the form as invalid
     }
     else {
-      clearError(field);
+      clearError(field); // clearing error messages if form is valid
     }
   });
-  return isValid;
+  return isValid; // returning form validity
 }
 
 /**
- * Show error message for a field
+ * Show error message for an invalid field
  * @param {HTMLElement} field - Form field
  * @param {string} message - Error message
  */
@@ -77,7 +77,7 @@ function showError(field, message) {
 }
 
 /**
- * Clear error message for a field
+ * Clear error message for a valid field
  * @param {HTMLElement} field - Form field
  */
 function clearError(field) {
@@ -87,10 +87,20 @@ function clearError(field) {
 }
 
 /**
- * Processes a validated form
+ * Processing a validated form
  */
 async function processForm() {
-  const token = document.getElementsByName("csrf-token")[0].getAttribute('content');
+  const spinner = document.getElementsByClassName('spinner-container')[0];
+
+
+  const button = document.getElementById('register');
+  button.style.opacity = 0.5;
+  button.style.pointerEvents = 'none';
+  spinner.style.display = 'block';
+
+
+
+  const token = document.getElementsByName("csrf-token")[0].getAttribute('content'); // retrieving csfrToken for safe fetch
   try { // fetch request to add register a user
     let response = await fetch('/register', {
       method: 'POST',
@@ -104,110 +114,25 @@ async function processForm() {
         password: document.getElementById('password').value
       }),
     });
-    if (response.status === 201) { // successful register
+    if (response.status === 201) { // successful register, telling user to complete registration in their email
       alert("Registration Successful!\nPlease complete the validation process in your email.");
       window.location.href = '/index';
     }
-    else if (response.status === 409) { // existing email address
-      alert("An account already exists with this email!");
+    else if (response.status === 409) { // existing email address, telling user to login
+      alert("An account already exists with this email! Please login to continue.");
+      window.location.href = '/login';
     }
-    else { // unable to connect to database
+    else { // unable to connect to database (500 status), telling user to try again at a later time
       alert("Account registration error. Please try again later.");
+      button.style.opacity = 1;
+      button.style.pointerEvents = 'all';
+      spinner.style.display = 'none';
     }
   }
-  catch(error) { // unable to find route to register
+  catch(error) { // fetch error, telling user to try again at a later time
     alert("Account registration error. Please try again later.");
+    button.style.opacity = 1;
+    button.style.pointerEvents = 'all';
+    spinner.style.display = 'none';
   }
 }
-
-// /**
-//  * Initialize interactive elements
-//  */
-// function initInteractiveElements() {
-//   // Example: Add smooth scrolling to anchor links
-//   const anchorLinks = document.querySelectorAll('a[href^="#"]');
-
-//   anchorLinks.forEach((link) => {
-//     link.addEventListener('click', function (e) {
-//       const targetId = this.getAttribute('href');
-//       if (targetId === '#') return;
-
-//       const targetElement = document.querySelector(targetId);
-//       if (targetElement) {
-//         e.preventDefault();
-//         targetElement.scrollIntoView({
-//           behavior: 'smooth',
-//           block: 'start',
-//         });
-//       }
-//     });
-//   });
-// }
-
-// /**
-//  * Make an AJAX request
-//  * @param {string} url - Request URL
-//  * @param {object} options - Request options (method, headers, body, etc.)
-//  * @returns {Promise<any>} - Response data
-//  */
-// /* eslint-disable no-unused-vars */
-// async function makeRequest(url, options = {}) {
-//   try {
-//     const response = await fetch(url, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//         ...options.headers,
-//       },
-//       ...options,
-//     });
-
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-
-//     return await response.json();
-//   } catch (error) {
-//     console.error('Request failed:', error);
-//     throw error;
-//   }
-// }
-
-// /**
-//  * Display a notification message
-//  * @param {string} message - Message to display
-//  * @param {string} type - Type of message (success, error, info, warning)
-//  */
-// /* eslint-disable no-unused-vars */
-// function showNotification(message, type = 'info') {
-//   // Create notification element
-//   const notification = document.createElement('div');
-//   notification.className = `notification notification-${type}`;
-//   notification.textContent = message;
-//   notification.style.position = 'fixed';
-//   notification.style.top = '20px';
-//   notification.style.right = '20px';
-//   notification.style.padding = '1rem';
-//   notification.style.borderRadius = '4px';
-//   notification.style.backgroundColor =
-//     type === 'success'
-//       ? '#28a745'
-//       : type === 'error'
-//         ? '#dc3545'
-//         : type === 'warning'
-//           ? '#ffc107'
-//           : '#17a2b8';
-//   notification.style.color = 'white';
-//   notification.style.zIndex = '1000';
-//   notification.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-
-//   // Add to page
-//   document.body.appendChild(notification);
-
-//   // Remove after 3 seconds
-//   setTimeout(() => {
-//     notification.remove();
-//   }, 3000);
-// }
-
-// Export functions if using modules
-// export { validateForm, makeRequest, showNotification };

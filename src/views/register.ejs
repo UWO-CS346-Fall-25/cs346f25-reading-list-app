@@ -21,6 +21,11 @@
   </header>
 
   <main>
+
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+
     <form novalidate>
       <figure>
         <img src="/images/open-book.png" alt="book image" width="100">
@@ -29,7 +34,7 @@
       <div id="content">
         <section class="user-detail">
           <h2>Username</h2>
-          <input id="username" required>
+          <input id="username" minlength="5" required>
           <div id="email-error" class="error-text">error text</div>
         </section>
         <section class="user-detail">
