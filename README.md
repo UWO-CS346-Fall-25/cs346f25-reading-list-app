@@ -11,6 +11,9 @@ Updates for external API (Open Library):
   - Did not add routes or controllers for API calls, instead imported new model into existing
     controllers that need to call to the API
 
+Updates to Manage Books:
+   -Move now works and instead of dragging, you can use the move modal
+
 ## Feature/week11/deliverable4_auth
 
 Updates to Landing page:

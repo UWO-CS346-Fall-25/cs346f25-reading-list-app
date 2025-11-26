@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   setupAddBookModal();
   calibrateModal();
   clearShelfModal();
+  setupMoveBookModal();
 
   // Find and attach the delete button listener
   // We need to give your delete link an ID
@@ -238,7 +239,7 @@ function dragBooks() {
           alert('The move failed. The book may now appear on both shelves.');
           window.location.reload();
         }
-        else  { // failed to locate book or insert
+        else { // failed to locate book or insert
           alert('Could not complete the move. Please try again later.');
           window.location.reload();
         }
@@ -529,4 +530,210 @@ async function clearShelf(currShelf) {
     alert('Network error. Please try again.');
   }
 }
+
+function setupMoveBookModal() {
+  const modal = document.getElementById('move-modal');
+  const form = document.getElementById('move-book-form');
+  const closeBtn = modal.querySelector('.close');
+
+  const fromSelect = document.getElementById('move-from-shelf');
+  const toSelect = document.getElementById('move-to-shelf');
+  const titleInput = document.getElementById('move-book-title');
+  const titleDropdown = document.getElementById('move-title-dropdown');
+
+  // shelves
+  const shelves = [
+    { value: 'to-read-books', label: 'To Read' },
+    { value: 'reading-books', label: 'Reading' },
+    { value: 'finished-books', label: 'Finished' },
+  ];
+
+  // open modal from Manage Books
+  const moveLink = document.getElementById('move-book-link');
+  if (moveLink) {
+    moveLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = 'block';
+    });
+  }
+
+  function resetFormState() {
+    form.reset();
+    toSelect.disabled = true;
+    titleInput.disabled = true;
+    titleDropdown.innerHTML = '';
+    titleDropdown.classList.add('hidden');
+    toSelect.innerHTML =
+      '<option value="" disabled selected>Select a shelf</option>';
+  }
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    resetFormState();
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      resetFormState();
+    }
+  });
+
+  // From input form
+  fromSelect.addEventListener('change', () => {
+    const fromValue = fromSelect.value;
+
+    if (!fromValue) {
+      resetFormState();
+      return;
+    }
+
+    // enable the other two inputs
+    toSelect.disabled = false;
+    titleInput.disabled = false;
+
+    // build To options: every shelf except the selected From
+    toSelect.innerHTML =
+      '<option value="" disabled selected>Select a shelf</option>';
+    shelves
+      .filter((s) => s.value !== fromValue)
+      .forEach((s) => {
+        const opt = document.createElement('option');
+        opt.value = s.value;
+        opt.textContent = s.label;
+        toSelect.appendChild(opt);
+      });
+
+    // clear any previous title list
+    titleDropdown.innerHTML = '';
+    titleDropdown.classList.add('hidden');
+  });
+
+  // Helper: get all book titles from a shelf (assumes <ul id="..."> with <li>Book Title</li>)
+  function getTitlesForShelf(shelfId) {
+  const shelf = document.getElementById(shelfId);
+  if (!shelf) return [];
+
+  const titles = [];
+
+  // each li has a div.book > div.center with several <p> tags
+  const centers = shelf.querySelectorAll('.book .center');
+
+  centers.forEach((center) => {
+    const ps = center.querySelectorAll('p');
+    // ps[0] = "BookID: ...", ps[1] = title
+    if (ps.length >= 2) {
+      const titleText = ps[1].textContent.trim();
+      if (titleText && !titles.includes(titleText)) {
+        titles.push(titleText);
+      }
+    }
+  });
+
+  return titles;
+}
+
+
+
+  //show the list of books ---
+  titleInput.addEventListener('focus', () => {
+    const fromValue = fromSelect.value;
+    if (!fromValue) {
+      alert('Select a "From shelf" first.');
+      fromSelect.focus();
+      return;
+    }
+
+    const titles = getTitlesForShelf(fromValue);
+    titleDropdown.innerHTML = '';
+
+    if (titles.length === 0) { //Handle empty column
+      const emptyMsg = document.createElement('div');
+      emptyMsg.classList.add('title-dropdown-item');
+      emptyMsg.textContent = 'No books in this shelf.';
+      titleDropdown.appendChild(emptyMsg);
+    } else {
+      titles.forEach((title) => {
+        const item = document.createElement('div');
+        item.classList.add('title-dropdown-item');
+        item.textContent = title;
+        item.addEventListener('click', () => {
+          titleInput.value = title;
+          titleDropdown.classList.add('hidden');
+        });
+        titleDropdown.appendChild(item);
+      });
+    }
+
+    titleDropdown.classList.remove('hidden');
+  });
+
+  // Hide dropdown if user clicks somewhere else
+  document.addEventListener('click', (e) => {
+    if (
+      !titleDropdown.contains(e.target) &&
+      e.target !== titleInput
+    ) {
+      titleDropdown.classList.add('hidden');
+    }
+  });
+
+  // Submit handler
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const start = fromSelect.value;
+    const end = toSelect.value;
+    const title = titleInput.value.trim();
+
+    if (!start || !end || !title) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    if (start === end) {
+      alert('The starting and ending shelf must be different.');
+      return;
+    }
+
+    const token = document
+      .getElementsByName('csrf-token')[0]
+      .getAttribute('content');
+
+    try {
+      const response = await fetch('move-btn', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'CSRF-Token': token,
+        },
+        body: JSON.stringify({ title, start, end }),
+      });
+
+      if (response.status === 201) {
+        const json = await response.json();
+        if (json.success) {
+          alert(`"${title}" was moved successfully.`);
+        } else {
+          alert('Move completed, reloading your bookshelf.');
+        }
+        window.location.reload();
+      } else if (response.status === 404) {
+        alert('Could not find that book on the specified starting shelf.');
+      } else if (response.status === 409) {
+        alert('Move failed due to a conflict.');
+        window.location.reload();
+      } else {
+        alert('Could not complete the move. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error moving book:', error);
+      alert('Network error. Please try again later.');
+    } finally {
+      modal.style.display = 'none';
+      resetFormState();
+    }
+  });
+}
+
 

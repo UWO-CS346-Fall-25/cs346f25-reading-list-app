@@ -322,7 +322,7 @@ class User {
           .insert([
             { title: book[0].title, authors: book[0].authors, user_id: userId },
           ]).select();
-          const newId = data.length === 1 ? Object.values(data[0])[0] : null;
+        const newId = data.length === 1 ? Object.values(data[0])[0] : null;
         if (!error) {
           // only attempting deletion if the insert worked
           const { data, error } = await supabase.supabase
@@ -405,6 +405,80 @@ class User {
       return false;
     }
   }
+
+  /**
+ * Moves a book from one shelf to another using its title instead of ID.
+ * @param {string} title - the book title
+ * @param {string} originShelf - origin shelf )
+ * @param {string} destinationShelf - destination shelf
+ * @param {string} userId - user's id
+ * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
+ */
+  static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
+    const originTable = this.getTableName(originShelf);
+    const destinationTable = this.getTableName(destinationShelf);
+
+    let idType = null;
+    if (originTable === 'books_to_read') {
+      idType = 'to_read_id';
+    } else if (originTable === 'books_being_read') {
+      idType = 'being_read_id';
+    } else {
+      idType = 'read_id';
+    }
+
+    try {
+      //find a matching book in the origin shelf
+      const { data, error } = await supabase.supabase
+        .from(originTable)
+        .select(`${idType}, title, authors`)
+        .eq('title', title)
+        .eq('user_id', userId)
+        .limit(1);
+
+      if (error) {
+        return false;        // DB error
+      }
+
+      if (!data || data.length === 0) {
+        return 'NOT_FOUND';  // no book with that title on this shelf
+      }
+
+      const book = data[0];
+
+      //insert into destination shelf
+      const insertResult = await supabase.supabase
+        .from(destinationTable)
+        .insert([
+          { title: book.title, authors: book.authors, user_id: userId },
+        ])
+        .select();
+
+      if (insertResult.error) {
+        return false;        // insert failed
+      }
+
+      const insertedRows = insertResult.data || [];
+      const newId =
+        insertedRows.length === 1 ? Object.values(insertedRows[0])[0] : null;
+
+      //delete from origin shelf
+      const deleteResult = await supabase.supabase
+        .from(originTable)
+        .delete()
+        .eq(idType, book[idType]);
+
+      if (deleteResult.error) {
+        return null;         // insert worked, delete failed
+      }
+
+      return newId;          // everything worked
+    } catch (error) {
+      return false;          // network / unexpected
+    }
+  }
+
+
   //   /**
   //    * Find all users
   //    * @returns {Promise<Array>} Array of users
