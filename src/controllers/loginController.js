@@ -1,89 +1,75 @@
 /**
- * Index Controller
+ * Login Controller
  *
- * Controllers handle the business logic for routes.
- * They process requests, interact with models, and send responses.
+ * This controller handles basic navigation on the login page,
+ * as well as logging the user into their Bookshelf
  *
- * Best practices:
- * - Keep controllers focused on request/response handling
- * - Move complex business logic to separate service files
- * - Use models to interact with the database
- * - Handle errors appropriately
+ * Primary task:
+ * - logs in a user to their account
  */
 
 // Import models if needed
 const User = require('../models/User');
 
 /**
- * GET /
- * Display the home page
- */
+* Controller: getHome
+* Purpose: Redirects the user to the home page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /index or shows an error page
+*/
 exports.getHome = async (req, res, next) => {
   try {
-    res.render('index', {
+    res.render('index', { // attempting to render the home page
       title: 'Home',
       csrfToken: req.csrfToken(),
     });
-  }
-  catch (error) {
+  } catch (error) { // catching error if the home page could not be rendered
     next(error);
   }
 };
 
 /**
- * GET /about
- * Display the about page
- */
+* Controller: getRegister
+* Purpose: Redirects the user to the register page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /register or shows an error page
+*/
 exports.getRegister = async (req, res, next) => {
   try {
     res.render('register', {
       title: 'Register',
       csrfToken: req.csrfToken(),
     });
-  }
-  catch (error) {
+  } catch (error) {
     next(error);
   }
 };
 
 /**
- * GET /about
- * Display the about page
- */
-exports.getBookshelf = async (req, res, next) => {
-  try {
-    res.render('bookshelf', {
-      title: 'Bookshelf',
-      csrfToken: req.csrfToken(),
-    });
-  }
-  catch (error) {
-    next(error);
-  }
-};
-
-/**
- * GET /login
- * Gets user account details, if they exist
- */
-exports.login = async (req, res) => {
+* Controller: postRegister
+* Purpose: attempts to register a new user account
+* Input: req, res, next. (Session data, follow up actions)
+* Output: 201 if success, 409 if already exists, 500 if cannot reach database
+*/
+exports.postLogin = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [loginController] Attempting to login user`);
   try { // attempting to contact the database
-    const response = await User.validateLogin(req.body.email, req.body.password);
+    const response = await User.validateLogin(
+      req.body.email,
+      req.body.password
+    );
     if (response.user === null) { // 404 if no account in database
-      res.status(404).json( { success: false } );
+      console.error(`[${new Date().toISOString()}] [loginController] DB Error: Unable to locate account that matches entered credentials`);
+      res.status(404).json({ success: false });
     }
     else { // storing session and 201 if account found
+      console.log(`[${new Date().toISOString()}] [RegisterController] Success: User found:`);
+      console.log(response);
       req.session.user = response.session.user.user_metadata;
-      // req.session.user = {
-      //   id: response.user.id,
-      //   email: response.user.email,
-      //   display_name: response.user.display_name,
-      //   session: response.session,
-      // };
-      res.status(201).json( { success: true } );
+      res.status(201).json({ success: true });
     }
-  }
-  catch (error) { // 500 if cannot connect to database
-    res.status(500).json( { success: false } );
+  } catch (error) {// 500 if cannot connect to database
+    console.error(`[${new Date().toISOString()}] [loginController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
   }
 };

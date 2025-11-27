@@ -99,7 +99,6 @@ async function processForm() {
   spinner.style.display = 'block';
 
 
-
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content'); // retrieving csfrToken for safe fetch
   try { // fetch request to add register a user
     let response = await fetch('/register', {

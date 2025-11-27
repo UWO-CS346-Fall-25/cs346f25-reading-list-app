@@ -174,7 +174,7 @@ class User {
       return data;
     } catch (networkError) {
       // throwing an error if an error occurred
-      throw new Error();
+      throw new Error(networkError.message);
     }
   }
 
