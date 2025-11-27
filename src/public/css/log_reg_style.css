@@ -224,6 +224,18 @@ button:active{
   color: var(--danger-color);
 }
 
+#reset-prompt {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+}
+
+#new-password-prompt {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+}
+
 /* Footer */
 footer {
   background-color: var(--dark-color);

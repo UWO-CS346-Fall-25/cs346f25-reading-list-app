@@ -91,13 +91,10 @@ function clearError(field) {
  */
 async function processForm() {
   const spinner = document.getElementsByClassName('spinner-container')[0];
-
-
   const button = document.getElementById('register');
   button.style.opacity = 0.5;
   button.style.pointerEvents = 'none';
   spinner.style.display = 'block';
-
 
   const token = document.getElementsByName("csrf-token")[0].getAttribute('content'); // retrieving csfrToken for safe fetch
   try { // fetch request to add register a user
@@ -123,13 +120,12 @@ async function processForm() {
     }
     else { // unable to connect to database (500 status), telling user to try again at a later time
       alert("Account registration error. Please try again later.");
-      button.style.opacity = 1;
-      button.style.pointerEvents = 'all';
-      spinner.style.display = 'none';
     }
   }
   catch(error) { // fetch error, telling user to try again at a later time
     alert("Account registration error. Please try again later.");
+  }
+  finally {
     button.style.opacity = 1;
     button.style.pointerEvents = 'all';
     spinner.style.display = 'none';

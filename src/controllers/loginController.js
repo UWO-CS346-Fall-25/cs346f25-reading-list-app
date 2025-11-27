@@ -46,6 +46,23 @@ exports.getRegister = async (req, res, next) => {
 };
 
 /**
+* Controller: getReset
+* Purpose: Redirects the user to the reset page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /reset or shows an error page
+*/
+exports.getReset = async (req, res, next) => {
+  try {
+    res.render('reset', {
+      title: 'Reset',
+      csrfToken: req.csrfToken(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
 * Controller: postRegister
 * Purpose: attempts to register a new user account
 * Input: req, res, next. (Session data, follow up actions)

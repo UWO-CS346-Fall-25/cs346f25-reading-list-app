@@ -79,6 +79,12 @@ app.use('/', csrfProtection, indexRouter);
 const loginRouter = require('./routes/login');
 app.use('/', csrfProtection, loginRouter);
 
+const resetRouter = require('./routes/reset');
+app.use('/', csrfProtection, resetRouter);
+
+const passwordRouter = require('./routes/password');
+app.use('/', csrfProtection, passwordRouter);
+
 const registerRouter = require('./routes/register');
 app.use('/', csrfProtection, registerRouter);
 

@@ -5,6 +5,21 @@ const User = require('../models/User');
 const Api = require('../models/Api');
 
 /**
+ * A special function that must exist for the password reset
+ * link in the reset email to work properly
+ */
+exports.getPassword = async (req, res, next) => {
+  try {
+    res.render('password', {
+      title: 'password',
+      csrfToken: req.csrfToken(),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * GET /
  * Display the home page
  */

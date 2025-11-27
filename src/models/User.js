@@ -153,7 +153,8 @@ class User {
         throw new Error(error.message);
       }
       return data;
-    } catch (networkError) {// catching potential network error
+    } catch (networkError) {
+      // catching potential network error
       throw new Error(networkError.message);
     }
   }
@@ -174,6 +175,52 @@ class User {
       return data;
     } catch (networkError) {
       // throwing an error if an error occurred
+      throw new Error(networkError.message);
+    }
+  }
+
+  /**
+   * A function that sends the user a password reset email
+   * @param {object} email user email address
+   * @returns {Promise<object>} True if email sent, false if now
+   */
+  static async passwordReset(email) {
+    try {
+      // attempting to send the password reset email
+      const { data, error } =
+        await supabase.supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: 'http://localhost:3000/password',
+        });
+      if (error) {
+        // password reset email was not sent
+        return false;
+      } else {
+        // password reset email was sent
+        return true;
+      }
+    } catch (networkError) {
+      // unable to connect to database
+      throw new Error(networkError.message);
+    }
+  }
+
+  /**
+   * A function that updates a user's password
+   * @param {object} password user's new password
+   * @param {object} accessToken user's access token
+   * @param {object} refreshToken user's refresh token
+   * @returns {Promise<object>} True if password updated, false if now
+   */
+  static async resetPassword(password, accessToken, refreshToken) {
+    try { // attempting to send the password reset email
+      await supabase.supabase.auth.setSession({access_token: accessToken, refresh_token: refreshToken});
+      const { data, error } = await supabase.supabase.auth.updateUser({ password: password });
+      if (error) { // password was not reset
+        return false;
+      } else { // password was reset
+        return true;
+      }
+    } catch (networkError) { // unable to connect to database
       throw new Error(networkError.message);
     }
   }
@@ -320,7 +367,8 @@ class User {
           .from(destinationTable) // attempting to insert the book into the destination table
           .insert([
             { title: book[0].title, authors: book[0].authors, user_id: userId },
-          ]).select();
+          ])
+          .select();
         const newId = data.length === 1 ? Object.values(data[0])[0] : null;
         if (!error) {
           // only attempting deletion if the insert worked
@@ -406,13 +454,13 @@ class User {
   }
 
   /**
- * Moves a book from one shelf to another using its title instead of ID.
- * @param {string} title - the book title
- * @param {string} originShelf - origin shelf )
- * @param {string} destinationShelf - destination shelf
- * @param {string} userId - user's id
- * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
- */
+   * Moves a book from one shelf to another using its title instead of ID.
+   * @param {string} title - the book title
+   * @param {string} originShelf - origin shelf )
+   * @param {string} destinationShelf - destination shelf
+   * @param {string} userId - user's id
+   * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
+   */
   static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
     const originTable = this.getTableName(originShelf);
     const destinationTable = this.getTableName(destinationShelf);
@@ -436,11 +484,11 @@ class User {
         .limit(1);
 
       if (error) {
-        return false;        // DB error
+        return false; // DB error
       }
 
       if (!data || data.length === 0) {
-        return 'NOT_FOUND';  // no book with that title on this shelf
+        return 'NOT_FOUND'; // no book with that title on this shelf
       }
 
       const book = data[0];
@@ -448,13 +496,11 @@ class User {
       //insert into destination shelf
       const insertResult = await supabase.supabase
         .from(destinationTable)
-        .insert([
-          { title: book.title, authors: book.authors, user_id: userId },
-        ])
+        .insert([{ title: book.title, authors: book.authors, user_id: userId }])
         .select();
 
       if (insertResult.error) {
-        return false;        // insert failed
+        return false; // insert failed
       }
 
       const insertedRows = insertResult.data || [];
@@ -468,15 +514,14 @@ class User {
         .eq(idType, book[idType]);
 
       if (deleteResult.error) {
-        return null;         // insert worked, delete failed
+        return null; // insert worked, delete failed
       }
 
-      return newId;          // everything worked
+      return newId; // everything worked
     } catch (error) {
-      return false;          // network / unexpected
+      return false; // network / unexpected
     }
   }
-
 
   //   /**
   //    * Find all users
