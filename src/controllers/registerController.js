@@ -49,7 +49,7 @@ exports.getLogin = (req, res, next) => {
 /**
 * Controller: postRegister
 * Purpose: attempts to register a new user account
-* Input: req, res, next. (Session data, follow up actions)
+* Input: req.body.username [user's username], req.body.email [user's email], req.body.password [user's password]
 * Output: 201 if success, 409 if already exists, 500 if cannot reach database
 */
 exports.postRegister = async (req, res) => {

@@ -263,17 +263,17 @@ input[list="authors"], input[list="genres"] {
   border-radius: 5px;
 }
 
-#recommendations {
+#trending {
   flex: 4;
 }
 
-#recommendations section {
+#trending section {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-#recommendations h2 {
+#trending h2 {
   font-size: xx-large;
   width: 100%;
   text-align: center;

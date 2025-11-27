@@ -11,7 +11,7 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/index" class="logo">Bookshelf</a>
+        <p class="logo">Bookshelf</p>
         <% if (user) { %>
           <span>Welcome back <%= user.display_name %>!</span>
         <% } %>
@@ -46,21 +46,21 @@
           <datalist id="authors"></datalist>
           <div id="author-error" class="error-text">error text</div>
         </section>
-        <section>
+        <!-- <section>
           <h2>Genre</h2>
           <input id="genre-input" list="genres">
           <datalist id="genres"></datalist>
           <div id="genre-error" class="error-text">error text</div>
-        </section>
-        <section id="page-count">
+        </section> -->
+        <!-- <section id="page-count">
           <h2>Maximum page count</h2>
           <div id="radio-list"></div>
-        </section>
+        </section> -->
       </div>
       <button id="filter" type="submit">Filter</button>
     </form>
-    <section id="recommendations">
-      <h2>User recommendations</h2>
+    <section id="trending">
+      <h2>Trending Reads</h2>
       <ul id="books"></ul>
     </section>
   </main>

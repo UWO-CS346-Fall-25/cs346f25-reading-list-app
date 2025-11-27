@@ -83,9 +83,13 @@ function clearError(field) {
  * Processes a validated form
  */
 async function processForm() {
-  const token = document
-    .getElementsByName('csrf-token')[0]
-    .getAttribute('content');
+  const spinner = document.getElementsByClassName('spinner-container')[0]; // showing activity spinner to prevent multiple login submissions
+  const button = document.getElementById('login');
+  button.style.opacity = 0.5;
+  button.style.pointerEvents = 'none';
+  spinner.style.display = 'block';
+
+  const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
   try { // fetch request to attempt to log user into their account
     let response = await fetch('/user_login', {
       method: 'POST',
@@ -109,5 +113,10 @@ async function processForm() {
     }
   } catch (error) { // fetch error, telling user to try again at a later time
     alert('Log in error. Please try again later.');
+  }
+  finally {
+    button.style.opacity = 1;
+    button.style.pointerEvents = 'all';
+    spinner.style.display = 'none';
   }
 }

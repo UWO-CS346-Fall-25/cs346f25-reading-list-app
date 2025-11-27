@@ -25,21 +25,19 @@ const indexController = require('../controllers/indexController');
 router.get('/password', indexController.getPassword); // must exist for password reset redirect to function
 
 // Get routes
-router.get('/index', indexController.getHome);
 router.get('/login', indexController.getLogin);
 router.get('/register', indexController.getRegister);
 router.get('/bookshelf', indexController.getBookshelf);
-router.get('/signout', indexController.signOut)
+router.get('/signout', indexController.getSignout)
 router.get('/authors', indexController.getAuthors);
-router.get('/genres', indexController.getGenres);
-router.get('/pages', indexController.getPages);
-router.get('/recommended', indexController.getRecommended);
+// FOR FUTURE EXPANSION, DO NOT DELETE
+// router.get('/genres', indexController.getGenres);
+// router.get('/pages', indexController.getPages);
+router.get('/trending', indexController.getTrending);
 router.get('/filter', indexController.getFilter);
 
 // book routes
 router.post('/add', indexController.addBook);
 router.post('/addbook', indexController.addBookToBookshelf);
-
-// dummy comment
 
 module.exports = router;

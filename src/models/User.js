@@ -36,9 +36,7 @@ class User {
    * @returns {Promise<object>} the author list
    */
   static async getAuthors() {
-    const { data, error } = await supabase.supabase
-      .from('books')
-      .select('author');
+    const { data, error } = await supabase.supabase.from('books_being_read').select('authors');
     if (error === null) {
       // validating query
       return data;
@@ -48,51 +46,55 @@ class User {
     }
   }
 
-  /**
-   * Returns a list of all genres
-   * from the books table
-   * @returns {Promise<object>} the genre list
-   */
-  static async getGenres() {
-    const { data, error } = await supabase.supabase
-      .from('books')
-      .select('genre');
-    if (error === null) {
-      // validating query
-      return data;
-    } else {
-      // throwing an error if an error occurred
-      throw new Error('Database connection error');
-    }
-  }
+  // THE FUNCTIONS BELOW ARE FOR FUTURE EXPANSION, DO NOT DELETE
+  // /**
+  //  * Returns a list of all genres
+  //  * from the books table
+  //  * @returns {Promise<object>} the genre list
+  //  */
+  // static async getGenres() {
+  //   const { data, error } = await supabase.supabase
+  //     .from('books')
+  //     .select('genre');
+  //   if (error === null) {
+  //     // validating query
+  //     return data;
+  //   } else {
+  //     // throwing an error if an error occurred
+  //     throw new Error('Database connection error');
+  //   }
+  // }
 
-  /**
-   * Returns the largest page count in the books table
-   * @returns {Promise<object>} the largest page count
-   */
-  static async getPages() {
-    const { data, error } = await supabase.supabase
-      .from('books')
-      .select('page_count')
-      .order('page_count', { ascending: false })
-      .limit(1);
-    if (error === null) {
-      // validating query
-      return data;
-    } else {
-      // throwing an error if an error occurred
-      throw new Error('Database connection error');
-    }
-  }
+  // /**
+  //  * Returns the largest page count in the books table
+  //  * @returns {Promise<object>} the largest page count
+  //  */
+  // static async getPages() {
+  //   const { data, error } = await supabase.supabase
+  //     .from('books')
+  //     .select('page_count')
+  //     .order('page_count', { ascending: false })
+  //     .limit(1);
+  //   if (error === null) {
+  //     // validating query
+  //     return data;
+  //   } else {
+  //     // throwing an error if an error occurred
+  //     throw new Error('Database connection error');
+  //   }
+  // }
 
   /**
    * Returns the entire books table from
    * the database
    * @returns {Promise<object>} the book list
    */
-  static async getRecommended() {
-    const { data, error } = await supabase.supabase.from('books').select('*');
-    if (error === null) {
+  static async getTrending() {
+    const { data, error } = await supabase.supabase.from('books_being_read')
+                                                   .select('*')
+                                                   .order('added', {ascending: false})
+                                                   .limit(100);
+    if (!error) {
       // validating query
       return data;
     } else {
@@ -112,14 +114,15 @@ class User {
       // adding author condition if not null
       query = query.eq('author', author);
     }
-    if (genre.trim() !== '') {
-      // adding genre condition if not null
-      query = query.eq('genre', genre);
-    }
-    if (pageCount !== '-1') {
-      // adding page count condition if not null
-      query = query.lte('page_count', pageCount);
-    }
+    // CODE BELOW FOR FUTURE EXPANSION, DO NOT DELETE
+    // if (genre.trim() !== '') {
+    //   // adding genre condition if not null
+    //   query = query.eq('genre', genre);
+    // }
+    // if (pageCount !== '-1') {
+    //   // adding page count condition if not null
+    //   query = query.lte('page_count', pageCount);
+    // }
     const { data, error } = await query; // completing query
     if (error === null) {
       // validating query

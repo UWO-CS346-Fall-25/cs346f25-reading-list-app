@@ -90,7 +90,7 @@ function clearError(field) {
  * Processing a validated form
  */
 async function processForm() {
-  const spinner = document.getElementsByClassName('spinner-container')[0];
+  const spinner = document.getElementsByClassName('spinner-container')[0]; // showing activity spinner to prevent multiple register submissions
   const button = document.getElementById('register');
   button.style.opacity = 0.5;
   button.style.pointerEvents = 'none';

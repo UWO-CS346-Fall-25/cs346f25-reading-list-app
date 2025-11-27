@@ -20,21 +20,6 @@ exports.getPassword = async (req, res, next) => {
 };
 
 /**
- * GET /
- * Display the home page
- */
-exports.getHome = async (req, res, next) => {
-  try {
-    res.render('index', {
-      title: 'Home',
-      csrfToken: req.csrfToken(),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-/**
  * GET /login
  * Display the login page
  */
@@ -79,7 +64,7 @@ exports.getBookshelf = async (req, res, next) => {
  * GET /sign out
  * Display the home page with cleared session
  */
-exports.signOut = async (req, res, next) => {
+exports.getSignout = async (req, res, next) => {
   try {
     const token = req.csrfToken();
     req.session.destroy((error) => {
@@ -107,8 +92,11 @@ exports.signOut = async (req, res, next) => {
  */
 function sortData(list) {
   const dataList = new Set();
-  list.forEach((dataPoint) => {
-    dataList.add(Object.values(dataPoint)[0]);
+  list.forEach((books) => {
+    const authorList = Object.values(books)[0];
+    authorList.forEach((author) => {
+      dataList.add(author);
+    });
   });
   return Array.from(dataList).sort();
 }
@@ -119,57 +107,56 @@ function sortData(list) {
  * from the database
  */
 exports.getAuthors = async (req, res) => {
-  try {
-    // getting authors list
+  try { // getting authors list
     const result = await User.getAuthors();
     res.status(201).json({ success: true, data: sortData(result) });
-  } catch (error) {
-    // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false });
   }
 };
 
-/**
- * GET /
- * Returns the fulls list of genres
- * from the database
- */
-exports.getGenres = async (req, res) => {
-  try {
-    // getting authors list
-    const result = await User.getGenres();
-    res.status(201).json({ success: true, data: sortData(result) });
-  } catch (error) {
-    // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+// THE FUNCTIONS BELOW ARE FOR FUTURE EXPANSION, DO NOT DELETE
+// /**
+//  * GET /
+//  * Returns the fulls list of genres
+//  * from the database
+//  */
+// exports.getGenres = async (req, res) => {
+//   try {
+//     // getting authors list
+//     const result = await User.getGenres();
+//     res.status(201).json({ success: true, data: sortData(result) });
+//   } catch (error) {
+//     // setting status if database connection didn't work
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
-/**
- * GET /
- * Returns the largest page count form
- * the books table
- */
-exports.getPages = async (req, res) => {
-  try {
-    // getting largest page count
-    const result = await User.getPages();
-    res.status(201).json({ success: true, data: result });
-  } catch (error) {
-    // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+// /**
+//  * GET /
+//  * Returns the largest page count form
+//  * the books table
+//  */
+// exports.getPages = async (req, res) => {
+//   try {
+//     // getting largest page count
+//     const result = await User.getPages();
+//     res.status(201).json({ success: true, data: result });
+//   } catch (error) {
+//     // setting status if database connection didn't work
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 
 /**
  * GET /
  * Returns the fulls list of books
  * from the database
  */
-exports.getRecommended = async (req, res) => {
+exports.getTrending = async (req, res) => {
   try {
     // getting recommended list
-    const result = await User.getRecommended();
+    const result = await User.getTrending();
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     // setting status if database connection didn't work
@@ -187,13 +174,12 @@ exports.getFilter = async (req, res) => {
     // getting filtered list
     const result = await User.getFiltered(
       req.query.author,
-      req.query.genre,
-      req.query.page_count
+      // req.query.genre, FOR FUTURE EXPANSION, DO NOT DELETE
+      // req.query.page_count
     );
     res.status(201).json({ success: true, data: result });
-  } catch (error) {
-    // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { // setting status if database connection didn't work
+    res.status(500).json({ success: false });
   }
 };
 

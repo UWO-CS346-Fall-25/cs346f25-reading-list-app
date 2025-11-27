@@ -63,10 +63,10 @@ exports.getReset = async (req, res, next) => {
 };
 
 /**
-* Controller: postRegister
-* Purpose: attempts to register a new user account
-* Input: req, res, next. (Session data, follow up actions)
-* Output: 201 if success, 409 if already exists, 500 if cannot reach database
+* Controller: postLogin
+* Purpose: attempts to login a user to their account
+* Input: req.body.email [user's email], req.body.password [user's password]
+* Output: 201 if success, 404 if could not find account, 500 if cannot reach database
 */
 exports.postLogin = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [loginController] Attempting to login user`);
@@ -80,8 +80,9 @@ exports.postLogin = async (req, res) => {
       res.status(404).json({ success: false });
     }
     else { // storing session and 201 if account found
-      console.log(`[${new Date().toISOString()}] [RegisterController] Success: User found:`);
+      console.log(`[${new Date().toISOString()}] [loginController] Success: User found:`);
       console.log(response);
+      console.log(response.session.user.user_metadata);
       req.session.user = response.session.user.user_metadata;
       res.status(201).json({ success: true });
     }
