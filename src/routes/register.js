@@ -8,10 +8,11 @@ const router = express.Router();
 // Import controllers
 const registerController = require('../controllers/registerController');
 
-// Define routes
+// Get routes
 router.get('/index', registerController.getHome);
 router.get('/login', registerController.getLogin);
-router.get('/bookshelf', registerController.getBookshelf);
+
+// Post routes
 router.post('/register', registerController.postRegister);
 
 module.exports = router;

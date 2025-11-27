@@ -150,12 +150,11 @@ class User {
       });
       if (error) {
         // throwing an error if cannot connect to database
-        throw new Error();
+        throw new Error(error.message);
       }
       return data;
-    } catch (networkError) {
-      // catching potential network error
-      throw new Error();
+    } catch (networkError) {// catching potential network error
+      throw new Error(networkError.message);
     }
   }
 

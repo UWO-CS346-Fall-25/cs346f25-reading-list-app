@@ -1,63 +1,73 @@
 /**
- * Index Controller
+ * Register Controller
  *
- * Controllers handle the business logic for routes.
- * They process requests, interact with models, and send responses.
+ * This controller handles basic navigation on the registration page,
+ * as well as register users to use Bookshelf
  *
- * Best practices:
- * - Keep controllers focused on request/response handling
- * - Move complex business logic to separate service files
- * - Use models to interact with the database
- * - Handle errors appropriately
+ * Primary task:
+ * - register new user accounts
  */
 
 // Import models if needed
 const User = require('../models/User');
 
 /**
- * GET /
- * Display the home page
- */
+* Controller: getHome
+* Purpose: Redirects the user to the home page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /index or shows an error page
+*/
 exports.getHome = async (req, res, next) => {
   try {
-    res.render('index', {
+    res.render('index', { // attempting to render the home page
       title: 'Home',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  } catch (error) { // catching error if the home page could not be rendered
     next(error);
   }
 };
 
-exports.getLogin = (req, res) => {
-  res.render('login', {
-    title: 'Login',
-    csrfToken: req.csrfToken(),
-  });
-};
-
-exports.getBookshelf = (req, res) => {
-  res.render('bookshelf', {
-    title: 'Bookshelf',
-    csrfToken: req.csrfToken(),
-  });
+/**
+* Controller: getLogin
+* Purpose: Redirects the user to the login page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /login or shows an error page
+*/
+exports.getLogin = (req, res, next) => {
+  try {
+    res.render('login', { // attempting to render the login page
+      title: 'Login',
+      csrfToken: req.csrfToken(),
+    });
+  }
+  catch(error) { // catching error if the login page could not be rendered
+    next(error);
+  }
 };
 
 /**
- * POST /
- * Registers a new user
- */
+* Controller: postRegister
+* Purpose: attempts to register a new user account
+* Input: req, res, next. (Session data, follow up actions)
+* Output: 201 if success, 409 if already exists, 500 if cannot reach database
+*/
 exports.postRegister = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [registerController] Attempting to register new user`);
   try { // attempting registration
     const result = await User.registerUser(req.body.username, req.body.email, req.body.password);
     if (result.user.user_metadata.email_verified === undefined) { // pre-existing account
-      res.status(409).json({ success: true, data: result });
+      console.error(`[${new Date().toISOString()}] [RegisterController] DB Error: An account with the entered email already exists`);
+      res.status(409).json({ success: true });
     }
     else { // registration successful
-      res.status(201).json({ success: true, data: result });
+      console.log(`[${new Date().toISOString()}] [RegisterController] Success: Account created:`);
+      console.log(result);
+      res.status(201).json({ success: true });
     }
   }
   catch(error) { // catching network error
-    res.status(500).json({ success: false, message: 'Registration failed' });
+    console.error(`[${new Date().toISOString()}] [RegisterController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
   }
 };
