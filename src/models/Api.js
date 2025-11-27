@@ -7,13 +7,11 @@ class Api {
    * @returns {Promise<object>} user entry if valid, else empty
    */
   static async getBookList(title, author) {
-    try {
-      // attempting to get book list from Open Library API
+    try { // attempting to get book list from Open Library API
       const query = new URLSearchParams({ title, author });
       return await fetch(`https://openlibrary.org/search.json?${query}`);
-    } catch (networkError) {
-      // throwing an error if an error occurred
-      throw new Error();
+    } catch (networkError) { // throwing an error if an error occurred
+      throw new Error(networkError.message);
     }
   }
 }

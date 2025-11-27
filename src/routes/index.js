@@ -1,20 +1,6 @@
 /**
  * Index Routes
- *
- * Define routes for the main pages of your application here.
- * Routes connect HTTP requests to controller functions.
- *
- * Example usage:
- * const express = require('express');
- * const router = express.Router();
- * const indexController = require('../controllers/indexController');
- *
- * router.get('/', indexController.getHome);
- * router.get('/about', indexController.getAbout);
- *
- * module.exports = router;
  */
-
 const express = require('express');
 const router = express.Router();
 
@@ -36,8 +22,8 @@ router.get('/authors', indexController.getAuthors);
 router.get('/trending', indexController.getTrending);
 router.get('/filter', indexController.getFilter);
 
-// book routes
-router.post('/add', indexController.addBook);
-router.post('/addbook', indexController.addBookToBookshelf);
+// Post routes
+router.post('/selector', indexController.postAddBookToSelector);
+router.post('/add_to_shelf', indexController.postAddBookToBookshelf);
 
 module.exports = router;

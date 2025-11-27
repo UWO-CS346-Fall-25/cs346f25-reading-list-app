@@ -1,116 +1,144 @@
 /**
  * Index Controller
+ *
+ * This controller handles basic navigation on the index page,
+ * as well as displaying trending books and adding books to a user's
+ * to_read bookshelf
+ *
+ * Primary tasks:
+ * - displays trending books
+ * - adds requested books to a user's bookshelf
  */
 const User = require('../models/User');
 const Api = require('../models/Api');
 
 /**
- * A special function that must exist for the password reset
- * link in the reset email to work properly
- */
+* Controller: getPassword
+* Purpose: A special function that must exist for the password reset link in the reset email to work properly
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /password or shows an error page
+*/
 exports.getPassword = async (req, res, next) => {
   try {
-    res.render('password', {
-      title: 'password',
+    res.render('password', { // attempting to render the password page
+      title: 'Password',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  } catch (error) { // catching error if the password page could not be rendered
     next(error);
   }
 };
 
 /**
- * GET /login
- * Display the login page
- */
-exports.getLogin = (req, res) => {
-  res.render('login', {
-    title: 'Login',
-    csrfToken: req.csrfToken(),
-  });
+* Controller: getLogin
+* Purpose: Redirects the user to the login page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /login or shows an error page
+*/
+exports.getLogin = (req, res, next) => {
+  try {
+    res.render('login', { // attempting to render the login page
+      title: 'Login',
+      csrfToken: req.csrfToken(),
+    });
+  } catch (error) {  // catching error if the login page could not be rendered
+    next(error);
+  }
 };
 
 /**
- * GET /register
- * Display the register page
- */
+* Controller: getRegister
+* Purpose: Redirects the user to the register page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /register or shows an error page
+*/
 exports.getRegister = async (req, res, next) => {
   try {
-    res.render('register', {
+    res.render('register', { // attempting to render the register page
       title: 'Register',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  } catch (error) { // catching error if the register page could not be rendered
     next(error);
   }
 };
 
 /**
- * GET /bookshelf
- * Display the about page
- */
+* Controller: getBookshelf
+* Purpose: Redirects the user to the bookshelf page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /bookshelf or shows an error page
+*/
 exports.getBookshelf = async (req, res, next) => {
   try {
-    res.render('bookshelf', {
+    res.render('bookshelf', { // attempting to render the bookshelf page
       title: 'Bookshelf',
       csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  } catch (error) { // catching error if the bookshelf page could not be rendered
     next(error);
   }
 };
 
 /**
- * GET /sign out
- * Display the home page with cleared session
- */
+* Controller: getSignout
+* Purpose: Destroys the current session and redirects the user back to the index page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /index or shows an error page
+*/
 exports.getSignout = async (req, res, next) => {
   try {
     const token = req.csrfToken();
-    req.session.destroy((error) => {
+    req.session.destroy((error) => { // attempting to destroy the current session
       if (error) {
         next(error);
       }
       res.clearCookie('connect.sid');
-      res.render('index', {
-        title: 'Bookshelf',
+      res.render('index', { // attempting to render the index page
+        title: 'Home',
         csrfToken: token,
         user: null,
       });
     });
-  } catch (error) {
+  } catch (error) { // catching error if the index page could not be rendered
     next(error);
   }
 };
 
 /**
- * A function that appears database
- * data, removes duplicates, and
- * repackages that data in a sorted list
- * @param {object} list - data to sort
- * @returns {Promise<object>} sorted data list
- */
+* Controller: sortData
+* Purpose: Prevent duplicates and alphabetizes data
+* Input: list [a list of data to sort]
+* Output: A sorted list of the param data
+*/
 function sortData(list) {
-  const dataList = new Set();
+  const dataSet = new Set(); // set to prevent duplicates
   list.forEach((books) => {
-    const authorList = Object.values(books)[0];
-    authorList.forEach((author) => {
-      dataList.add(author);
+    const dataList = Object.values(books)[0]; // retrieving each data list
+    dataList.forEach((author) => { // adding each data point
+      dataSet.add(author);
     });
   });
-  return Array.from(dataList).sort();
+  return Array.from(dataSet).sort(); // returning the sorted array of data without duplicates
 }
 
 /**
- * GET /
- * Returns the fulls list of authors
- * from the database
- */
+* Controller: getAuthors
+* Purpose: Retrieves the lists of authors for all the trending books
+* Input: req [not user, but required], res [response data]
+* Output: Sorted list of authors
+*/
 exports.getAuthors = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to get author list`);
   try { // getting authors list
     const result = await User.getAuthors();
-    res.status(201).json({ success: true, data: sortData(result) });
-  } catch (error) { // setting status if database connection didn't work
+    const sortedList = sortData(result);
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Author list:`);
+    console.log(sortedList);
+    res.status(201).json({ success: true, data: sortedList });
+  }
+  catch (error) { // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
     res.status(500).json({ success: false });
   }
 };
@@ -149,46 +177,58 @@ exports.getAuthors = async (req, res) => {
 // };
 
 /**
- * GET /
- * Returns the fulls list of books
- * from the database
- */
-exports.getTrending = async (req, res) => {
-  try {
-    // getting recommended list
-    const result = await User.getTrending();
-    res.status(201).json({ success: true, data: result });
-  } catch (error) {
-    // setting status if database connection didn't work
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-/**
- * GET /
- * Returns a filtered list of
- * books from the database
- */
+* Controller: getFilter
+* Purpose: Retrieves the list of filtered trending books
+* Input: req.query.author [the filter option for trending books]
+* Output: Trending book list where each book contains the param author
+*/
 exports.getFilter = async (req, res) => {
-  try {
-    // getting filtered list
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve filtered list`);
+  try {// getting filtered list
     const result = await User.getFiltered(
-      req.query.author,
+      req.query.author
       // req.query.genre, FOR FUTURE EXPANSION, DO NOT DELETE
       // req.query.page_count
     );
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Filtered list:`);
+    console.log(result);
     res.status(201).json({ success: true, data: result });
-  } catch (error) { // setting status if database connection didn't work
+  }
+  catch (error) {
+    // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
     res.status(500).json({ success: false });
   }
 };
 
 /**
- * POST /
- * Adds a book to the select book window
- */
-exports.addBook = async (req, res) => {
-  try { // attempting to contact Open Library
+* Controller: getTrending
+* Purpose: Retrieves the list of trending books
+* Input: req [not user, but required], res [response data]
+* Output: Trending book list
+*/
+exports.getTrending = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve trending list`);
+  try { // getting recommended list
+    const result = await User.getTrending();
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Trending list:`);
+    console.log(result);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) { // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+* Controller: postAddBookToSelector
+* Purpose: Adds all the editions of a book to the book selector
+* Input: req.body.title, req.body.author
+* Output: Status: 201 is loaded all editions, 404 if could not find editions, 500 if could not connect to API
+*/
+exports.postAddBookToSelector = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve edition list from OpenLibrary`);
+  try {// attempting to contact Open Library
     const result = await Api.getBookList(req.body.title, req.body.author);
     if (result.ok) { // determining if the fetch worked
       const books = await result.json();
@@ -204,29 +244,34 @@ exports.addBook = async (req, res) => {
         } else {
           coverURL = '/images/broken_image.png';
         }
-        let displayBook = { // building a book to display in the selector window
-          title: book.title,
-          authors: book.author_name,
-          cover: coverURL,
-        };
-        bookList.push(displayBook); // adding a book to the book list
+        bookList.push({ title: book.title, authors: book.author_name, cover: coverURL }); // adding a book to the book list
       }
+      console.log(`[${new Date().toISOString()}] [indexController] Success: Edition list:`);
+      console.log(bookList);
       res.status(201).json({ success: true, data: bookList }); // returning the completed list
-    } else { // no editions for a book were found
-      res.status(404).json({ success: false, message: 'Book not found' });
+    }
+    else { // no editions for a book were found
+      console.error(`[${new Date().toISOString()}] [indexController] DB Error: Unable to retrieve edition list from OpenLibrary`);
+      res.status(404).json({ success: false });
     }
   } catch (error) { // could not connect to Open Library
-    res.status(500).json({ success: false, message: error.message });
+      console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
+      res.status(500).json({ success: false });
   }
 };
 
 /**
- * POST /
- * Adds a book to the users to-read bookshelf
- */
-exports.addBookToBookshelf = async (req, res) => {
-  if (req.session.user) { // only adding if a user is logged in
-    try { // attempting to insert the book
+* Controller: postAddBookToSelector
+* Purpose: Adds all the editions of a book to the book selector
+* Input: req.session.user, req.body.title, req.body.authors
+* Output: Status: 201 if added, 409 if already on shelf, 500 if could not access database, 403 if user is not logged in
+*/
+exports.postAddBookToBookshelf = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to add book to bookshelf on index`);
+  if (req.session.user) {
+    // only adding if a user is logged in
+    try {
+      // attempting to insert the book
       const result = await User.addBook(
         req.body.title,
         req.body.authors,
@@ -234,14 +279,18 @@ exports.addBookToBookshelf = async (req, res) => {
         req.session.user.sub
       );
       if (result) { // the insert worked
+        console.log(`[${new Date().toISOString()}] [indexController] Success: Book added`);
         res.status(201).json({ success: true });
-      } else { // the insert failed
+      } else { // the book already exists
+        console.error(`[${new Date().toISOString()}] [indexController] DB Error: The book already exists on the user's bookshelf`);
         res.status(409).json({ success: false });
       }
     } catch (error) { // network error
+      console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
       res.status(500).json({ success: false });
     }
   } else { // no user is logged in
+    console.error(`[${new Date().toISOString()}] [indexController] User is not logged in`);
     res.status(403).json({ success: false });
   }
 };

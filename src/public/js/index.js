@@ -54,25 +54,19 @@ function fillComboBoxes() {
  * options for a given combo box on the filter form
  */
 async function fetchOptions(requestType) {
-  try {
-    // attempting the given fetch request
+  try { // attempting the given fetch request
     const response = await fetch('/' + requestType);
-    if (response.ok) {
-      // validating fetch request
+    if (response.ok) { // validating fetch request
       const json = await response.json();
-      if (json.success) {
-        // validating json translation
+      if (json.success) { // validating json translation
         addOptions(false, requestType, json.data);
-      } else {
-        // loading default options if cannot translate json
+      } else { // loading default options if cannot translate json
         addOptions(true);
       }
-    } else {
-      // loading default options if database could not be reached
+    } else { // loading default options if database could not be reached
       addOptions(true);
     }
-  } catch (error) {
-    // loading default options if fetch request could not be completed
+  } catch (error) { // loading default options if fetch request could not be completed
     addOptions(true);
   }
 }
@@ -80,7 +74,7 @@ async function fetchOptions(requestType) {
 /**
  * A helper function that builds the
  * a combo box for the filter form
- * @param {object} error - true if options could not be located, false if they could
+ * @param {object} error - false if options could not be located, true if they could
  * @param {object} requestType - the combo box type to add options to
  * @param {object} options - list of options, null if unable to located list
  */
@@ -225,7 +219,7 @@ function clearError(filters) {
  * Processes a filter form
  */
 async function processForm() {
-  const author = document.getElementById('author-input');
+  const author = document.getElementById('author-input'); // retrieving author
   try { // fetch request to get book list with filters
     // THE CODE BELOW IS FOR FUTURE EXPANSION, DO NOT DELETE
     // let index = 0;
@@ -240,20 +234,20 @@ async function processForm() {
     // if (pageFilter.length === 5) {
     //   pageFilter = pageFilter.replace('+', '');
     // }
-    const filters = {
+    const filters = { // creating fetch params
       author: author.value,
       // genre: document.getElementById('genre-input').value, FOR FUTURE EXPANSION, DO NOT DELETE
       // page_count: pageFilter,
     };
-    let response = await fetch(
+    let response = await fetch( // attempting fetch for matching filters
       // eslint-disable-next-line no-undef -- file is registering the code below as an error
       '/filter?' + new URLSearchParams(filters).toString()
     );
     if (response.status === 201) { // successful filter
       clearList(); // clearing the existing list
-      const json = await response.json();
-      if (json.success) {
-        loadList(false, json.data);
+      const json = await response.json(); // extracting new list
+      if (json.success) { // checking if the extraction was successful
+        loadList(false, json.data); // loading the trending list with filter options
       } else { // unable to translate json
         alert('Unable to connect to the database.');
       }
@@ -303,27 +297,27 @@ async function fetchTrending() {
  * @param {object} trending - list of trending books
  */
 function loadList(error, trending) {
-  if (!error) {
-    const recommendedList = document.getElementById('books');
+  const trendingList = document.getElementById('books');
+  if (!error) { // checking for error loading book list
     trending.forEach((element) => { // building a visual book object
-      const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      const li = document.createElement('li');
-      const book = document.createElement('div');
+      const color = getRandomColor(); // getting random color for each book
+      const li = document.createElement('li'); // creating each list item
+      const book = document.createElement('div'); // creating each book object
       book.classList.add('book');
-      const leftSpacer = document.createElement('div');
+      const leftSpacer = document.createElement('div'); // creating the left spacer of each book
       leftSpacer.classList.add('left-spacer');
       leftSpacer.style.borderColor = color;
       book.append(leftSpacer);
-      const center = document.createElement('div');
+      const center = document.createElement('div'); // creating the center container of each book
       center.classList.add('center');
-      const title = document.createElement('p');
+      const title = document.createElement('p'); // creating the title for the center container
       title.textContent = element.title;
       title.style.maxWidth = '35ch';
       title.style.whiteSpace = 'nowrap';
       title.style.overflow = 'hidden';
       title.style.textOverflow = 'ellipsis';
       center.append(title);
-      const authors = element.authors;
+      const authors = element.authors; // creating the author(s) for the center container
       const numAuthors = authors.length;
       const author = document.createElement('p');
       author.textContent = authors[0];
@@ -334,9 +328,9 @@ function loadList(error, trending) {
         center.append(otherAuthors);
       }
       book.append(center);
-      const rightSpacer = document.createElement('div');
+      const rightSpacer = document.createElement('div'); // creating the right spacer of each book
       rightSpacer.classList.add('right-spacer');
-      const button = document.createElement('button');
+      const button = document.createElement('button'); // creating the add button for the right spacer
       button.textContent = '+';
       button.title = 'Add to bookshelf';
       button.classList.add('add-button');
@@ -344,35 +338,38 @@ function loadList(error, trending) {
       rightSpacer.style.borderColor = color;
       book.append(rightSpacer);
       li.append(book);
-      recommendedList.append(li);
+      trendingList.append(li);
     });
-    configureOuterAddButtons();
+    configureOuterAddButtons(); // configuring each add button
+  }
+  else { // added message saying that books could not be loaded
+    trendingList.textContent = "Unable to load books";
+    trendingList.style.textAlign = 'center';
   }
 }
 
 /**
- * A helper function that clears all the books form the
+ * A helper function that clears all the books from the
  * books list
  */
 function clearList() {
   document.getElementById('books').innerHTML = '';
 }
+
 /**
  * A function that adds a listener to the add button
- * on each book in the user recommendations sections
+ * on each book in the trending reads section
  */
 function configureOuterAddButtons() {
-  const token = document
-    .getElementsByName('csrf-token')[0]
-    .getAttribute('content');
-  const buttonList = document.querySelectorAll('.add-button');
-  buttonList.forEach((button) => {
-    button.addEventListener('click', async function () {
-      try {
-        const title = button.parentNode.previousSibling.firstChild.textContent;
-        let author = button.parentNode.previousSibling.lastChild;
-        author = author.textContent.charAt(0) == '+' ? author.previousSibling.textContent : author.textContent;
-        let response = await fetch('add', {
+  const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
+  const buttonList = document.querySelectorAll('.add-button'); // getting each add button
+  buttonList.forEach((button) => { // looping through each add button
+    button.addEventListener('click', async function () { // adding a click listener to each button
+      try { // attempting the fetch request for the books selector
+        const title = button.parentNode.previousSibling.firstChild.textContent; // getting the book title
+        let author = button.parentNode.previousSibling.lastChild; // getting the author(s)
+        author = author.textContent.charAt(0) === '+' ? author.previousSibling.textContent : author.textContent;
+        let response = await fetch('selector', { // get fetch for books selector
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -380,27 +377,24 @@ function configureOuterAddButtons() {
           },
           body: JSON.stringify({ title: title, author: author }),
         });
-        if (response.status === 201) {
-          // book added successfully
+        if (response.status === 201) { // book added successfully
           const json = await response.json();
-          if (json.success) {
-            // validating json translation
+          if (json.success) { // validating json translation
             const popup = document.getElementsByClassName('modal');
             popup[0].style.display = 'block';
             buildBookSelector(json.data); // building the book selector
-          } else {
-            // loading default list if cannot translate to json
+          } else { // unable to translate json
             alert('Error! Please try again');
           }
-        } else if (response.status === 404) {
-          // cannot add book, no user logged in
+        }
+        else if (response.status === 404) { // cannot add book, no user logged in
           alert('Please log in to add books to your bookshelf');
-        } else {
-          // unable to access the database
+        }
+        else { // unable to make call to API
+          console.log(response);
           alert('Network error. Please try again later');
         }
-      } catch (error) {
-        // unable to access the database
+      } catch (error) { // unable to access the database
         alert('Network error. Please try again later');
       }
     });
@@ -413,7 +407,7 @@ function configureOuterAddButtons() {
  * @param {object} books
  */
 function buildBookSelector(books) {
-  const targetLocation = document.getElementById('book-list');
+  const bookModal = document.getElementById('book-list');
   books.forEach((book) => {
     const bookItem = document.createElement('li');
     const displayBook = document.createElement('div');
@@ -464,7 +458,7 @@ function buildBookSelector(books) {
     displayBook.append(buttonSection);
     // putting everything together
     bookItem.append(displayBook);
-    targetLocation.append(bookItem);
+    bookModal.append(bookItem);
   });
 }
 
@@ -476,13 +470,11 @@ function buildBookSelector(books) {
  * @param {object} addButton
  */
 function configureInnerAddButton(title, authors, addButton) {
-  const modalWindow = document.getElementById('popup');
   try {
-    const token = document
-      .getElementsByName('csrf-token')[0]
-      .getAttribute('content');
-    addButton.addEventListener('click', async function () {
-      let response = await fetch('addbook', {
+    const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
+    const modalWindow = document.getElementById('popup');
+    addButton.addEventListener('click', async function () { // adding click listener to each inner add button
+      let response = await fetch('add_to_shelf', { // fetch to add book to user bookshelf
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -493,19 +485,27 @@ function configureInnerAddButton(title, authors, addButton) {
           authors: authors,
         }),
       });
-      if (response.status === 201) {
+      if (response.status === 201) { // book was successfully added
         alert(`${title} was added to your bookshelf`);
         document.getElementById('book-list').innerHTML = '';
         modalWindow.style.display = 'none';
-      } else if (response.status === 403) {
+      } else if (response.status === 403) { // user is not logged in and can't add the book
         alert('Please log in to add books to your bookshelf');
-      } else if (response.status === 409) {
+      } else if (response.status === 409) { // the book already exists on the user's bookshelf
         alert(`${title} is already on your bookshelf`);
-      } else {
+      } else { // the database could not complete the add
         alert('Network error! Please try again');
       }
     });
-  } catch (error) {
+  } catch (error) {  // the database could not be accessed
     alert('Network error! Please try again');
   }
+}
+
+/**
+ * A helper function that returns a random color for books
+ * @returns a random color as a string
+ */
+function getRandomColor() {
+  return '#' + Math.floor(Math.random() * 16777215).toString(16);
 }

@@ -6,6 +6,7 @@
  */
 // Supabase connection
 const supabase = require('../models/db');
+var numBooksToDisplay = 100;
 
 /**
  * The class that communicates directly with the database
@@ -36,7 +37,10 @@ class User {
    * @returns {Promise<object>} the author list
    */
   static async getAuthors() {
-    const { data, error } = await supabase.supabase.from('books_being_read').select('authors');
+    const { data, error } = await supabase.supabase.from('books_being_read')
+                                                   .select('authors')
+                                                   .order('added', { ascending: false })
+                                                   .limit(numBooksToDisplay);
     if (error === null) {
       // validating query
       return data;
@@ -85,34 +89,15 @@ class User {
   // }
 
   /**
-   * Returns the entire books table from
-   * the database
-   * @returns {Promise<object>} the book list
-   */
-  static async getTrending() {
-    const { data, error } = await supabase.supabase.from('books_being_read')
-                                                   .select('*')
-                                                   .order('added', {ascending: false})
-                                                   .limit(100);
-    if (!error) {
-      // validating query
-      return data;
-    } else {
-      // throwing an error if an error occurred
-      throw new Error('Database connection error');
-    }
-  }
-
-  /**
    * Returns the filtered books table from
    * the database
    * @returns {Promise<object>} the book list
    */
   static async getFiltered(author, genre, pageCount) {
-    let query = supabase.supabase.from('books').select('*'); // setting up the query
+    let query = supabase.supabase.from('books_being_read').select('*'); // setting up the query
     if (author.trim() !== '') {
       // adding author condition if not null
-      query = query.eq('author', author);
+      query = query.contains('authors', [author]);
     }
     // CODE BELOW FOR FUTURE EXPANSION, DO NOT DELETE
     // if (genre.trim() !== '') {
@@ -125,6 +110,25 @@ class User {
     // }
     const { data, error } = await query; // completing query
     if (error === null) {
+      // validating query
+      return data;
+    } else {
+      // throwing an error if an error occurred
+      throw new Error('Database connection error');
+    }
+  }
+
+  /**
+   * Returns the entire books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getTrending() {
+    const { data, error } = await supabase.supabase.from('books_being_read')
+                                                   .select('*')
+                                                   .order('added', { ascending: false })
+                                                   .limit(numBooksToDisplay);
+    if (!error) {
       // validating query
       return data;
     } else {
@@ -215,15 +219,24 @@ class User {
    * @returns {Promise<object>} True if password updated, false if now
    */
   static async resetPassword(password, accessToken, refreshToken) {
-    try { // attempting to send the password reset email
-      await supabase.supabase.auth.setSession({access_token: accessToken, refresh_token: refreshToken});
-      const { data, error } = await supabase.supabase.auth.updateUser({ password: password });
-      if (error) { // password was not reset
+    try {
+      // attempting to send the password reset email
+      await supabase.supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      const { data, error } = await supabase.supabase.auth.updateUser({
+        password: password,
+      });
+      if (error) {
+        // password was not reset
         return false;
-      } else { // password was reset
+      } else {
+        // password was reset
         return true;
       }
-    } catch (networkError) { // unable to connect to database
+    } catch (networkError) {
+      // unable to connect to database
       throw new Error(networkError.message);
     }
   }
