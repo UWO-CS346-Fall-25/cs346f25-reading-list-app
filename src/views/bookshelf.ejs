@@ -15,9 +15,7 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/index" class="logo">
-          <%= user.display_name %>'s Bookshelf
-        </a>
+        <p class="logo"><%= user.display_name %>'s Bookshelf</p>
         <ul class="nav-links">
           <li class="dropdown">
             <button id="manage-books" class="managebooks">Manage Books</button>
@@ -26,6 +24,7 @@
               <a href="#" class="dropdown-link" id="move-book-link">Move</a>
             </div>
           </li>
+          <li><a href="/index">Trending Reads</a></li>
           <li><a href="/logout">Sign Out</a></li>
         </ul>
       </div>
