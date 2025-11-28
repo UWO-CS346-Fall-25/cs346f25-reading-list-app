@@ -1,47 +1,27 @@
 /**
- *
- *
- * Define routes for the main pages of your application here.
- * Routes connect HTTP requests to controller functions.
- *
- * Example usage:
- * const express = require('express');
- * const router = express.Router();
- * const indexController = require('../controllers/indexController');
- *
- * router.get('/', indexController.getHome);
- * router.get('/about', indexController.getAbout);
- *
- * module.exports = router;
+ * Bookshelf Routes
  */
-
 const express = require('express');
 const router = express.Router();
 
 // Import controllers
 const bookshelfController = require('../controllers/bookshelfController');
 
-// Define routes
-router.get('/home', bookshelfController.getHome);
-router.get('/bookshelf', bookshelfController.getHome);
-router.get('/logout', bookshelfController.logout);
-router.post('/addbook', bookshelfController.addBook);
-router.post('/addtoselector', bookshelfController.addBooksToSelector);
-router.post('/addbooktoshelf', bookshelfController.addBookToBookshelf);
-
-// routes for loading bookshelves
+// Get routes
+router.get('/index', bookshelfController.getHome);
+router.get('/logout', bookshelfController.getLogout);
 router.get('/toread', bookshelfController.getToReadShelf);
 router.get('/reading', bookshelfController.getReadingShelf);
 router.get('/read', bookshelfController.getReadShelf);
 
-// routes for deleting bookshelves
-router.delete('/move', bookshelfController.moveBook);
-router.delete('/move-btn', bookshelfController.moveBookBtn);
-router.delete('/delete', bookshelfController.removeBook);
-router.delete('/clear', bookshelfController.clearShelf);
+// Post routes
+router.post('/addtoselector', bookshelfController.postAddBooksToSelector);
+router.post('/addbooktoshelf', bookshelfController.postAddBookToBookshelf);
 
-// router.post('/bookshelf/add', bookshelfController.postAddBook);
-// router.post('/bookshelf/delete', bookshelfController.postDeleteBook);
+// Delete routes
+router.delete('/move', bookshelfController.deleteMoveBook);
+router.delete('/move-btn', bookshelfController.deleteMoveBookBtn);
+router.delete('/delete', bookshelfController.deleteRemoveBook);
+router.delete('/clear', bookshelfController.deleteClearShelf);
 
-// dummy comment
 module.exports = router;

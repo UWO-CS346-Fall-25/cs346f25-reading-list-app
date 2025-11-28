@@ -262,7 +262,7 @@ exports.postAddBookToSelector = async (req, res) => {
 
 /**
 * Controller: postAddBookToSelector
-* Purpose: Adds all the editions of a book to the book selector
+* Purpose: Adds a book to the user's bookshelf
 * Input: req.session.user, req.body.title, req.body.authors
 * Output: Status: 201 if added, 409 if already on shelf, 500 if could not access database, 403 if user is not logged in
 */

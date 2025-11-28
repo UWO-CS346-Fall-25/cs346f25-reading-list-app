@@ -407,9 +407,8 @@ class User {
         // not able to verify the book details
         return false;
       }
-    } catch (error) {
-      // initial select failed, network error
-      return false;
+    } catch (error) { // initial select failed, network error
+      throw new Error(error.message);
     }
   }
 
@@ -439,7 +438,7 @@ class User {
       return true;
     } catch (error) {
       // network error
-      throw new Error();
+      throw new Error(error.message);
     }
   }
 

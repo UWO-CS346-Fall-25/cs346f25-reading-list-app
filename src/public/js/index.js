@@ -258,7 +258,7 @@ async function processForm() {
     alert('Unable to connect to the database.');
   }
   finally { // clearing filter fields
-    author.value = '';
+    document.querySelector('form').reset();
   }
 }
 
