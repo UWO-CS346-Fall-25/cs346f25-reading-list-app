@@ -375,6 +375,38 @@ button:active {
   background-color: var(--dark-color);
 }
 
+/* Error Page */
+.error-page {
+  text-align: center;
+  padding: 3rem 0;
+  margin: 0 auto;
+}
+
+.error-page h1 {
+  font-size: 6rem;
+  color: var(--danger-color);
+  margin-bottom: 1rem;
+}
+
+.error-page h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.error-details {
+  text-align: left;
+  background-color: var(--light-color);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin: 2rem 0;
+}
+
+.error-details pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 /* Footer */
 footer {
   background-color: var(--dark-color);
