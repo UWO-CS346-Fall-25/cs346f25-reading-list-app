@@ -7,11 +7,50 @@
  * Primary task:
  * - use the username, email, and password to register a user account
  */
+let resolvePromise;
 
 // Adding listeners to the register form when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
+  configureCustomAlert();
   initFormValidation();
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * Initialize form validation
@@ -111,19 +150,19 @@ async function processForm() {
       }),
     });
     if (response.status === 201) { // successful register, telling user to complete registration in their email
-      alert("Registration Successful!\nPlease complete the validation process in your email.");
+      await customAlert("Registration Successful!\nPlease complete the validation process in your email.");
       window.location.href = '/index';
     }
     else if (response.status === 409) { // existing email address, telling user to login
-      alert("An account already exists with this email! Please login to continue.");
+      await customAlert("An account already exists with this email! Please login to continue.");
       window.location.href = '/login';
     }
     else { // unable to connect to database (500 status), telling user to try again at a later time
-      alert("Account registration error. Please try again later.");
+      await customAlert("Account registration error. Please try again later.");
     }
   }
   catch(error) { // fetch error, telling user to try again at a later time
-    alert("Account registration error. Please try again later.");
+    await customAlert('Account registration error. Please try again later.');
   }
   finally {
     button.style.opacity = 1;

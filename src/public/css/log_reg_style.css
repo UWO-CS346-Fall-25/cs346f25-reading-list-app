@@ -151,6 +151,45 @@ main::before {
   animation: spin 1s linear infinite;
 }
 
+.modal {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 1000;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  width: 400px;
+  height: 200px;
+  padding: 10px;
+  display: flex;
+  max-height: 600px;
+  margin: 350px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#alert-message {
+  flex: 1;
+  display: flex;
+  font-size: 16px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#ok-button {
+  flex: 1;
+  font-size: 16px;
+  max-height: 50px;
+}
+
 form {
   width: 300px;
   height: 500px;

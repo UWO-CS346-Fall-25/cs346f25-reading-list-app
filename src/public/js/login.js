@@ -7,11 +7,50 @@
  * Primary task:
  * - use the email, and password to login a user
  */
+let resolvePromise;
 
 // Adding listeners to the login form when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
+  configureCustomAlert();
   initFormValidation();
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * Initialize form validation
@@ -106,13 +145,13 @@ async function processForm() {
       window.location.href = '/bookshelf';
     }
     else if (response.status === 404) { // unsuccessful login, could not locate user, telling user the data is incorrect
-      alert('The email or password is incorrect');
+      await customAlert('The email or password is incorrect');
     }
     else { // unable to connect to database (500 status), telling user to try again at a later time
-      alert('Log in error. Please try again later.');
+      await customAlert('Log in error. Please try again later');
     }
   } catch (error) { // fetch error, telling user to try again at a later time
-    alert('Log in error. Please try again later.');
+    await customAlert('Log in error. Please try again later');
   }
   finally {
     button.style.opacity = 1;

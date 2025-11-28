@@ -139,6 +139,35 @@ main {
   border: 2px solid black;
 }
 
+#modal-content {
+  width: 400px;
+  height: 200px;
+  padding: 10px;
+  display: flex;
+  max-height: 600px;
+  margin: 350px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#alert-message {
+  flex: 1;
+  display: flex;
+  font-size: 16px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#ok-button {
+  flex: 1;
+  font-size: 16px;
+  max-height: 50px;
+  border-radius: 5px;
+}
+
 #close {
   width: 50px;
   color: black;

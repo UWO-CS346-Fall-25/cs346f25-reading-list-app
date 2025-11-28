@@ -7,11 +7,50 @@
  * Primary task:
  * - use the email to send a password reset email
  */
+let resolvePromise;
 
 // Adding listeners to the reset form when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
+  configureCustomAlert();
   initFormValidation();
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * Initialize form validation
@@ -106,16 +145,16 @@ async function processForm() {
       }),
     });
     if (response.status === 201) {// email sent, redirecting user new password view
-      alert('The password reset email has been sent. Please complete the process in your email.');
+      await customAlert('The password reset email has been sent. Please complete the process in your email.');
       window.location.href = '/index';
     } else if (response.status === 404) {// email not sent, telling user to try again at a later time
-      alert('We could not send the password reset at this time. Please try again later.');
+      await customAlert('We could not send the password reset at this time. Please try again later.');
     } else {// unable to connect to database (500 status), telling user to try again at a later time
-      alert('We could not send the password reset at this time. Please try again later.');
+      await customAlert('We could not send the password reset at this time. Please try again later.');
     }
   }
   catch (error) {// fetch error, telling user to try again at a later time
-    alert('We could not send the password reset at this time. Please try again later.');
+    await customAlert('We could not send the password reset at this time. Please try again later.');
   }
   finally {
     button.style.opacity = 1;

@@ -7,11 +7,50 @@
  * Primary task:
  * - resets the user's password
  */
+let resolvePromise;
 
 // Adding listeners to the register form when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
+  configureCustomAlert();
   initFormValidation();
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * Initialize form validation
@@ -93,6 +132,7 @@ async function processForm() {
 
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content'); // retrieving csfrToken for safe fetch
   try {
+    // eslint-disable-next-line no-undef -- this comment prevents the IDE from registerer the line below this as an error
     const params = new URLSearchParams(window.location.hash.substring(1)); // getting access and refresh tokens from current session
     let response = await fetch('/reset_password', { // attempting fetch to reset password
       method: 'POST',
@@ -107,18 +147,18 @@ async function processForm() {
       })
     });
     if (response.status === 201) { // reset successful, redirecting user and telling them to login
-      alert('Password successfully reset! Please login to continue.');
+      await customAlert('Password successfully reset! Please login to continue.');
       window.location.href = '/index';
     }
     else if (response.status === 404) { // reset unsuccessful, telling user to request a new link
-      alert('Password reset link expired. Please request a new reset link.');
+      await customAlert('Password reset link expired. Please request a new reset link.');
     }
     else { // could not reach supabase, telling user to try again later
-      alert('Unable to reset password at this time. Please try again later.');
+      await customAlert('Unable to reset password at this time. Please try again later.');
     }
   }
   catch(error) { // could not execute fetch request, telling user to try again later
-    alert('Unable to reset password at this time. Please try again later.');
+    await customAlert('Unable to reset password at this time. Please try again later.');
   }
   finally { // closing the activity spinner
     button.style.opacity = 1;

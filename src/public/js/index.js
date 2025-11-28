@@ -9,15 +9,54 @@
  * - offer filtering options for those 100 books
  * - the ability to add books directly to a user's bookshelf if they are logged in
  */
+let resolvePromise;
 
 // Adding listeners to performs above tasks when the DOM loads
 document.addEventListener('DOMContentLoaded', function () {
+  configureCustomAlert();
   calibrateModal();
   fillComboBoxes();
   // fetchFilterRadios();  FOR FUTURE EXPANSION, DO NOT DELETE
   initFormValidation();
   fetchTrending();
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * A function that adds listeners to
@@ -249,13 +288,13 @@ async function processForm() {
       if (json.success) { // checking if the extraction was successful
         loadList(false, json.data); // loading the trending list with filter options
       } else { // unable to translate json
-        alert('Unable to connect to the database.');
+        await customAlert('Unable to connect to the database.');
       }
     } else { // unable to connect to database
-      alert('Unable to connect to the database.');
+      await customAlert('Unable to connect to the database.');
     }
   } catch (error) { // unable to find route to register
-    alert('Unable to connect to the database.');
+    await customAlert('Unable to connect to the database.');
   }
   finally { // clearing filter fields
     document.querySelector('form').reset();
@@ -384,18 +423,18 @@ function configureOuterAddButtons() {
             popup[0].style.display = 'block';
             buildBookSelector(json.data); // building the book selector
           } else { // unable to translate json
-            alert('Error! Please try again');
+            await customAlert('Error! Please try again');
           }
         }
         else if (response.status === 404) { // cannot add book, no user logged in
-          alert('Please log in to add books to your bookshelf');
+          await customAlert('Please log in to add books to your bookshelf');
         }
         else { // unable to make call to API
           console.log(response);
-          alert('Network error. Please try again later');
+          await customAlert('Network error. Please try again later');
         }
       } catch (error) { // unable to access the database
-        alert('Network error. Please try again later');
+        await customAlert('Network error. Please try again later');
       }
     });
   });
@@ -469,7 +508,7 @@ function buildBookSelector(books) {
  * @param {object} authors
  * @param {object} addButton
  */
-function configureInnerAddButton(title, authors, addButton) {
+async function configureInnerAddButton(title, authors, addButton) {
   try {
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
     const modalWindow = document.getElementById('popup');
@@ -486,19 +525,20 @@ function configureInnerAddButton(title, authors, addButton) {
         }),
       });
       if (response.status === 201) { // book was successfully added
-        alert(`${title} was added to your bookshelf`);
+        await customAlert(`${title} was added to your bookshelf`);
         document.getElementById('book-list').innerHTML = '';
         modalWindow.style.display = 'none';
       } else if (response.status === 403) { // user is not logged in and can't add the book
-        alert('Please log in to add books to your bookshelf');
+        await customAlert('Please log in to add books to your bookshelf');
       } else if (response.status === 409) { // the book already exists on the user's bookshelf
-        alert(`${title} is already on your bookshelf`);
+        await customAlert(`${title} is already on your bookshelf`);
       } else { // the database could not complete the add
-        alert('Network error! Please try again');
+        await customAlert('Network error! Please try again');
       }
     });
-  } catch (error) {  // the database could not be accessed
-    alert('Network error! Please try again');
+  }
+  catch (error) {  // the database could not be accessed
+    await customAlert('Network error! Please try again');
   }
 }
 

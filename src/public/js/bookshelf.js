@@ -8,11 +8,12 @@
  * - load user's books
  * - control the addition, moving, and deletion of books
  */
-
+let resolvePromise;
 var draggedBook; // global book used for drag and drop event handler
 
 // Setting up bookshelves, add and move modals, and delete buttons when the DOM loads
 document.addEventListener('DOMContentLoaded', async function () {
+  configureCustomAlert();
   await loadBooks();
   bookDropdown();
   setupAddBookModal();
@@ -30,6 +31,43 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
   }
 });
+
+/**
+ * A function that acts as a custom alert for the user
+ * @param {object} message the alert message
+ * @returns a promise that resolves when the user closes the alert
+ */
+function customAlert(message) {
+  const alert = document.getElementById('custom-alert');
+  const alertMessage = document.getElementById('alert-message');
+  alertMessage.textContent = message;
+  alert.style.display = 'block';
+  return new Promise(resolve => { resolvePromise = resolve; });
+}
+
+/**
+ * A function that configures the customer alert
+ */
+function configureCustomAlert() {
+  const customAlert = document.getElementById('custom-alert');
+  const okButton = document.getElementById('ok-button');
+  okButton.addEventListener('click', function () {
+    customAlert.style.display = 'none';
+    if (resolvePromise) {
+      resolvePromise();
+      resolvePromise = null;
+    }
+  });
+  window.addEventListener('click', function (event) {
+    if (event.target == customAlert) {
+      customAlert.style.display = 'none';
+      if (resolvePromise) {
+        resolvePromise();
+        resolvePromise = null;
+      }
+    }
+  });
+}
 
 /**
  * A function that loads the user's books to their bookshelves
@@ -148,7 +186,7 @@ function configureDeleteButton(button) {
     if (response.status === 201) { // removing book from DOM if delete worked
       bookshelf.removeChild(button.parentElement.parentElement.parentElement);
     } else { // could not delete the book
-      alert('Network error! Please try again later.');
+      await customAlert('Network error! Please try again later.');
     }
   });
 }
@@ -236,10 +274,10 @@ function dragBooks() {
             window.location.reload();
           }
         } else if (response.status === 409) { // insert worked, but the delete failed
-          alert('The move failed. The book may now appear on both shelves.');
+          await customAlert('The move failed. The book may now appear on both shelves.');
           window.location.reload();
         } else { // failed to locate book or insert
-          alert('Could not complete the move. Please try again later.');
+          await customAlert('Could not complete the move. Please try again later.');
           window.location.reload();
         }
       }
@@ -298,13 +336,13 @@ function setupAddBookModal() {
           alert('Network error! Please try again later');
         }
       } else if (response.status === 404) { // could not retrieve book list from API
-        alert('Please log in to add books to your bookshelf');
+        await customAlert('Please log in to add books to your bookshelf');
       } else { // unable to access the database
-        alert('Network error. Please try again later');
+        await customAlert('Network error. Please try again later');
       }
     }
     catch (error) { // unable to complete fetch request
-      alert(error.message);
+      await customAlert(error.message);
     }
     finally { // resetting the form
       form.reset();
@@ -386,7 +424,7 @@ function buildBookSelector(books, bookshelfTable) {
  * @param {object} addButton the add button
  * @param {object} bookshelfTable the table to be added to
  */
-function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
+async function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
   const modalWindow = document.getElementById('popup');
   try {
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
@@ -416,22 +454,22 @@ function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
           window.location.reload();
         }
       } else if (response.status === 403) { // user is no longer logged in
-        alert('Please log in to add books to your bookshelf');
+        await customAlert('Please log in to add books to your bookshelf');
       } else if (response.status === 409) { // the book already exist in the bookshelf
-        alert(`${title} is already on your bookshelf`);
+        await customAlert(`${title} is already on your bookshelf`);
       } else { // the insert could not be completed
-        alert('Network error! Please try again');
+        await customAlert('Network error! Please try again');
       }
     });
   } catch (error) { // network error
-    alert('Network error! Please try again');
+    await customAlert('Network error! Please try again');
   }
 }
 
 /**
  * Controls the clear shelf modal's buttons and interaction
  */
-function clearShelfModal() {
+async function clearShelfModal() {
   const modal = document.getElementById('clear-shelf-modal');
   const confirmBtn = document.getElementById('confirm-clear-shelf');
   const cancelBtn = document.getElementById('cancel-clear-shelf');
@@ -491,7 +529,7 @@ async function clearShelf(currShelf) {
     if (!response.ok) {
       //failed to clear from DB
       console.error('Failed to clear shelf:', response.status);
-      alert('Failed to clear shelf. Please try again.');
+      await customAlert('Failed to clear shelf. Please try again.');
       return;
     }
 
@@ -501,11 +539,11 @@ async function clearShelf(currShelf) {
     if (listElement) {
       listElement.innerHTML = '';
     } else {
-      alert('Attempt to clear shelf failed.');
+      await customAlert('Attempt to clear shelf failed.');
     }
   } catch (error) {
     console.error('Error clearing shelf:', error);
-    alert('Network error. Please try again.');
+    await customAlert('Network error. Please try again.');
   }
 }
 
@@ -612,10 +650,10 @@ function setupMoveBookModal() {
   }
 
   //show the list of books ---
-  titleInput.addEventListener('focus', () => {
+  titleInput.addEventListener('focus', async () => {
     const fromValue = fromSelect.value;
     if (!fromValue) {
-      alert('Select a "From shelf" first.');
+      await customAlert('Select a "From shelf" first.');
       fromSelect.focus();
       return;
     }
@@ -661,12 +699,12 @@ function setupMoveBookModal() {
     const title = titleInput.value.trim();
 
     if (!start || !end || !title) {
-      alert('Please fill out all fields.');
+      await customAlert('Please fill out all fields.');
       return;
     }
 
     if (start === end) {
-      alert('The starting and ending shelf must be different.');
+      await customAlert('The starting and ending shelf must be different.');
       return;
     }
 
@@ -683,28 +721,27 @@ function setupMoveBookModal() {
         },
         body: JSON.stringify({ title, start, end }),
       });
-
+      modal.style.display = 'none';
       if (response.status === 201) {
         const json = await response.json();
         if (json.success) {
-          alert(`"${title}" was moved successfully.`);
+          await customAlert(`"${title}" was moved successfully.`);
         } else {
-          alert('Move completed, reloading your bookshelf.');
+          await customAlert('Move completed, reloading your bookshelf.');
         }
         window.location.reload();
       } else if (response.status === 404) {
-        alert('Could not find that book on the specified starting shelf.');
+        await customAlert('Could not find that book on the specified starting shelf.');
       } else if (response.status === 409) {
-        alert('Move failed due to a conflict.');
+        await customAlert('Move failed due to a conflict.');
         window.location.reload();
       } else {
-        alert('Could not complete the move. Please try again later.');
+        await customAlert('Could not complete the move. Please try again later.');
       }
     } catch (error) {
       console.error('Error moving book:', error);
-      alert('Network error. Please try again later.');
+      await customAlert('Network error. Please try again later.');
     } finally {
-      modal.style.display = 'none';
       resetFormState();
     }
   });

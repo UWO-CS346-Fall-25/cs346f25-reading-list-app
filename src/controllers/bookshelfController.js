@@ -309,9 +309,7 @@ exports.deleteClearShelf = async (req, res) => {
     //if the user is logged in, get the bookshelf they're targeting,
     //their id, and perform the clear
     if (!req.session.user) {
-      return res
-        .status(403)
-        .json({ success: false, message: 'User not logged in.' });
+      return res.status(403).json({ success: false, message: 'User not logged in.' });
     }
 
     const { bookshelf } = req.body;
