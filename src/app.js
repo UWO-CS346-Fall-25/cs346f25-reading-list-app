@@ -91,14 +91,27 @@ app.use('/', csrfProtection, registerRouter);
 const bookshelfRouter = require('./routes/bookshelf');
 app.use('/', csrfProtection, bookshelfRouter);
 
-// const apiRouter = require('./routes/api');
-// app.use('/', csrfProtection, apiRouter);
-
-// Placeholder home route
+// Home route
 app.get('/', csrfProtection, (req, res) => {
   res.render('index', {
     title: 'Home',
     csrfToken: req.csrfToken(),
+  });
+});
+
+// 500 handler
+app.use((err, req, res, next) => {
+  if (req.path === '/bookshelf' && (!req.session || !req.session.user)) { // preventing illegal bookshelf access to non-registered users
+    return res.status(403).render('error', {
+      title: 'Access Denied',
+      message: 'You must be logged in to access the bookshelf.',
+      error: { status: 403 },
+    });
+  }
+  res.status(500).render('error', { // handing all server errors not relating to illegal access to the bookshelf page
+    title: 'Server Error',
+    message: 'The page you are looking for could not be loaded.',
+    error: process.env.NODE_ENV === 'development' ? err : { status: 500 },
   });
 });
 
