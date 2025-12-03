@@ -88,17 +88,12 @@ exports.getBookshelf = async (req, res, next) => {
 */
 exports.getSignout = async (req, res, next) => {
   try {
-    const token = req.csrfToken();
     req.session.destroy((error) => { // attempting to destroy the current session
       if (error) {
         next(error);
       }
       res.clearCookie('connect.sid');
-      res.render('index', { // attempting to render the index page
-        title: 'Home',
-        csrfToken: token,
-        user: null,
-      });
+      res.redirect('index');
     });
   } catch (error) { // catching error if the index page could not be rendered
     next(error);
@@ -125,7 +120,7 @@ function sortData(list) {
 /**
 * Controller: getAuthors
 * Purpose: Retrieves the lists of authors for all the trending books
-* Input: req [not user, but required], res [response data]
+* Input: req [not used, but required], res [response data]
 * Output: Sorted list of authors
 */
 exports.getAuthors = async (req, res) => {
@@ -142,38 +137,25 @@ exports.getAuthors = async (req, res) => {
   }
 };
 
-// THE FUNCTIONS BELOW ARE FOR FUTURE EXPANSION, DO NOT DELETE
-// /**
-//  * GET /
-//  * Returns the fulls list of genres
-//  * from the database
-//  */
-// exports.getGenres = async (req, res) => {
-//   try {
-//     // getting authors list
-//     const result = await User.getGenres();
-//     res.status(201).json({ success: true, data: sortData(result) });
-//   } catch (error) {
-//     // setting status if database connection didn't work
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
-// /**
-//  * GET /
-//  * Returns the largest page count form
-//  * the books table
-//  */
-// exports.getPages = async (req, res) => {
-//   try {
-//     // getting largest page count
-//     const result = await User.getPages();
-//     res.status(201).json({ success: true, data: result });
-//   } catch (error) {
-//     // setting status if database connection didn't work
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
+/**
+* Controller: getPages
+* Purpose: Retrieves the maximum number of pages any given book contains in the books_being_read table
+* Input: req [not used, but required], res [response data]
+* Output: A value representing the maximum number of pages
+*/
+exports.getPages = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve max pages numbers`);
+  try {
+    // getting largest page count
+    const result = await User.getPages();
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Max page numbers: ${result}`);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 /**
 * Controller: getFilter
@@ -185,9 +167,8 @@ exports.getFilter = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve filtered list`);
   try {// getting filtered list
     const result = await User.getFiltered(
-      req.query.author
-      // req.query.genre, FOR FUTURE EXPANSION, DO NOT DELETE
-      // req.query.page_count
+      req.query.author,
+      req.query.page_count
     );
     console.log(`[${new Date().toISOString()}] [indexController] Success: Number of books in the filtered list: ${result.length}`);
     res.status(201).json({ success: true, data: result });
@@ -264,8 +245,10 @@ exports.postAddBookToBookshelf = async (req, res) => {
     try {
       // attempting to insert the book
       const result = await User.addBook(
+        req.body.isbn,
         req.body.title,
         req.body.authors,
+        req.body.pageCount,
         'to-read-books',
         req.session.user.sub
       );

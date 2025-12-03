@@ -428,8 +428,10 @@ function buildBookSelector(books, bookshelfTable) {
     button.textContent = 'Add';
     button.id = 'add-button';
     configureInnerAddButton(
+      bookISBN.textContent,
       bookTitle.textContent,
       book.authors,
+      bookPageCount.textContent,
       button,
       bookshelfTable
     );
@@ -448,7 +450,7 @@ function buildBookSelector(books, bookshelfTable) {
  * @param {object} addButton the add button
  * @param {object} bookshelfTable the table to be added to
  */
-async function configureInnerAddButton(title, authors, addButton, bookshelfTable) {
+async function configureInnerAddButton(isbn, title, authors, pageCount, addButton, bookshelfTable) {
   const modalWindow = document.getElementById('popup');
   try {
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
@@ -460,8 +462,10 @@ async function configureInnerAddButton(title, authors, addButton, bookshelfTable
           'CSRF-Token': token,
         },
         body: JSON.stringify({
+          isbn: isbn,
           title: title,
           authors: authors,
+          pageCount: pageCount,
           table: bookshelfTable,
         }),
       });

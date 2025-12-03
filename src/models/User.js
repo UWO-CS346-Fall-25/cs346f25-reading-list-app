@@ -49,64 +49,44 @@ class User {
     }
   }
 
-  // THE FUNCTIONS BELOW ARE FOR FUTURE EXPANSION, DO NOT DELETE
-  // /**
-  //  * Returns a list of all genres
-  //  * from the books table
-  //  * @returns {Promise<object>} the genre list
-  //  */
-  // static async getGenres() {
-  //   const { data, error } = await supabase.supabase
-  //     .from('books')
-  //     .select('genre');
-  //   if (error === null) {
-  //     // validating query
-  //     return data;
-  //   } else {
-  //     // throwing an error if an error occurred
-  //     throw new Error('Database connection error');
-  //   }
-  // }
-
-  // /**
-  //  * Returns the largest page count in the books table
-  //  * @returns {Promise<object>} the largest page count
-  //  */
-  // static async getPages() {
-  //   const { data, error } = await supabase.supabase
-  //     .from('books')
-  //     .select('page_count')
-  //     .order('page_count', { ascending: false })
-  //     .limit(1);
-  //   if (error === null) {
-  //     // validating query
-  //     return data;
-  //   } else {
-  //     // throwing an error if an error occurred
-  //     throw new Error('Database connection error');
-  //   }
-  // }
+  /**
+   * Returns the largest page count in the books table
+   * @returns {Promise<object>} the largest page count
+   */
+  static async getPages() {
+    const { data, error } = await supabase.supabase
+      .from('books_being_read')
+      .select('page_count')
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
+    if (error === null) { // validating query
+      let maxPages = 0;
+      for (const pageCount of data) {
+        if (pageCount.page_count > maxPages) {
+          maxPages = pageCount.page_count;
+        }
+      }
+      return maxPages;
+    } else { // throwing an error if an error occurred
+      throw new Error('Database connection error');
+    }
+  }
 
   /**
    * Returns the filtered books table from
    * the database
    * @returns {Promise<object>} the book list
    */
-  static async getFiltered(author, genre, pageCount) {
+  static async getFiltered(author, pageCount) {
     let query = supabase.supabase.from('books_being_read').select('*'); // setting up the query
     if (author.trim() !== '') {
       // adding author condition if not null
       query = query.contains('authors', [author]);
     }
-    // CODE BELOW FOR FUTURE EXPANSION, DO NOT DELETE
-    // if (genre.trim() !== '') {
-    //   // adding genre condition if not null
-    //   query = query.eq('genre', genre);
-    // }
-    // if (pageCount !== '-1') {
-    //   // adding page count condition if not null
-    //   query = query.lte('page_count', pageCount);
-    // }
+    if (pageCount !== '-1') {
+      // adding page count condition if not null
+      query = query.lte('page_count', pageCount);
+    }
     const { data, error } = await query; // completing query
     if (error === null) {
       // validating query
@@ -243,20 +223,22 @@ class User {
   /**
    * Add
    */
-  static async addBook(title, authors, bookshelfTable, userId) {
+  static async addBook(isbn, title, authors, pageCount, bookshelfTable, userId) {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
       const { data, error } = await supabase.supabase
         .from(databaseTable)
         .select('*')
+        .eq('isbn', isbn)
         .eq('title', title)
         .contains('authors', authors)
+        .eq('page_count', pageCount)
         .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
         const { data, error } = await supabase.supabase
           .from(databaseTable)
-          .insert([{ title: title, authors: authors, user_id: userId }], {
+          .insert([{ isbn: isbn, title: title, authors: authors, page_count: pageCount, user_id: userId }], {
             returning: 'representation',
           });
         if (error) {
@@ -276,8 +258,10 @@ class User {
           const { data, error } = await supabase.supabase
             .from(databaseTable) // getting the id of the book inserted
             .select(idType)
+            .eq('isbn', isbn)
             .eq('title', title)
             .contains('authors', authors)
+            .eq('page_count', pageCount)
             .eq('user_id', userId);
           return data[0];
         }

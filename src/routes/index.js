@@ -14,11 +14,9 @@ router.get('/password', indexController.getPassword); // must exist for password
 router.get('/login', indexController.getLogin);
 router.get('/register', indexController.getRegister);
 router.get('/bookshelf', indexController.getBookshelf);
-router.get('/signout', indexController.getSignout)
+router.get('/signout', indexController.getSignout);
 router.get('/authors', indexController.getAuthors);
-// FOR FUTURE EXPANSION, DO NOT DELETE
-// router.get('/genres', indexController.getGenres);
-// router.get('/pages', indexController.getPages);
+router.get('/pages', indexController.getPages);
 router.get('/trending', indexController.getTrending);
 router.get('/filter', indexController.getFilter);
 

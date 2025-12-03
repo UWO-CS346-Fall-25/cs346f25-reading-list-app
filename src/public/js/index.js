@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   configureCustomAlert();
   calibrateModal();
   fillComboBoxes();
-  // fetchFilterRadios();  FOR FUTURE EXPANSION, DO NOT DELETE
+  fetchFilterRadios();
   initFormValidation();
   fetchTrending();
 });
@@ -128,58 +128,64 @@ function addOptions(error, requestType, options) {
   }
 }
 
-// -------------------- THE FUNCTIONS BELOW ARE CURRENTLY FOR FUTURE EXPANSION, DO NOT DELETE --------------------
-// /**
-//  * A function that creates the page count
-//  * radio buttons for the filter form
-//  */
-// async function fetchFilterRadios() {
-//   try {
-//     // attempting fetch request to get largest number of pages
-//     const response = await fetch('/pages');
-//     if (response.ok) {
-//       // validating fetch request
-//       const json = await response.json();
-//       if (json.success) {
-//         // validating json translation
-//         buildRadios(json.data[0].page_count);
-//       } else {
-//         // loading default max pages if cannot translate to json
-//         buildRadios(1500);
-//       }
-//     } else {
-//       // loading default max pages if database could not be reached
-//       buildRadios(1500);
-//     }
-//   } catch (error) {
-//     // picking default value
-//     buildRadios(1500);
-//   }
-// }
+/**
+ * A function that creates the page count
+ * radio buttons for the filter form
+ */
+async function fetchFilterRadios() {
+  try {
+    // attempting fetch request to get largest number of pages
+    const response = await fetch('/pages');
+    if (response.ok) {
+      // validating fetch request
+      const json = await response.json();
+      if (json.success) {
+        // validating json translation
+        buildRadios(json.data);
+      } else {
+        // loading default max pages if cannot translate to json
+        buildRadios(1500);
+      }
+    } else {
+      // loading default max pages if database could not be reached
+      buildRadios(1500);
+    }
+  } catch (error) {
+    // picking default value
+    buildRadios(1500);
+  }
+}
 
-// /**
-//  * A function that builds the radio buttons
-//  * for the filter form
-//  * @param {number} maxNumPages
-//  */
-// function buildRadios(maxNumPages) {
-//   let radioValue = 150;
-//   const radioList = document.getElementById('radio-list');
-//   while (radioValue < maxNumPages) {
-//     const button = document.createElement('span');
-//     const radio = document.createElement('input');
-//     radio.type = 'radio';
-//     radio.name = radioList.id;
-//     radio.classList.add('radio');
-//     if (radioValue + 150 < maxNumPages) {
-//       button.append(radio, ' ' + radioValue);
-//     } else {
-//       button.append(radio, ' ' + radioValue + '+');
-//     }
-//     radioList.append(button);
-//     radioValue += 150;
-//   }
-// }
+/**
+ * A function that builds the radio buttons
+ * for the filter form
+ * @param {number} maxNumPages
+ */
+function buildRadios(maxNumPages) {
+  let radioValue = 150;
+  const radioList = document.getElementById('radio-list');
+  if (radioValue < maxNumPages) {
+    while (radioValue < maxNumPages) {
+      const button = document.createElement('span');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = radioList.id;
+      radio.classList.add('radio');
+      button.append(radio, ' ' + radioValue);
+      radioList.append(button);
+      radioValue += 150;
+    }
+  }
+  else {
+    const button = document.createElement('span');
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = radioList.id;
+    radio.classList.add('radio');
+    button.append(radio, ' ' + maxNumPages);
+    radioList.append(button);
+  }
+}
 
 /**
  * Initialize form validation
@@ -260,23 +266,18 @@ function clearError(filters) {
 async function processForm() {
   const author = document.getElementById('author-input'); // retrieving author
   try { // fetch request to get book list with filters
-    // THE CODE BELOW IS FOR FUTURE EXPANSION, DO NOT DELETE
-    // let index = 0;
-    // let pageFilter = -1;
-    // const pageRadios = document.getElementById('radio-list').childNodes;
-    // while (pageFilter === -1 && index < pageRadios.length) {
-    //   if (pageRadios[index].firstChild.checked) {
-    //     pageFilter = pageRadios[index].lastChild.textContent.trim();
-    //   }
-    //   index++;
-    // }
-    // if (pageFilter.length === 5) {
-    //   pageFilter = pageFilter.replace('+', '');
-    // }
+    let index = 0;
+    let pageFilter = -1;
+    const pageRadios = document.getElementById('radio-list').childNodes;
+    while (pageFilter === -1 && index < pageRadios.length) {
+      if (pageRadios[index].firstChild.checked) {
+        pageFilter = pageRadios[index].lastChild.textContent.trim();
+      }
+      index++;
+    }
     const filters = { // creating fetch params
       author: author.value,
-      // genre: document.getElementById('genre-input').value, FOR FUTURE EXPANSION, DO NOT DELETE
-      // page_count: pageFilter,
+      page_count: pageFilter
     };
     let response = await fetch( // attempting fetch for matching filters
       // eslint-disable-next-line no-undef -- file is registering the code below as an error
@@ -405,7 +406,10 @@ function configureOuterAddButtons() {
   buttonList.forEach((button) => { // looping through each add button
     button.addEventListener('click', async function () { // adding a click listener to each button
       try { // attempting the fetch request for the books selector
-        const title = button.parentNode.previousSibling.firstChild.textContent; // getting the book title
+        let title = button.parentNode.previousSibling.firstChild.textContent; // getting the book title
+        if (title.includes('(')) {
+          title = title.substring(0, title.indexOf('('));
+        }
         let author = button.parentNode.previousSibling.lastChild; // getting the author(s)
         author = author.textContent.charAt(0) === '+' ? author.previousSibling.textContent : author.textContent;
         let response = await fetch('selector', { // get fetch for books selector
@@ -430,7 +434,6 @@ function configureOuterAddButtons() {
           await customAlert('Please log in to add books to your bookshelf');
         }
         else { // unable to make call to API
-          console.log(response);
           await customAlert('Network error. Please try again later');
         }
       } catch (error) { // unable to access the database
@@ -516,7 +519,7 @@ function buildBookSelector(books) {
     const button = document.createElement('button');
     button.textContent = 'Add';
     button.id = 'add-button';
-    configureInnerAddButton(bookTitle.textContent, book.authors, button);
+    configureInnerAddButton(bookISBN.textContent, bookTitle.textContent, book.authors, bookPageCount.textContent, button);
     buttonSection.append(button);
     displayBook.append(buttonSection);
     // putting everything together
@@ -532,7 +535,7 @@ function buildBookSelector(books) {
  * @param {object} authors
  * @param {object} addButton
  */
-async function configureInnerAddButton(title, authors, addButton) {
+async function configureInnerAddButton(isbn, title, authors, pageCount, addButton) {
   try {
     const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
     const modalWindow = document.getElementById('popup');
@@ -544,8 +547,10 @@ async function configureInnerAddButton(title, authors, addButton) {
           'CSRF-Token': token,
         },
         body: JSON.stringify({
+          isbn: isbn,
           title: title,
           authors: authors,
+          pageCount: pageCount
         }),
       });
       if (response.status === 201) { // book was successfully added

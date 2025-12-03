@@ -40,17 +40,12 @@ exports.getHome = async (req, res, next) => {
 */
 exports.getLogout = async (req, res, next) => {
   try {
-    const token = req.csrfToken();
     req.session.destroy((error) => { // attempting to destroy the current session
       if (error) {
         next(error);
       }
       res.clearCookie('connect.sid');
-      res.render('index', { // attempting to render the index page
-        title: 'Home',
-        csrfToken: token,
-        user: null,
-      });
+      res.redirect('index');
     });
   } catch (error) { // catching error if the index page could not be rendered
     next(error);
@@ -159,8 +154,10 @@ exports.postAddBookToBookshelf = async (req, res) => {
   if (req.session.user) { // checking to make sure the user is logged in
     try { // trying to insert the book
       const result = await User.addBook(
+        req.body.isbn,
         req.body.title,
         req.body.authors,
+        req.body.pageCount,
         req.body.table,
         req.session.user.sub
       );
