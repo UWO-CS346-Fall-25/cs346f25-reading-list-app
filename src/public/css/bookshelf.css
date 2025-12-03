@@ -303,19 +303,6 @@ h2 {
   border-left: 20px double var(--warning-color);
 }
 
-/* Highlight book when dragging
-.book-column li.dragging {
-  opacity: 0.5;
-  background-color: #d3d3d3;
-}
-
-Highlight drop zone
-.book-column ul.over {
-  background-color: rgba(0, 123, 255, 0.1);
-  border: 2px dashed #007bff;
-  transition: background-color 0.2s;
-} */
-
 .modal {
   display: none;
   position: fixed;
@@ -349,6 +336,10 @@ Highlight drop zone
   color: white;
   border: none;
   border-radius: 4px;
+}
+
+#book-selector {
+  min-width: 800px;
 }
 
 .close {
@@ -416,6 +407,14 @@ Highlight drop zone
   padding-top: 3px;
 }
 
+.isbn-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .title-section {
   display: flex;
   width: 200px;
@@ -430,6 +429,14 @@ Highlight drop zone
   width: 200px;
   text-align: center;
   overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-count-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
   flex-direction: column;
   justify-content: center;
 }

@@ -240,7 +240,8 @@ exports.postAddBookToSelector = async (req, res) => {
       else {
         coverURL = `https://covers.openlibrary.org/b/id/${edition.cover}-L.jpg`;
       }
-      bookList.push({ isbn: edition.isbn_13, title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
+      // console.log(edition.isbn_13[0]);
+      bookList.push({ isbn: edition.isbn_13[0], title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
     }
     console.log(`[${new Date().toISOString()}] [indexController] Success: Number of editions found: ${bookList.length}`);
     res.status(201).json({ success: true, data: bookList }); // returning the completed list

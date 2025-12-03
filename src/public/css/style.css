@@ -129,7 +129,7 @@ main {
 }
 
 .modal-content {
-  width: 600px;
+  width: 800px;
   display: flex;
   max-height: 600px;
   margin: 100px auto;
@@ -205,6 +205,14 @@ main {
   padding-top: 3px;
 }
 
+.isbn-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .title-section {
   display: flex;
   width: 200px;
@@ -219,6 +227,14 @@ main {
   width: 200px;
   text-align: center;
   overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-count-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
   flex-direction: column;
   justify-content: center;
 }

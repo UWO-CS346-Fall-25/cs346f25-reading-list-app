@@ -371,6 +371,18 @@ function buildBookSelector(books, bookshelfTable) {
     image.alt = book.title;
     imageSection.append(image);
     displayBook.append(imageSection);
+    // creating of isbn section
+    const isbnSection = document.createElement('div');
+    isbnSection.classList.add('isbn-section');
+    const isbn = document.createElement('p');
+    isbn.textContent = 'ISBN';
+    isbn.style.textDecoration = 'underline';
+    isbnSection.append(isbn);
+    const bookISBN = document.createElement('p');
+    bookISBN.textContent = book.isbn;
+    bookISBN.style.fontSize = '11px';
+    isbnSection.append(bookISBN);
+    displayBook.append(isbnSection);
     // creation of title section
     const titleSection = document.createElement('div');
     titleSection.classList.add('title-section');
@@ -397,6 +409,18 @@ function buildBookSelector(books, bookshelfTable) {
       authorSection.append(bookAuthor);
     });
     displayBook.append(authorSection);
+    // creation of page count section
+    const pageCountSection = document.createElement('div');
+    pageCountSection.classList.add('page-count-section');
+    const pageCount = document.createElement('p');
+    pageCount.textContent = 'Page Count';
+    pageCount.style.textDecoration = 'underline';
+    pageCountSection.append(pageCount);
+    const bookPageCount = document.createElement('p');
+    bookPageCount.textContent = book.pageCount;
+    bookPageCount.style.fontSize = '11px';
+    pageCountSection.append(bookPageCount);
+    displayBook.append(pageCountSection);
     // creation of button section
     const buttonSection = document.createElement('div');
     buttonSection.classList.add('button-section');
