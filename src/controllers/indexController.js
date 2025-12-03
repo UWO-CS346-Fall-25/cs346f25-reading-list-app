@@ -224,38 +224,33 @@ exports.getTrending = async (req, res) => {
 * Controller: postAddBookToSelector
 * Purpose: Adds all the editions of a book to the book selector
 * Input: req.body.title, req.body.author
-* Output: Status: 201 is loaded all editions, 404 if could not find editions, 500 if could not connect to API
+* Output: Status: 201 is loaded all editions, 500 if could not connect to API
 */
 exports.postAddBookToSelector = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve edition list from OpenLibrary`);
   try {// attempting to contact Open Library
     const result = await Api.getBookList(req.body.title, req.body.author);
-    if (result.ok) { // determining if the fetch worked
-      const books = await result.json();
-      let bookList = []; // building a list of all editions for a given title
-      for (const book of books.docs) { // getting a book cover if it exists
-        let coverURL = null;
-        if (book.cover_i) {
-          coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
-        } else if (book.cover_edition_key) {
-          coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
-        } else if (book.ocaid) {
-          coverURL = `https://archive.org/services/img/${book.ocaid}`;
-        } else {
-          coverURL = '/images/broken_image.png';
-        }
-        bookList.push({ title: book.title, authors: book.author_name, cover: coverURL }); // adding a book to the book list
+    let bookList = []; // building a list of all editions for a given title
+    for (const edition of result) { // getting the book cover
+      let coverURL = null;
+      console.log(edition);
+      if (edition.cover_i) {
+        coverURL = `https://covers.openlibrary.org/b/id/${edition.cover_i}-L.jpg`;
+      } else if (edition.cover_edition_key) {
+        coverURL = `https://covers.openlibrary.org/b/olid/${edition.cover_edition_key}-L.jpg`;
+      } else if (edition.ocaid) {
+        coverURL = `https://archive.org/services/img/${edition.ocaid}`;
       }
-      console.log(`[${new Date().toISOString()}] [indexController] Success: Edition list:`);
-      console.log(bookList);
-      res.status(201).json({ success: true, data: bookList }); // returning the completed list
+      else {
+        coverURL = `https://covers.openlibrary.org/b/id/${edition.cover}-L.jpg`;
+      }
+      bookList.push({ isbn: edition.isbn_13, title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
     }
-    else { // no editions for a book were found
-      console.error(`[${new Date().toISOString()}] [indexController] DB Error: Unable to retrieve edition list from OpenLibrary`);
-      res.status(404).json({ success: false });
-    }
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Edition list:`);
+    console.log(bookList);
+    res.status(201).json({ success: true, data: bookList }); // returning the completed list
   } catch (error) { // could not connect to Open Library
-      console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
+      console.error(`[${new Date().toISOString()}] [indexController] API Error: ${error.message}`);
       res.status(500).json({ success: false });
   }
 };
