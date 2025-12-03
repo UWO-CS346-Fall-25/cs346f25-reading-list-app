@@ -76,7 +76,7 @@ exports.postPasswordReset = async (req, res) => {
       req.body.email,
     );
     if (response) { // 201 password reset sent
-      console.log(`[${new Date().toISOString()}] [resetController] Success: Email sent: ${response}`);
+      console.log(`[${new Date().toISOString()}] [resetController] Success: Reset email sent`);
       res.status(201).json({ success: response });
     } else { // 404 password reset not sent
       console.error(`[${new Date().toISOString()}] [resetController] DB Error: Email was not sent`);

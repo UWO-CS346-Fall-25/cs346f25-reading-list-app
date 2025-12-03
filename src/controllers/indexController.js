@@ -133,8 +133,7 @@ exports.getAuthors = async (req, res) => {
   try { // getting authors list
     const result = await User.getAuthors();
     const sortedList = sortData(result);
-    console.log(`[${new Date().toISOString()}] [indexController] Success: Author list:`);
-    console.log(sortedList);
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Number of authors retrieved: ${sortedList.length}`);
     res.status(201).json({ success: true, data: sortedList });
   }
   catch (error) { // setting status if database connection didn't work
@@ -190,8 +189,7 @@ exports.getFilter = async (req, res) => {
       // req.query.genre, FOR FUTURE EXPANSION, DO NOT DELETE
       // req.query.page_count
     );
-    console.log(`[${new Date().toISOString()}] [indexController] Success: Filtered list:`);
-    console.log(result);
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Number of books in the filtered list: ${result.length}`);
     res.status(201).json({ success: true, data: result });
   }
   catch (error) {
@@ -211,8 +209,7 @@ exports.getTrending = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [indexController] Attempting to retrieve trending list`);
   try { // getting recommended list
     const result = await User.getTrending();
-    console.log(`[${new Date().toISOString()}] [indexController] Success: Trending list:`);
-    console.log(result);
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Number of books in the trending list: ${result.length}`);
     res.status(201).json({ success: true, data: result });
   } catch (error) { // setting status if database connection didn't work
     console.error(`[${new Date().toISOString()}] [indexController] DB Error: ${error.message}`);
@@ -233,7 +230,6 @@ exports.postAddBookToSelector = async (req, res) => {
     let bookList = []; // building a list of all editions for a given title
     for (const edition of result) { // getting the book cover
       let coverURL = null;
-      console.log(edition);
       if (edition.cover_i) {
         coverURL = `https://covers.openlibrary.org/b/id/${edition.cover_i}-L.jpg`;
       } else if (edition.cover_edition_key) {
@@ -246,8 +242,7 @@ exports.postAddBookToSelector = async (req, res) => {
       }
       bookList.push({ isbn: edition.isbn_13, title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
     }
-    console.log(`[${new Date().toISOString()}] [indexController] Success: Edition list:`);
-    console.log(bookList);
+    console.log(`[${new Date().toISOString()}] [indexController] Success: Number of editions found: ${bookList.length}`);
     res.status(201).json({ success: true, data: bookList }); // returning the completed list
   } catch (error) { // could not connect to Open Library
       console.error(`[${new Date().toISOString()}] [indexController] API Error: ${error.message}`);

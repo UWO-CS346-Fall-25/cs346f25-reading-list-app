@@ -67,8 +67,7 @@ exports.getToReadShelf = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to get user's books_to_read list`);
   try { // getting to-read list
     const result = await User.getToRead(req.session.user.sub);
-    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: books_to_read list:`);
-    console.log(result);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
     res.status(201).json({ success: true, data: result });
   } catch (error) { // setting status if database connection didn't work
       console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
@@ -87,8 +86,7 @@ exports.getReadingShelf = async (req, res) => {
   try {
     // getting reading list
     const result = await User.getReading(req.session.user.sub);
-    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: books_being_read list:`);
-    console.log(result);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     // setting status if database connection didn't work
@@ -108,8 +106,7 @@ exports.getReadShelf = async (req, res) => {
   try {
     // getting read list
     const result = await User.getRead(req.session.user.sub);
-    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: books_read list:`);
-    console.log(result);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     // setting status if database connection didn't work
@@ -122,40 +119,33 @@ exports.getReadShelf = async (req, res) => {
 * Controller: postAddBooksToSelector
 * Purpose: Adds all the editions of a book to the book selector
 * Input: req.body.title, req.body.author
-* Output: Status: 201 is loaded all editions, 404 if could not find editions, 500 if could not connect to API
+* Output: Status: 201 is loaded all editions, 500 if could not connect to API
 */
 exports.postAddBooksToSelector = async (req, res) => {
   console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to retrieve edition list from OpenLibrary`);
-  try {// attempting to contact Open Library
-    const result = await Api.getBookList(req.body.title, req.body.author);
-    if (result.ok) { // determining if the fetch worked
-      const books = await result.json();
+    try { // attempting to contact Open Library
+      const result = await Api.getBookList(req.body.title, req.body.author);
       let bookList = []; // building a list of all editions for a given title
-      for (const book of books.docs) { // getting a book cover if it exists
+      for (const edition of result) { // getting the book cover
         let coverURL = null;
-        if (book.cover_i) {
-          coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
-        } else if (book.cover_edition_key) {
-          coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
-        } else if (book.ocaid) {
-          coverURL = `https://archive.org/services/img/${book.ocaid}`;
-        } else {
-          coverURL = '/images/broken_image.png';
+        if (edition.cover_i) {
+          coverURL = `https://covers.openlibrary.org/b/id/${edition.cover_i}-L.jpg`;
+        } else if (edition.cover_edition_key) {
+          coverURL = `https://covers.openlibrary.org/b/olid/${edition.cover_edition_key}-L.jpg`;
+        } else if (edition.ocaid) {
+          coverURL = `https://archive.org/services/img/${edition.ocaid}`;
         }
-        bookList.push({ title: book.title, authors: book.author_name, cover: coverURL }); // adding a book to the book list
+        else {
+          coverURL = `https://covers.openlibrary.org/b/id/${edition.cover}-L.jpg`;
+        }
+        bookList.push({ isbn: edition.isbn_13, title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
       }
-      console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Edition list:`);
-      console.log(bookList);
+      console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of editions found: ${bookList.length}`);
       res.status(201).json({ success: true, data: bookList }); // returning the completed list
+    } catch (error) { // could not connect to Open Library
+        console.error(`[${new Date().toISOString()}] [bookshelfController] API Error: ${error.message}`);
+        res.status(500).json({ success: false });
     }
-    else { // no editions for a book were found
-      console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Unable to retrieve edition list from OpenLibrary`);
-      res.status(404).json({ success: false });
-    }
-  } catch (error) { // could not connect to Open Library
-      console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
-      res.status(500).json({ success: false });
-  }
 };
 
 /**
@@ -175,8 +165,7 @@ exports.postAddBookToBookshelf = async (req, res) => {
         req.session.user.sub
       );
       if (result) { // insert worked
-        console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book added:`);
-        console.log(result);
+        console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book added`);
         res.status(201).json({ success: true, data: result });
       } else { // book already exists in the table
         console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Book is already on the bookshelf`);
@@ -208,8 +197,7 @@ exports.deleteMoveBook = async (req, res) => {
       req.session.user.sub
     );
     if (result) { // the insert worked
-      console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book moved:`);
-      console.log(result);
+      console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book moved`);
       res.status(201).json({ success: true, data: result });
     } else if (result === null) { // the insert worked, but the delete failed
       console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Could not delete book`);

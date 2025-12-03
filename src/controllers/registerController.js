@@ -61,8 +61,7 @@ exports.postRegister = async (req, res) => {
       res.status(409).json({ success: true });
     }
     else { // registration successful
-      console.log(`[${new Date().toISOString()}] [RegisterController] Success: Account created:`);
-      console.log(result);
+      console.log(`[${new Date().toISOString()}] [RegisterController] Success: Account created`);
       res.status(201).json({ success: true });
     }
   }

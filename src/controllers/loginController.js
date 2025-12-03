@@ -80,9 +80,7 @@ exports.postLogin = async (req, res) => {
       res.status(404).json({ success: false });
     }
     else { // storing session and 201 if account found
-      console.log(`[${new Date().toISOString()}] [loginController] Success: User found:`);
-      console.log(response);
-      console.log(response.session.user.user_metadata);
+      console.log(`[${new Date().toISOString()}] [loginController] Success: User located`);
       req.session.user = response.session.user.user_metadata;
       res.status(201).json({ success: true });
     }
