@@ -36,10 +36,11 @@ class User {
    * @returns {Promise<object>} the author list
    */
   static async getAuthors() {
-    const { data, error } = await supabase.supabase.from('books_being_read')
-                                                   .select('authors')
-                                                   .order('added', { ascending: false })
-                                                   .limit(numBooksToDisplay);
+    const { data, error } = await supabase.supabase
+      .from('books_being_read')
+      .select('authors')
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
     if (error === null) {
       // validating query
       return data;
@@ -59,7 +60,8 @@ class User {
       .select('page_count')
       .order('added', { ascending: false })
       .limit(numBooksToDisplay);
-    if (error === null) { // validating query
+    if (error === null) {
+      // validating query
       let maxPages = 0;
       for (const pageCount of data) {
         if (pageCount.page_count > maxPages) {
@@ -67,7 +69,8 @@ class User {
         }
       }
       return maxPages;
-    } else { // throwing an error if an error occurred
+    } else {
+      // throwing an error if an error occurred
       throw new Error('Database connection error');
     }
   }
@@ -103,10 +106,11 @@ class User {
    * @returns {Promise<object>} the book list
    */
   static async getTrending() {
-    const { data, error } = await supabase.supabase.from('books_being_read')
-                                                   .select('*')
-                                                   .order('added', { ascending: false })
-                                                   .limit(numBooksToDisplay);
+    const { data, error } = await supabase.supabase
+      .from('books_being_read')
+      .select('*')
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
     if (!error) {
       // validating query
       return data;
@@ -223,7 +227,14 @@ class User {
   /**
    * Add
    */
-  static async addBook(isbn, title, authors, pageCount, bookshelfTable, userId) {
+  static async addBook(
+    isbn,
+    title,
+    authors,
+    pageCount,
+    bookshelfTable,
+    userId
+  ) {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
       const { data, error } = await supabase.supabase
@@ -238,9 +249,20 @@ class User {
         // continue with the add process
         const { data, error } = await supabase.supabase
           .from(databaseTable)
-          .insert([{ isbn: isbn, title: title, authors: authors, page_count: pageCount, user_id: userId }], {
-            returning: 'representation',
-          });
+          .insert(
+            [
+              {
+                isbn: isbn,
+                title: title,
+                authors: authors,
+                page_count: pageCount,
+                user_id: userId,
+              },
+            ],
+            {
+              returning: 'representation',
+            }
+          );
         if (error) {
           // addition did not work - network issue
           throw new Error();
@@ -356,7 +378,7 @@ class User {
       // attempting database operations
       const { data, error } = await supabase.supabase
         .from(originTable) // grabbing the book details
-        .select('title, authors')
+        .select('isbn, title, authors, page_count')
         .eq(idType, bookId)
         .eq('user_id', userId);
       const book = data; // restoring data for scope
@@ -365,7 +387,13 @@ class User {
         const { data, error } = await supabase.supabase
           .from(destinationTable) // attempting to insert the book into the destination table
           .insert([
-            { title: book[0].title, authors: book[0].authors, user_id: userId },
+            {
+              isbn: book[0].isbn,
+              title: book[0].title,
+              authors: book[0].authors,
+              page_count: book[0].page_count,
+              user_id: userId,
+            },
           ])
           .select();
         const newId = data.length === 1 ? Object.values(data[0])[0] : null;
@@ -390,7 +418,8 @@ class User {
         // not able to verify the book details
         return false;
       }
-    } catch (error) { // initial select failed, network error
+    } catch (error) {
+      // initial select failed, network error
       throw new Error(error.message);
     }
   }
@@ -453,13 +482,13 @@ class User {
 
   /**
    * Moves a book from one shelf to another using its title instead of ID.
-   * @param {string} title - the book title
+   * @param {string} bookId - the book id
    * @param {string} originShelf - origin shelf )
    * @param {string} destinationShelf - destination shelf
    * @param {string} userId - user's id
    * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
    */
-  static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
+  static async moveBookByTitle(bookId, originShelf, destinationShelf, userId) {
     const originTable = this.getTableName(originShelf);
     const destinationTable = this.getTableName(destinationShelf);
 
@@ -476,10 +505,9 @@ class User {
       //find a matching book in the origin shelf
       const { data, error } = await supabase.supabase
         .from(originTable)
-        .select(`${idType}, title, authors`)
-        .eq('title', title)
-        .eq('user_id', userId)
-        .limit(1);
+        .select('*')
+        .eq(idType, bookId)
+        .eq('user_id', userId);
 
       if (error) {
         return false; // DB error
@@ -494,7 +522,7 @@ class User {
       //insert into destination shelf
       const insertResult = await supabase.supabase
         .from(destinationTable)
-        .insert([{ title: book.title, authors: book.authors, user_id: userId }])
+        .insert([{ isbn: book.isbn, title: book.title, authors: book.authors, page_count: book.page_count, user_id: userId }])
         .select();
 
       if (insertResult.error) {
@@ -509,7 +537,7 @@ class User {
       const deleteResult = await supabase.supabase
         .from(originTable)
         .delete()
-        .eq(idType, book[idType]);
+        .eq(idType, bookId);
 
       if (deleteResult.error) {
         return null; // insert worked, delete failed
