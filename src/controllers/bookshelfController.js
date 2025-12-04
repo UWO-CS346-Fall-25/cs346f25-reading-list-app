@@ -223,9 +223,9 @@ exports.deleteMoveBookBtn = async (req, res) => {
   }
 
   const userId = req.session.user.sub;
-  const { title, start, end } = req.body;
+  const { bookId, start, end } = req.body;
 
-  if (!title || !start || !end) {
+  if (!bookId || !start || !end) {
     return res
       .status(400)
       .json({ success: false, message: 'Missing title/start/end.' });
@@ -239,7 +239,7 @@ exports.deleteMoveBookBtn = async (req, res) => {
   }
 
   try {
-    const result = await User.moveBookByTitle(title, start, end, userId);
+    const result = await User.moveBookByTitle(bookId, start, end, userId);
 
     if (result === 'NOT_FOUND') {
       // no book with that title in the origin shelf

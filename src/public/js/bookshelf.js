@@ -126,6 +126,7 @@ function loadList(bookShelf, bookList) {
     bookId.style.display = 'none'; // hiding the bookId to use a silent database hook
     center.append(bookId);
     const title = document.createElement('p'); // creating the title for the center container
+    title.classList.add('title');
     title.textContent = element.title;
     title.style.maxWidth = '25ch';
     title.style.whiteSpace = 'nowrap';
@@ -725,6 +726,15 @@ function setupMoveBookModal() {
     const start = fromSelect.value;
     const end = toSelect.value;
     const title = titleInput.value.trim();
+    const titles = document.getElementsByClassName('title');
+    let bookId = null;
+    let index = 0;
+    while (bookId === null) {
+      if (titles[index].textContent === title) {
+        bookId = titles[index].previousSibling.textContent;
+      }
+      index++;
+    }
 
     if (!start || !end || !title) {
       await customAlert('Please fill out all fields.');
@@ -747,7 +757,7 @@ function setupMoveBookModal() {
           'Content-Type': 'application/json',
           'CSRF-Token': token,
         },
-        body: JSON.stringify({ title, start, end }),
+        body: JSON.stringify({ bookId, start, end }),
       });
       modal.style.display = 'none';
       if (response.status === 201) {
