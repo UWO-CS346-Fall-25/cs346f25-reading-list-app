@@ -501,7 +501,7 @@ class User {
         return false; // insert failed
       }
 
-      const insertedRows = insertResult.data || [];
+      const insertedRows = insertResult.data || []; 
       const newId =
         insertedRows.length === 1 ? Object.values(insertedRows[0])[0] : null;
 

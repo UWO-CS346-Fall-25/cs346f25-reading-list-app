@@ -544,7 +544,7 @@ async function clearShelf(currShelf) {
     .getElementsByName('csrf-token')[0]
     .getAttribute('content');
 
-  try {
+  try { 
     const response = await fetch('/clear', {
       method: 'DELETE',
       headers: {
@@ -566,15 +566,21 @@ async function clearShelf(currShelf) {
 
     if (listElement) {
       listElement.innerHTML = '';
-    } else {
+    } else { 
       await customAlert('Attempt to clear shelf failed.');
     }
-  } catch (error) {
+  } catch (error) { //
     console.error('Error clearing shelf:', error);
     await customAlert('Network error. Please try again.');
   }
 }
 
+/**
+ * Sets up the move book modal from Manage Books dropdown and handles the move, 
+ * including the fetch and delete using the CSRF Token.
+ * 
+ * Utilizes an internal method called getTitlesForShelf() to get the column's books and display them in the book modal
+ */
 function setupMoveBookModal() {
   const modal = document.getElementById('move-modal');
   const form = document.getElementById('move-book-form');
@@ -601,6 +607,9 @@ function setupMoveBookModal() {
     });
   }
 
+  /**
+   * Resets the forms state when a user has clicked the x in the modal or outside the modal somewhere else in the window
+   */
   function resetFormState() {
     form.reset();
     toSelect.disabled = true;
@@ -623,7 +632,7 @@ function setupMoveBookModal() {
     }
   });
 
-  // From input form
+  //from input form
   fromSelect.addEventListener('change', () => {
     const fromValue = fromSelect.value;
 
@@ -653,7 +662,12 @@ function setupMoveBookModal() {
     titleDropdown.classList.add('hidden');
   });
 
-  // Helper: get all book titles from a shelf (assumes <ul id="..."> with <li>Book Title</li>)
+  
+  /**
+   * get all book titles from a shelf
+   * @param {*} shelfId the id of the shelf we are pulling the books from 
+   * @returns 
+   */
   function getTitlesForShelf(shelfId) {
     const shelf = document.getElementById(shelfId);
     if (!shelf) return [];
@@ -695,7 +709,7 @@ function setupMoveBookModal() {
       emptyMsg.classList.add('title-dropdown-item');
       emptyMsg.textContent = 'No books in this shelf.';
       titleDropdown.appendChild(emptyMsg);
-    } else {
+    } else { //display the column and handle click event
       titles.forEach((title) => {
         const item = document.createElement('div');
         item.classList.add('title-dropdown-item');
@@ -736,11 +750,12 @@ function setupMoveBookModal() {
       return;
     }
 
+    //get the token 
     const token = document
       .getElementsByName('csrf-token')[0]
       .getAttribute('content');
 
-    try {
+    try { //attempt the deletion process using the title, start, and end 
       const response = await fetch('move-btn', {
         method: 'DELETE',
         headers: {
@@ -750,15 +765,16 @@ function setupMoveBookModal() {
         body: JSON.stringify({ title, start, end }),
       });
       modal.style.display = 'none';
-      if (response.status === 201) {
+      if (response.status === 201) { //response was good
         const json = await response.json();
-        if (json.success) {
+        if (json.success) { 
           await customAlert(`"${title}" was moved successfully.`);
         } else {
           await customAlert('Move completed, reloading your bookshelf.');
         }
+        //dont refresh the page when moving, remove this line and the else above and check output
         window.location.reload();
-      } else if (response.status === 404) {
+      } else if (response.status === 404) { 
         await customAlert('Could not find that book on the specified starting shelf.');
       } else if (response.status === 409) {
         await customAlert('Move failed due to a conflict.');

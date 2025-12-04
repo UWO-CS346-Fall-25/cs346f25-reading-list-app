@@ -1,3 +1,8 @@
+# Final Feature
+
+
+
+
 # Feature/week12/deliverable5_api
 
 Updates to the bookshelf page:
@@ -7,7 +12,7 @@ Updates to the bookshelf page:
   - Set bookId to display none, allowing for an anonymous database hook when moving books
 
 Updates for external API (Open Library):
-  - New model created to only fatch from API, separating the API model from the database model
+  - New model created to only fetch from API, separating the API model from the database model
   - Did not add routes or controllers for API calls, instead imported new model into existing
     controllers that need to call to the API
 

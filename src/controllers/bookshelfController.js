@@ -222,16 +222,17 @@ exports.deleteMoveBookBtn = async (req, res) => {
       .json({ success: false, message: 'User not logged in.' });
   }
 
+  //get the userID 
   const userId = req.session.user.sub;
   const { title, start, end } = req.body;
 
-  if (!title || !start || !end) {
+  if (!title || !start || !end) { //if the title, starting column, and ending column id 
     return res
       .status(400)
       .json({ success: false, message: 'Missing title/start/end.' });
   }
 
-  if (start === end) {
+  if (start === end) { 
     return res.status(400).json({
       success: false,
       message: 'Start and end shelves must be different.',
