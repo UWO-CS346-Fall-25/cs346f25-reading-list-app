@@ -397,6 +397,18 @@ function clearList() {
 }
 
 /**
+ * A helper function that disables the background so the spinner is visible
+ */
+function enableBackground() {
+  const filterForm = document.getElementsByTagName('form')[0];
+  const trending = document.getElementById('trending');
+  filterForm.style.opacity = 1;
+  filterForm.style.pointerEvents = 'all';
+  trending.style.opacity = 1;
+  trending.style.pointerEvents = 'all';
+}
+
+/**
  * A function that adds a listener to the add button
  * on each book in the trending reads section
  */
@@ -404,8 +416,16 @@ function configureOuterAddButtons() {
   const token = document.getElementsByName('csrf-token')[0].getAttribute('content');
   const buttonList = document.querySelectorAll('.add-button'); // getting each add button
   buttonList.forEach((button) => { // looping through each add button
+    const filterForm = document.getElementsByTagName('form')[0];
+    const trending = document.getElementById('trending');
+    const spinner = document.getElementsByClassName('spinner-container')[0];
     button.addEventListener('click', async function () { // adding a click listener to each button
       try { // attempting the fetch request for the books selector
+        filterForm.style.opacity = 0.5;
+        filterForm.style.pointerEvents = 'none';
+        trending.style.opacity = 0.5;
+        trending.style.pointerEvents = 'none';
+        spinner.style.display = 'block';
         let title = button.parentNode.previousSibling.firstChild.textContent; // getting the book title
         if (title.includes('(')) {
           title = title.substring(0, title.indexOf('('));
@@ -420,13 +440,17 @@ function configureOuterAddButtons() {
           },
           body: JSON.stringify({ title: title, author: author }),
         });
+        const popup = document.getElementsByClassName('modal')[0];
         if (response.status === 201) { // book added successfully
           const json = await response.json();
           if (json.success) { // validating json translation
-            const popup = document.getElementsByClassName('modal');
-            popup[0].style.display = 'block';
+            popup.style.display = 'block';
             buildBookSelector(json.data); // building the book selector
+            enableBackground();
+            spinner.style.display = 'none';
           } else { // unable to translate json
+            enableBackground();
+            spinner.style.display = 'none';
             await customAlert('Error! Please try again');
           }
         }
@@ -434,10 +458,14 @@ function configureOuterAddButtons() {
           await customAlert('Please log in to add books to your bookshelf');
         }
         else { // unable to make call to API
-          await customAlert('Network error. Please try again later');
+          enableBackground();
+          spinner.style.display = 'none';
+          await customAlert('Could not load books. Please try again later');
         }
-      } catch (error) { // unable to access the database
-        await customAlert('Network error. Please try again later');
+      } catch (error) { // unable to access OpenLibrary
+        enableBackground();
+        spinner.style.display = 'none';
+        await customAlert('Could not load books. Please try again later');
       }
     });
   });
@@ -553,12 +581,14 @@ async function configureInnerAddButton(isbn, title, authors, pageCount, addButto
           pageCount: pageCount
         }),
       });
+      const popup = document.getElementsByClassName('modal')[0];
       if (response.status === 201) { // book was successfully added
         await customAlert(`${title} was added to your bookshelf`);
         document.getElementById('book-list').innerHTML = '';
         modalWindow.style.display = 'none';
       } else if (response.status === 403) { // user is not logged in and can't add the book
         await customAlert('Please log in to add books to your bookshelf');
+        popup.style.display = 'none';
       } else if (response.status === 409) { // the book already exists on the user's bookshelf
         await customAlert(`${title} is already on your bookshelf`);
       } else { // the database could not complete the add
