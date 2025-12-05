@@ -133,7 +133,7 @@ exports.postAddBooksToSelector = async (req, res) => {
         else {
           coverURL = `https://covers.openlibrary.org/b/id/${edition.cover}-L.jpg`;
         }
-        bookList.push({ isbn: edition.isbn_13, title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
+        bookList.push({ isbn: edition.isbn_13[0], title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
       }
       console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of editions found: ${bookList.length}`);
       res.status(201).json({ success: true, data: bookList }); // returning the completed list
@@ -222,7 +222,7 @@ exports.deleteMoveBookBtn = async (req, res) => {
       .json({ success: false, message: 'User not logged in.' });
   }
 
-  //get the userID 
+  //get the userID
   const userId = req.session.user.sub;
   const { bookId, start, end } = req.body;
 
@@ -232,7 +232,7 @@ exports.deleteMoveBookBtn = async (req, res) => {
       .json({ success: false, message: 'Missing title/start/end.' });
   }
 
-  if (start === end) { 
+  if (start === end) {
     return res.status(400).json({
       success: false,
       message: 'Start and end shelves must be different.',

@@ -312,6 +312,16 @@ function setupAddBookModal() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const bookSection = document.getElementById('book-sections');
+    const spinner = document.getElementsByClassName('spinner-container')[0];
+    const searchButton = document.getElementById('search');
+    bookSection.style.opacity = 0.5;
+    bookSection.style.pointerEvents = 'none';
+    searchButton.style.opacity = 0.5;
+    searchButton.style.pointerEvents = 'none';
+    spinner.style.display = 'block';
+    modal.style.pointerEvents = 'none';
+
     //call addBookToShelf to perform the fetch
     const title = document.getElementById('book-title').value;
     const author = document.getElementById('book-author').value;
@@ -333,22 +343,43 @@ function setupAddBookModal() {
           modal.style.display = 'none';
           popup.style.display = 'block';
           buildBookSelector(json.data, bookshelfTable); // building the book selector
+          enableBackground();
         } else { // could not translate book list to json
           alert('Network error! Please try again later');
+          enableBackground();
         }
       } else if (response.status === 404) { // could not retrieve book list from API
         await customAlert('Please log in to add books to your bookshelf');
+        enableBackground();
       } else { // unable to access the database
         await customAlert('Network error. Please try again later');
+        enableBackground();
       }
     }
     catch (error) { // unable to complete fetch request
       await customAlert(error.message);
+      enableBackground();
     }
     finally { // resetting the form
       form.reset();
     }
   });
+}
+
+/**
+ * A helper function that enables the background after a book search
+ */
+function enableBackground() {
+  const modal = document.getElementById('addBookModal');
+  const bookSection = document.getElementById('book-sections');
+  const spinner = document.getElementsByClassName('spinner-container')[0];
+  const searchButton = document.getElementById('search');
+  bookSection.style.opacity = 1;
+  bookSection.style.pointerEvents = 'all';
+  searchButton.style.opacity = 1;
+  searchButton.style.pointerEvents = 'all';
+  spinner.style.display = 'none';
+  modal.style.pointerEvents = 'all';
 }
 
 /**
@@ -359,89 +390,95 @@ function setupAddBookModal() {
  */
 function buildBookSelector(books, bookshelfTable) {
   const targetLocation = document.getElementById('book-list');
-  books.forEach((book) => {
-    const bookItem = document.createElement('li');
-    const displayBook = document.createElement('div');
-    displayBook.classList.add('display-book');
-    // created of image section
-    const imageSection = document.createElement('div');
-    imageSection.classList.add('image-section');
-    const image = document.createElement('img');
-    image.src = book.cover;
-    image.height = 94;
-    image.alt = book.title;
-    imageSection.append(image);
-    displayBook.append(imageSection);
-    // creating of isbn section
-    const isbnSection = document.createElement('div');
-    isbnSection.classList.add('isbn-section');
-    const isbn = document.createElement('p');
-    isbn.textContent = 'ISBN';
-    isbn.style.textDecoration = 'underline';
-    isbnSection.append(isbn);
-    const bookISBN = document.createElement('p');
-    bookISBN.textContent = book.isbn;
-    bookISBN.style.fontSize = '11px';
-    isbnSection.append(bookISBN);
-    displayBook.append(isbnSection);
-    // creation of title section
-    const titleSection = document.createElement('div');
-    titleSection.classList.add('title-section');
-    const title = document.createElement('p');
-    title.textContent = 'Title';
-    title.style.textDecoration = 'underline';
-    titleSection.append(title);
-    const bookTitle = document.createElement('p');
-    bookTitle.textContent = book.title;
-    bookTitle.style.fontSize = '11px';
-    titleSection.append(bookTitle);
-    displayBook.append(titleSection);
-    // creation of authors section
-    const authorSection = document.createElement('div');
-    authorSection.classList.add('author-section');
-    const author = document.createElement('p');
-    author.textContent = 'Author(s)';
-    author.style.textDecoration = 'underline';
-    authorSection.append(author);
-    book.authors.forEach((author) => {
-      const bookAuthor = document.createElement('p');
-      bookAuthor.textContent = author;
-      bookAuthor.style.fontSize = '11px';
-      authorSection.append(bookAuthor);
+  if (books.length !== 0) {
+    books.forEach((book) => {
+      const bookItem = document.createElement('li');
+      const displayBook = document.createElement('div');
+      displayBook.classList.add('display-book');
+      // created of image section
+      const imageSection = document.createElement('div');
+      imageSection.classList.add('image-section');
+      const image = document.createElement('img');
+      image.src = book.cover;
+      image.height = 94;
+      image.alt = book.title;
+      imageSection.append(image);
+      displayBook.append(imageSection);
+      // creating of isbn section
+      const isbnSection = document.createElement('div');
+      isbnSection.classList.add('isbn-section');
+      const isbn = document.createElement('p');
+      isbn.textContent = 'ISBN';
+      isbn.style.textDecoration = 'underline';
+      isbnSection.append(isbn);
+      const bookISBN = document.createElement('p');
+      bookISBN.textContent = book.isbn;
+      bookISBN.style.fontSize = '11px';
+      isbnSection.append(bookISBN);
+      displayBook.append(isbnSection);
+      // creation of title section
+      const titleSection = document.createElement('div');
+      titleSection.classList.add('title-section');
+      const title = document.createElement('p');
+      title.textContent = 'Title';
+      title.style.textDecoration = 'underline';
+      titleSection.append(title);
+      const bookTitle = document.createElement('p');
+      bookTitle.textContent = book.title;
+      bookTitle.style.fontSize = '11px';
+      titleSection.append(bookTitle);
+      displayBook.append(titleSection);
+      // creation of authors section
+      const authorSection = document.createElement('div');
+      authorSection.classList.add('author-section');
+      const author = document.createElement('p');
+      author.textContent = 'Author(s)';
+      author.style.textDecoration = 'underline';
+      authorSection.append(author);
+      book.authors.forEach((author) => {
+        const bookAuthor = document.createElement('p');
+        bookAuthor.textContent = author;
+        bookAuthor.style.fontSize = '11px';
+        authorSection.append(bookAuthor);
+      });
+      displayBook.append(authorSection);
+      // creation of page count section
+      const pageCountSection = document.createElement('div');
+      pageCountSection.classList.add('page-count-section');
+      const pageCount = document.createElement('p');
+      pageCount.textContent = 'Page Count';
+      pageCount.style.textDecoration = 'underline';
+      pageCountSection.append(pageCount);
+      const bookPageCount = document.createElement('p');
+      bookPageCount.textContent = book.pageCount;
+      bookPageCount.style.fontSize = '11px';
+      pageCountSection.append(bookPageCount);
+      displayBook.append(pageCountSection);
+      // creation of button section
+      const buttonSection = document.createElement('div');
+      buttonSection.classList.add('button-section');
+      const button = document.createElement('button');
+      button.textContent = 'Add';
+      button.id = 'add-button';
+      configureInnerAddButton(
+        bookISBN.textContent,
+        bookTitle.textContent,
+        book.authors,
+        bookPageCount.textContent,
+        button,
+        bookshelfTable
+      );
+      buttonSection.append(button);
+      displayBook.append(buttonSection);
+      // putting everything together
+      bookItem.append(displayBook);
+      targetLocation.append(bookItem);
     });
-    displayBook.append(authorSection);
-    // creation of page count section
-    const pageCountSection = document.createElement('div');
-    pageCountSection.classList.add('page-count-section');
-    const pageCount = document.createElement('p');
-    pageCount.textContent = 'Page Count';
-    pageCount.style.textDecoration = 'underline';
-    pageCountSection.append(pageCount);
-    const bookPageCount = document.createElement('p');
-    bookPageCount.textContent = book.pageCount;
-    bookPageCount.style.fontSize = '11px';
-    pageCountSection.append(bookPageCount);
-    displayBook.append(pageCountSection);
-    // creation of button section
-    const buttonSection = document.createElement('div');
-    buttonSection.classList.add('button-section');
-    const button = document.createElement('button');
-    button.textContent = 'Add';
-    button.id = 'add-button';
-    configureInnerAddButton(
-      bookISBN.textContent,
-      bookTitle.textContent,
-      book.authors,
-      bookPageCount.textContent,
-      button,
-      bookshelfTable
-    );
-    buttonSection.append(button);
-    displayBook.append(buttonSection);
-    // putting everything together
-    bookItem.append(displayBook);
-    targetLocation.append(bookItem);
-  });
+  }
+  else {
+    targetLocation.style.textAlign = 'center';
+    targetLocation.textContent = 'No books were found based on your search.';
+  }
 }
 
 /**
@@ -479,19 +516,24 @@ async function configureInnerAddButton(isbn, title, authors, pageCount, addButto
           book.title = title;
           book.authors = authors;
           loadList(document.getElementById(bookshelfTable), [book]);
+          enableBackground();
         } else { // reloading the page if cannot add book in real time
           window.location.reload();
         }
       } else if (response.status === 403) { // user is no longer logged in
         await customAlert('Please log in to add books to your bookshelf');
+        enableBackground();
       } else if (response.status === 409) { // the book already exist in the bookshelf
         await customAlert(`${title} is already on your bookshelf`);
+        enableBackground();
       } else { // the insert could not be completed
         await customAlert('Network error! Please try again');
+        enableBackground();
       }
     });
   } catch (error) { // network error
     await customAlert('Network error! Please try again');
+    enableBackground();
   }
 }
 
@@ -545,7 +587,7 @@ async function clearShelf(currShelf) {
     .getElementsByName('csrf-token')[0]
     .getAttribute('content');
 
-  try { 
+  try {
     const response = await fetch('/clear', {
       method: 'DELETE',
       headers: {
@@ -567,7 +609,7 @@ async function clearShelf(currShelf) {
 
     if (listElement) {
       listElement.innerHTML = '';
-    } else { 
+    } else {
       await customAlert('Attempt to clear shelf failed.');
     }
   } catch (error) { //
@@ -577,9 +619,9 @@ async function clearShelf(currShelf) {
 }
 
 /**
- * Sets up the move book modal from Manage Books dropdown and handles the move, 
+ * Sets up the move book modal from Manage Books dropdown and handles the move,
  * including the fetch and delete using the CSRF Token.
- * 
+ *
  * Utilizes an internal method called getTitlesForShelf() to get the column's books and display them in the book modal
  */
 function setupMoveBookModal() {
@@ -663,11 +705,11 @@ function setupMoveBookModal() {
     titleDropdown.classList.add('hidden');
   });
 
-  
+
   /**
    * get all book titles from a shelf
-   * @param {*} shelfId the id of the shelf we are pulling the books from 
-   * @returns 
+   * @param {*} shelfId the id of the shelf we are pulling the books from
+   * @returns
    */
   function getTitlesForShelf(shelfId) {
     const shelf = document.getElementById(shelfId);
@@ -760,12 +802,12 @@ function setupMoveBookModal() {
       return;
     }
 
-    //get the token 
+    //get the token
     const token = document
       .getElementsByName('csrf-token')[0]
       .getAttribute('content');
 
-    try { //attempt the deletion process using the title, start, and end 
+    try { //attempt the deletion process using the title, start, and end
       const response = await fetch('move-btn', {
         method: 'DELETE',
         headers: {
@@ -777,14 +819,14 @@ function setupMoveBookModal() {
       modal.style.display = 'none';
       if (response.status === 201) { //response was good
         const json = await response.json();
-        if (json.success) { 
+        if (json.success) {
           await customAlert(`"${title}" was moved successfully.`);
         } else {
           await customAlert('Move completed, reloading your bookshelf.');
         }
         //dont refresh the page when moving, remove this line and the else above and check output
         window.location.reload();
-      } else if (response.status === 404) { 
+      } else if (response.status === 404) {
         await customAlert('Could not find that book on the specified starting shelf.');
       } else if (response.status === 409) {
         await customAlert('Move failed due to a conflict.');

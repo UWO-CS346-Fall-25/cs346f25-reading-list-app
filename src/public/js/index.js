@@ -397,7 +397,7 @@ function clearList() {
 }
 
 /**
- * A helper function that disables the background so the spinner is visible
+ * A helper function that enables the background after a book search
  */
 function enableBackground() {
   const filterForm = document.getElementsByTagName('form')[0];
