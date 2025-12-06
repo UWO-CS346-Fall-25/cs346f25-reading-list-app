@@ -48,7 +48,7 @@ The '+' button on index.ejs is now hooked up to an external API,
 allowing users to select the edition of the book they want to add.
 
 -Bookshelf now displays a user's books, and inside of Manage Books, add is partially functional.
--Working on modifiying the existing code for fetching the books for the page.
+-Working on modifying the existing code for fetching the books for the page.
 -Delete is also partially completed
 
 How would we use row level security?

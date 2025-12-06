@@ -808,6 +808,7 @@ function setupMoveBookModal() {
       .getAttribute('content');
 
     try { //attempt the deletion process using the title, start, and end
+      console.log('Submitting move request:', { bookId, start, end, title });
       const response = await fetch('move-btn', {
         method: 'DELETE',
         headers: {
@@ -816,26 +817,27 @@ function setupMoveBookModal() {
         },
         body: JSON.stringify({ bookId, start, end }),
       });
+      console.log('Move response status:', response.status);
       modal.style.display = 'none';
       if (response.status === 201) { //response was good
         const json = await response.json();
+        console.log('Move 201 JSON:', json);
         if (json.success) {
           await customAlert(`"${title}" was moved successfully.`);
-        } else {
-          await customAlert('Move completed, reloading your bookshelf.');
         }
-        //dont refresh the page when moving, remove this line and the else above and check output
-        window.location.reload();
       } else if (response.status === 404) {
+        console.log('Move 404 - book not found for', { bookId, start });
         await customAlert('Could not find that book on the specified starting shelf.');
       } else if (response.status === 409) {
+        console.log('Move 409 - conflict when moving', { bookId, start, end });
         await customAlert('Move failed due to a conflict.');
         window.location.reload();
       } else {
+        console.error('Move failed with unexpected status:', response.status);
         await customAlert('Could not complete the move. Please try again later.');
       }
     } catch (error) {
-      console.error('Error moving book:', error);
+      console.error('Network or JS error when moving:', error);
       await customAlert('Network error. Please try again later.');
     } finally {
       resetFormState();
