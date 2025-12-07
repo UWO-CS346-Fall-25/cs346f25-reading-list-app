@@ -29,23 +29,29 @@ class Api {
     for (const book of bookList.docs) { // checking the editions of each iteration of the book
       const authors = book.author_name; // storing the author list for easy access
       const editions = await (await fetch(`https://openlibrary.org${book.key}/editions.json`)).json(); // fetching all editions
-      for (let edition of editions.entries) { // checking each edition
-        if (edition.isbn_13 && edition.number_of_pages) { // validating isbn number and number of pages
-          if (edition.cover_i || edition.cover_edition_key || edition.ocaid) { // validating a book cover
-            edition.authors = authors;
-            editionList.push(edition);
-          }
-          else if (edition.covers) { // locating alternative book covers
-            let index = 0;
-            let foundCover = false;
-            while (!foundCover && index < edition.covers.length) { // checking alternative book covers and grabbing the first valid cover
-              if (edition.covers[index] > 0) {
-                foundCover = true;
-                edition.authors = authors;
-                edition.cover = edition.covers[index];
-                editionList.push(edition);
+      if (editions.entries) {
+        for (let edition of editions.entries) {
+          // checking each edition
+          if (edition.isbn_13 && edition.number_of_pages) {
+            // validating isbn number and number of pages
+            if (edition.cover_i || edition.cover_edition_key || edition.ocaid) {
+              // validating a book cover
+              edition.authors = authors;
+              editionList.push(edition);
+            } else if (edition.covers) {
+              // locating alternative book covers
+              let index = 0;
+              let foundCover = false;
+              while (!foundCover && index < edition.covers.length) {
+                // checking alternative book covers and grabbing the first valid cover
+                if (edition.covers[index] > 0) {
+                  foundCover = true;
+                  edition.authors = authors;
+                  edition.cover = edition.covers[index];
+                  editionList.push(edition);
+                }
+                index++;
               }
-              index++;
             }
           }
         }
