@@ -135,7 +135,60 @@ main::before {
   background-image: url("/images/sign_in_background.jpg");
 }
 
-/* Maybe we can add something like input:invalid { border: 2px solid red; } for incorrectly formatted email and password AND keep your alert on button click */
+.spinner-container {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.modal {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  z-index: 1000;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  width: 400px;
+  height: 200px;
+  padding: 10px;
+  display: flex;
+  max-height: 600px;
+  margin: 350px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#alert-message {
+  flex: 1;
+  display: flex;
+  font-size: 16px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#ok-button {
+  flex: 1;
+  font-size: 16px;
+  max-height: 50px;
+}
 
 form {
   width: 300px;
@@ -210,6 +263,18 @@ button:active{
   color: var(--danger-color);
 }
 
+#reset-prompt {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+}
+
+#new-password-prompt {
+  width: 80%;
+  margin: 0 auto;
+  text-align: justify;
+}
+
 /* Footer */
 footer {
   background-color: var(--dark-color);
@@ -217,6 +282,13 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Move Indicator */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

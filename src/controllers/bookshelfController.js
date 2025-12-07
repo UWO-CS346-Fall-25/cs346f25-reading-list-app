@@ -1,236 +1,252 @@
 /**
- * Index Controller
+ * Bookshelf Controller
  *
- * Controllers handle the business logic for routes.
- * They process requests, interact with models, and send responses.
+ * This controller handles basic navigation on the bookshelf page,
+ * as well as displaying the books from the user's bookshelves, adding
+ * books to a requested bookshelf, moving books between bookshelves, and
+ * deleted books from bookshelves
  *
- * Best practices:
- * - Keep controllers focused on request/response handling
- * - Move complex business logic to separate service files
- * - Use models to interact with the database
- * - Handle errors appropriately
+ * Primary tasks:
+ * - displays user's books
+ * - adds books to bookshelves
+ * - move books between bookshelves
+ * - deletes books from bookshelves
  */
-
-// Import models if needed
 const User = require('../models/User');
 const Api = require('../models/Api');
 
 /**
- * GET /
- * Display the home page with the user's books
- */
+* Controller: getHome
+* Purpose: Redirects the user to the home page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /index or shows an error page
+*/
 exports.getHome = async (req, res, next) => {
   try {
-    res.render('index', {
-      title: 'Bookshelf',
-      csrfToken: req.csrfToken()
+    res.render('index', { // attempting to render the index page
+      title: 'Home',
+      csrfToken: req.csrfToken(),
     });
-  } catch (error) {
+  } catch (error) { // catching error if the index page could not be rendered
     next(error);
   }
 };
 
 /**
- *
- * Gets the book from the add book button
- * @returns
- */
-exports.postAddBook = async (req, res, next) => {
+* Controller: getLogout
+* Purpose: Destroys the current session and redirects the user back to the index page
+* Input: req, res, next. (Session data, follow up actions)
+* Output: Redirects to /index or shows an error page
+*/
+exports.getLogout = async (req, res, next) => {
   try {
-
-    const { title, author, status } = req.body;
-
-    //Verify user id
-    const userId = req.session.user ? req.session.user.id : null;
-
-    if (!userId) {
-      return res.status(401).json({ success: false, message: 'User not logged in.' });
-    }
-    res.status(201).json({ success: true });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-}
-
-exports.addBook = async (req, res) => {
-  try {
-    const { author, title, bookshelfTable } = req.body;
-    const userId = req.session.user.sub;
-    const result = await User.addBook(author, title, bookshelfTable, userId);
-    if (result) { // addition worked
-      res.status(201).json({ success: true });
-    }
-    else { // addition failed
-      res.status(409).json({ success: false });
-    }
-  } catch (error) { // network error
-    res.status(500).json({ success: false });
-  }
-}
-
-/**
- * GET /logout
- * Display the home page with cleared session
- */
-exports.logout = async (req, res, next) => {
-  try {
-    const csrfToken = req.csrfToken();
-    req.session.destroy(error => {
+    req.session.destroy((error) => { // attempting to destroy the current session
       if (error) {
         next(error);
       }
       res.clearCookie('connect.sid');
-      res.render('index', {
-        title: 'Bookshelf',
-        csrfToken: csrfToken,
-        user: null, //reassign user to null and clear the columns
-      });
+      res.redirect('index');
     });
-  } catch (error) {
+  } catch (error) { // catching error if the index page could not be rendered
     next(error);
   }
 };
 
 /**
- * POST /
- * Adds a book to the select book window
- */
-exports.addBooksToSelector = async (req, res) => {
-  try {
-    const result = await Api.getBookList(req.body.title, req.body.author);
-    if (result.ok) {
-      const books = await result.json();
-      let bookList = [];
-      for (const book of books.docs) {
-        let coverURL = null;
-        if (book.cover_i) {
-          coverURL = `https://covers.openlibrary.org/b/id/${book.cover_i}-L.jpg`;
-        } else if (book.cover_edition_key) {
-          coverURL = `https://covers.openlibrary.org/b/olid/${book.cover_edition_key}-L.jpg`;
-        } else if (book.ocaid) {
-          coverURL = `https://archive.org/services/img/${book.ocaid}`;
-        } else {
-          coverURL = '/images/broken_image.png';
-        }
-        let displayBook = {
-          title: book.title,
-          authors: book.author_name,
-          cover: coverURL,
-        };
-        bookList.push(displayBook);
-      }
-      res.status(201).json({ success: true, data: bookList });
-    } else {
-      res.status(404).json({ success: false, message: 'Book not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+* Controller: getToReadShelf
+* Purpose: Retrieves the user's books_to_read table
+* Input: req.sessions.user.sub [user id]
+* Output: A list of books on the user's books_to_read table
+*/
+exports.getToReadShelf = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to get user's books_to_read list`);
+  try { // getting to-read list
+    const result = await User.getToRead(req.session.user.sub);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) { // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
   }
 };
 
 /**
- * POST /
- * Adds a book to the users to-read bookshelf
- */
-exports.addBookToBookshelf = async (req, res) => {
+* Controller: getToReadShelf
+* Purpose: Retrieves the user's books_being_read table
+* Input: req.sessions.user.sub [user id]
+* Output: A list of books on the user's books_being_read table
+*/
+exports.getReadingShelf = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to get user's books_being_read list`);
+  try {
+    // getting reading list
+    const result = await User.getReading(req.session.user.sub);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+* Controller: getToReadShelf
+* Purpose: Retrieves the user's books_read table
+* Input: req.sessions.user.sub [user id]
+* Output: A list of books on the user's books_read table
+*/
+exports.getReadShelf = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to get user's books_read list`);
+  try {
+    // getting read list
+    const result = await User.getRead(req.session.user.sub);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of books retrieved: ${result.length}`);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    // setting status if database connection didn't work
+    console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+* Controller: postAddBooksToSelector
+* Purpose: Adds all the editions of a book to the book selector
+* Input: req.body.title, req.body.author
+* Output: Status: 201 is loaded all editions, 500 if could not connect to API
+*/
+exports.postAddBooksToSelector = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to retrieve edition list from OpenLibrary`);
+  try { // attempting to contact Open Library
+    const result = await Api.getBookList(req.body.title, req.body.author);
+    let bookList = []; // building a list of all editions for a given title
+    for (const edition of result) { // getting the book cover
+      let coverURL = null;
+      if (edition.cover_i) {
+        coverURL = `https://covers.openlibrary.org/b/id/${edition.cover_i}-L.jpg`;
+      } else if (edition.cover_edition_key) {
+        coverURL = `https://covers.openlibrary.org/b/olid/${edition.cover_edition_key}-L.jpg`;
+      } else if (edition.ocaid) {
+        coverURL = `https://archive.org/services/img/${edition.ocaid}`;
+      }
+      else {
+        coverURL = `https://covers.openlibrary.org/b/id/${edition.cover}-L.jpg`;
+      }
+      bookList.push({ isbn: edition.isbn_13[0], title: edition.title, authors: edition.authors, pageCount: edition.number_of_pages, cover: coverURL }); // adding a book to the book list
+    }
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Number of editions found: ${bookList.length}`);
+    res.status(201).json({ success: true, data: bookList }); // returning the completed list
+  } catch (error) { // could not connect to Open Library
+    console.error(`[${new Date().toISOString()}] [bookshelfController] API Error: ${error.message}`);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+* Controller: postAddBookToBookshelf
+* Purpose: Adds a book to a user's bookshelf
+* Input: req.session.user, req.body.title, req.body.authors, req.body.table
+* Output: Status: 201 if added, 409 if already on shelf, 500 if could not access database, 403 if user is not logged in
+*/
+exports.postAddBookToBookshelf = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to add book to user's shelf`);
   if (req.session.user) { // checking to make sure the user is logged in
     try { // trying to insert the book
       const result = await User.addBook(
+        req.body.isbn,
         req.body.title,
         req.body.authors,
+        req.body.pageCount,
         req.body.table,
         req.session.user.sub
       );
       if (result) { // insert worked
+        console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book added`);
         res.status(201).json({ success: true, data: result });
       } else { // book already exists in the table
+        console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Book is already on the bookshelf`);
         res.status(409).json({ success: false });
       }
     } catch (error) { // network error
+      console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
       res.status(500).json({ success: false });
     }
-  }
-  else { // user is no longer logged in
+  } else { // user is no longer logged in
+    console.error(`[${new Date().toISOString()}] [bookshelfController] Error: The user is not logged in`);
     res.status(403).json({ success: false });
   }
 };
 
 /**
- * GET /
- * Gets the books in a user's to-read shelf
- */
-exports.getToReadShelf = async (req, res) => {
-  try { // getting to-read list
-    const result = await User.getToRead(req.session.user.sub);
-    res.status(201).json({ success: true, data: result });
+* Controller: deleteMoveBook
+* Purpose: Moves a book from one bookshelf to another
+* Input: req.body.book_id, req.body.start [current shelf], req.body.end [future shelf], req.session.user.sub [user id]
+* Output: Status: 201 if moved, 404 if the book could not be located, 409 if insert worked, but delete failed, 500 if could not access database
+*/
+exports.deleteMoveBook = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to move a book`);
+  try { // attempting to move the book
+    let result = await User.moveBook(
+      req.body.book_id,
+      req.body.start,
+      req.body.end,
+      req.session.user.sub
+    );
+    if (result) { // the insert worked
+      console.log(`[${new Date().toISOString()}] [bookshelfController] Success: Book moved`);
+      res.status(201).json({ success: true, data: result });
+    } else if (result === null) { // the insert worked, but the delete failed
+      console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Could not delete book`);
+      res.status(409).json({ success: false });
+    } else { // the initial select failed, or the insert failed
+      console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: Could not locate or insert book`);
+      res.status(404).json({ success: false });
+    }
   }
-  catch (error) { // setting status if database connection didn't work
+  catch (error) { // could not complete move
+    console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
     res.status(500).json({ success: false });
   }
-}
+};
 
 /**
- * GET /
- * Gets the books in a user's reading shelf
- */
-exports.getReadingShelf = async (req, res) => {
-  try { // getting reading list
-    const result = await User.getReading(req.session.user.sub);
-    res.status(201).json({ success: true, data: result });
-  }
-  catch (error) { // setting status if database connection didn't work
-    res.status(500).json({ success: false });
-  }
-}
+* Controller: deleteMoveBookBtn
+* Purpose: Moves a book from one bookshelf to another using the Move Book modal
+* Input: req.session.user.sub [user id], req.body.bookId, req.body.start [current shelf], req.body.end [future shelf]
+* Output: Status: 201 if moved, 400 if fields are missing or shelves match,
+*         403 if user not logged in, 404 if book could not be located,
+*         409 if insert worked but delete failed, 500 on database or server error
+*/
+exports.deleteMoveBookBtn = async (req, res) => {
+  const timestamp = new Date().toISOString();
+  console.log(
+    `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Request received to move book via modal.`
+  );
 
-/**
- * GET /
- * Gets the books in a user's read shelf
- */
-exports.getReadShelf = async (req, res) => {
-  try { // getting read list
-    const result = await User.getRead(req.session.user.sub);
-    res.status(201).json({ success: true, data: result });
-  }
-  catch (error) { // setting status if database connection didn't work
-    res.status(500).json({ success: false });
-  }
-}
-
-/**
- * DELETE /
- * Moves a book from one shelf to another
- */
-exports.moveBook = async (req, res) => {
-  let result = await User.moveBook(req.body.book_id, req.body.start, req.body.end, req.session.user.sub);
-  if (result) { // the insert worked
-    res.status(201).json({ success: true, data: result });
-  }
-  else if (result === null) { // the insert worked, but the delete failed
-    res.status(409).json({ success: false });
-  } else {
-    // the initial select failed, or the insert failed
-    res.status(500).json({ success: false });
-  }
-}
-
-/**
- * DELETE /move-btn
- * Moves a book from one shelf to another using the Move Book modal (by title)
- */
-exports.moveBookBtn = async (req, res) => {
   // must be logged in
   if (!req.session.user) {
+    console.error(
+      `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Error: User not logged in.`
+    );
     return res
       .status(403)
       .json({ success: false, message: 'User not logged in.' });
   }
 
+  //get the userID
   const userId = req.session.user.sub;
-  const { title, start, end } = req.body;
+  const { bookId, start, end } = req.body;
 
-  if (!title || !start || !end) {
+  console.log(
+    `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Content:`,
+    { userId, bookId, start, end }
+  );
+
+  if (!bookId || !start || !end) {
+    console.error(
+      `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Error: Missing bookId/start/end.`
+    );
     return res
       .status(400)
       .json({ success: false, message: 'Missing title/start/end.' });
@@ -244,70 +260,115 @@ exports.moveBookBtn = async (req, res) => {
   }
 
   try {
-    const result = await User.moveBookByTitle(title, start, end, userId);
+    console.log(
+      `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Calling User.moveBookByTitle.`
+    );
+    const result = await User.moveBookByTitle(bookId, start, end, userId);
 
     if (result === 'NOT_FOUND') {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Book not found on the origin shelf.`
+      );
       // no book with that title in the origin shelf
       return res.status(404).json({
         success: false,
         message: 'Book not found on the origin shelf.',
       });
     } else if (result === null) {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] DB Error: Insert worked but delete failed.`
+      );
       // insert worked, delete failed
       return res.status(409).json({ success: false });
     } else if (result) {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] Success: Book moved via modal.`
+      );
       // everything worked
       return res.status(201).json({ success: true, data: result });
     } else {
+      console.error(
+        `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] DB Error: Failed to move book.`
+      );
       // DB error
       return res.status(500).json({ success: false });
     }
   } catch (error) {
+    console.error(
+      `[${timestamp}] [bookshelfController] [deleteMoveBookBtn] DB Error: ${error.message}`
+    );
     return res.status(500).json({ success: false });
   }
 };
 
-
 /**
- * DELETE /
- * Removes a book from the requested shelf
- */
-exports.removeBook = async (req, res) => {
-  try { // attempt to delete a book
-    let result = await User.removeBook(req.body.book_id, req.body.bookshelf);
+* Controller: deleteRemoveBook
+* Purpose: Removes a book from a user's bookshelf
+* Input: req.body.book_id, req.body.bookshelf
+* Output: Status: 201 if removed, 500 if could not access database
+*/
+exports.deleteRemoveBook = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] [bookshelfController] Attempting to remove a book`);
+  try {
+    // attempt to delete a book
+    await User.removeBook(req.body.book_id, req.body.bookshelf);
+    console.log(`[${new Date().toISOString()}] [bookshelfController] Success: book has been removed`);
     res.status(201).json({ success: true });
-  }
-  catch (error) { // network error
+  } catch (error) {
+    // network error
+    console.error(`[${new Date().toISOString()}] [bookshelfController] DB Error: ${error.message}`);
     res.status(500).json({ success: false });
   }
-}
+};
 
 /**
- * DELETE /
- * Clear all books from the requested shelf
- * @param {} req
- * @param {*} res
- * @returns
- */
-exports.clearShelf = async (req, res) => {
+* Controller: deleteClearShelf
+* Purpose: Clears all books from a specific bookshelf for the logged-in user
+* Input: req.session.user.sub [user id], req.body.bookshelf
+* Output: Status: 200 if cleared, 403 if user not logged in,
+*         500 if database or server error occurs
+*/
+exports.deleteClearShelf = async (req, res) => {
+  const timestamp = new Date().toISOString();
+  console.log(
+    `[${timestamp}] [bookshelfController] [deleteClearShelf] Request received to clear a shelf.`
+  );
+
   try {
     //if the user is logged in, get the bookshelf they're targeting,
     //their id, and perform the clear
     if (!req.session.user) {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteClearShelf] Error: User not logged in.`
+      );
       return res.status(403).json({ success: false, message: 'User not logged in.' });
     }
 
     const { bookshelf } = req.body;
     const userId = req.session.user.sub;
 
+    console.log(
+      `[${timestamp}] [bookshelfController] [deleteClearShelf] Content:`,
+      { userId, bookshelf }
+    );
+
     const result = await User.clearShelf(bookshelf, userId);
 
     if (result) {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteClearShelf] Success: Shelf cleared.`
+      );
       res.status(200).json({ success: true });
     } else {
+      console.log(
+        `[${timestamp}] [bookshelfController] [deleteClearShelf] DB Error: clearShelf returned poor result.`
+      );
       res.status(500).json({ success: false });
     }
   } catch (error) {
+    console.error(
+      `[${timestamp}] [bookshelfController] [deleteClearShelf] DB Error: ${error.message}`
+    );
     res.status(500).json({ success: false, message: error.message });
-  };
-}
+  }
+};

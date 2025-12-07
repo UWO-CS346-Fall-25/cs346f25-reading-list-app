@@ -117,6 +117,23 @@ main {
   display: flex;
 }
 
+.spinner-container {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1000;
+}
+
+.spinner {
+  border: 8px solid transparent;
+  border-left-color: var(--danger-color);
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  animation: spin 1s linear infinite;
+}
+
 .modal {
   top: 0;
   left: 0;
@@ -129,7 +146,7 @@ main {
 }
 
 .modal-content {
-  width: 600px;
+  width: 800px;
   display: flex;
   max-height: 600px;
   margin: 100px auto;
@@ -137,6 +154,35 @@ main {
   flex-direction: column;
   background-color: white;
   border: 2px solid black;
+}
+
+#modal-content {
+  width: 400px;
+  height: 200px;
+  padding: 10px;
+  display: flex;
+  max-height: 600px;
+  margin: 350px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#alert-message {
+  flex: 1;
+  display: flex;
+  font-size: 16px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#ok-button {
+  flex: 1;
+  font-size: 16px;
+  max-height: 50px;
+  border-radius: 5px;
 }
 
 #close {
@@ -176,6 +222,14 @@ main {
   padding-top: 3px;
 }
 
+.isbn-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .title-section {
   display: flex;
   width: 200px;
@@ -190,6 +244,14 @@ main {
   width: 200px;
   text-align: center;
   overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-count-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
   flex-direction: column;
   justify-content: center;
 }
@@ -263,17 +325,17 @@ input[list="authors"], input[list="genres"] {
   border-radius: 5px;
 }
 
-#recommendations {
+#trending {
   flex: 4;
 }
 
-#recommendations section {
+#trending section {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-#recommendations h2 {
+#trending h2 {
   font-size: xx-large;
   width: 100%;
   text-align: center;
@@ -346,6 +408,38 @@ button:active {
   background-color: var(--dark-color);
 }
 
+/* Error Page */
+.error-page {
+  text-align: center;
+  padding: 3rem 0;
+  margin: 0 auto;
+}
+
+.error-page h1 {
+  font-size: 6rem;
+  color: var(--danger-color);
+  margin-bottom: 1rem;
+}
+
+.error-page h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.error-details {
+  text-align: left;
+  background-color: var(--light-color);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin: 2rem 0;
+}
+
+.error-details pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 /* Footer */
 footer {
   background-color: var(--dark-color);
@@ -353,6 +447,13 @@ footer {
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+}
+
+/* Move Indicator */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Animation definition */

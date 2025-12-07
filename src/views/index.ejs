@@ -11,7 +11,7 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/index" class="logo">Bookshelf</a>
+        <p class="logo">Bookshelf</p>
         <% if (user) { %>
           <span>Welcome back <%= user.display_name %>!</span>
         <% } %>
@@ -30,10 +30,21 @@
 
   <main class="container">
 
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+
     <div id="popup" class="modal">
       <div class="modal-content">
         <button id="close">X</button>
         <ul id="book-list"></ul>
+      </div>
+    </div>
+
+    <div id="custom-alert" class="modal">
+      <div id="modal-content">
+        <p id="alert-message"></p>
+        <button id="ok-button">OK</button>
       </div>
     </div>
 
@@ -46,12 +57,6 @@
           <datalist id="authors"></datalist>
           <div id="author-error" class="error-text">error text</div>
         </section>
-        <section>
-          <h2>Genre</h2>
-          <input id="genre-input" list="genres">
-          <datalist id="genres"></datalist>
-          <div id="genre-error" class="error-text">error text</div>
-        </section>
         <section id="page-count">
           <h2>Maximum page count</h2>
           <div id="radio-list"></div>
@@ -59,8 +64,8 @@
       </div>
       <button id="filter" type="submit">Filter</button>
     </form>
-    <section id="recommendations">
-      <h2>User recommendations</h2>
+    <section id="trending">
+      <h2>Trending Reads</h2>
       <ul id="books"></ul>
     </section>
   </main>

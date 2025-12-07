@@ -11,7 +11,7 @@
   <header>
     <nav>
       <div class="container">
-        <a href="/" class="logo">Bookshelf</a>
+        <p class="logo">Bookshelf</p>
         <ul class="nav-links">
           <li><a href="/index">Home</a></li>
           <li><a href="/register">Register</a></li>
@@ -21,6 +21,18 @@
   </header>
 
   <main>
+
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="custom-alert" class="modal">
+      <div class="modal-content">
+        <p id="alert-message"></p>
+        <button id="ok-button">OK</button>
+      </div>
+    </div>
+
     <form novalidate>
       <figure>
         <img src="/images/open-book.png" alt="book image" width="100">
@@ -38,10 +50,10 @@
           <div id="password-error" class="error-text">error text</div>
         </section>
         <div class="user-detail">
-          <button id="register" type="submit">Log In</button>
+          <button id="login" type="submit">Log In</button>
         </div>
       </div>
-      <a id="forgot-password" href="">Forgot password?</a>
+      <a id="forgot-password" href="/reset">Forgot password?</a>
     </form>
   </main>
 

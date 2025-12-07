@@ -2,10 +2,10 @@
  * User Model
  *
  * This model handles all database operations related to users.
- * Use parameterized queries ($1, $2, etc.) to prevent SQL injection.
  */
 // Supabase connection
 const supabase = require('../models/db');
+var numBooksToDisplay = 100;
 
 /**
  * The class that communicates directly with the database
@@ -37,26 +37,10 @@ class User {
    */
   static async getAuthors() {
     const { data, error } = await supabase.supabase
-      .from('books')
-      .select('author');
-    if (error === null) {
-      // validating query
-      return data;
-    } else {
-      // throwing an error if an error occurred
-      throw new Error('Database connection error');
-    }
-  }
-
-  /**
-   * Returns a list of all genres
-   * from the books table
-   * @returns {Promise<object>} the genre list
-   */
-  static async getGenres() {
-    const { data, error } = await supabase.supabase
-      .from('books')
-      .select('genre');
+      .from('books_being_read')
+      .select('authors')
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
     if (error === null) {
       // validating query
       return data;
@@ -72,10 +56,41 @@ class User {
    */
   static async getPages() {
     const { data, error } = await supabase.supabase
-      .from('books')
+      .from('books_being_read')
       .select('page_count')
-      .order('page_count', { ascending: false })
-      .limit(1);
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
+    if (error === null) {
+      // validating query
+      let maxPages = 0;
+      for (const pageCount of data) {
+        if (pageCount.page_count > maxPages) {
+          maxPages = pageCount.page_count;
+        }
+      }
+      return maxPages;
+    } else {
+      // throwing an error if an error occurred
+      throw new Error('Database connection error');
+    }
+  }
+
+  /**
+   * Returns the filtered books table from
+   * the database
+   * @returns {Promise<object>} the book list
+   */
+  static async getFiltered(author, pageCount) {
+    let query = supabase.supabase.from('books_being_read').select('*'); // setting up the query
+    if (author.trim() !== '') {
+      // adding author condition if not null
+      query = query.contains('authors', [author]);
+    }
+    if (pageCount !== '-1') {
+      // adding page count condition if not null
+      query = query.lte('page_count', pageCount);
+    }
+    const { data, error } = await query; // completing query
     if (error === null) {
       // validating query
       return data;
@@ -90,38 +105,13 @@ class User {
    * the database
    * @returns {Promise<object>} the book list
    */
-  static async getRecommended() {
-    const { data, error } = await supabase.supabase.from('books').select('*');
-    if (error === null) {
-      // validating query
-      return data;
-    } else {
-      // throwing an error if an error occurred
-      throw new Error('Database connection error');
-    }
-  }
-
-  /**
-   * Returns the filtered books table from
-   * the database
-   * @returns {Promise<object>} the book list
-   */
-  static async getFiltered(author, genre, pageCount) {
-    let query = supabase.supabase.from('books').select('*'); // setting up the query
-    if (author.trim() !== '') {
-      // adding author condition if not null
-      query = query.eq('author', author);
-    }
-    if (genre.trim() !== '') {
-      // adding genre condition if not null
-      query = query.eq('genre', genre);
-    }
-    if (pageCount !== '-1') {
-      // adding page count condition if not null
-      query = query.lte('page_count', pageCount);
-    }
-    const { data, error } = await query; // completing query
-    if (error === null) {
+  static async getTrending() {
+    const { data, error } = await supabase.supabase
+      .from('books_being_read')
+      .select('*')
+      .order('added', { ascending: false })
+      .limit(numBooksToDisplay);
+    if (!error) {
       // validating query
       return data;
     } else {
@@ -150,12 +140,12 @@ class User {
       });
       if (error) {
         // throwing an error if cannot connect to database
-        throw new Error();
+        throw new Error(error.message);
       }
       return data;
     } catch (networkError) {
       // catching potential network error
-      throw new Error();
+      throw new Error(networkError.message);
     }
   }
 
@@ -175,29 +165,104 @@ class User {
       return data;
     } catch (networkError) {
       // throwing an error if an error occurred
-      throw new Error();
+      throw new Error(networkError.message);
+    }
+  }
+
+  /**
+   * A function that sends the user a password reset email
+   * @param {object} email user email address
+   * @returns {Promise<object>} True if email sent, false if now
+   */
+  static async passwordReset(email) {
+    try {
+      // attempting to send the password reset email
+      const { data, error } =
+        await supabase.supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: 'http://localhost:3000/password',
+        });
+      if (error) {
+        // password reset email was not sent
+        return false;
+      } else {
+        // password reset email was sent
+        return true;
+      }
+    } catch (networkError) {
+      // unable to connect to database
+      throw new Error(networkError.message);
+    }
+  }
+
+  /**
+   * A function that updates a user's password
+   * @param {object} password user's new password
+   * @param {object} accessToken user's access token
+   * @param {object} refreshToken user's refresh token
+   * @returns {Promise<object>} True if password updated, false if now
+   */
+  static async resetPassword(password, accessToken, refreshToken) {
+    try {
+      // attempting to send the password reset email
+      await supabase.supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      const { data, error } = await supabase.supabase.auth.updateUser({
+        password: password,
+      });
+      if (error) {
+        // password was not reset
+        return false;
+      } else {
+        // password was reset
+        return true;
+      }
+    } catch (networkError) {
+      // unable to connect to database
+      throw new Error(networkError.message);
     }
   }
 
   /**
    * Add
    */
-  static async addBook(title, authors, bookshelfTable, userId) {
+  static async addBook(
+    isbn,
+    title,
+    authors,
+    pageCount,
+    bookshelfTable,
+    userId
+  ) {
     try {
       let databaseTable = this.getTableName(bookshelfTable);
       const { data, error } = await supabase.supabase
         .from(databaseTable)
         .select('*')
+        .eq('isbn', isbn)
         .eq('title', title)
         .contains('authors', authors)
+        .eq('page_count', pageCount)
         .eq('user_id', userId);
       if (data.length === 0) {
         // continue with the add process
         const { data, error } = await supabase.supabase
           .from(databaseTable)
-          .insert([{ title: title, authors: authors, user_id: userId }], {
-            returning: 'representation',
-          });
+          .insert(
+            [
+              {
+                isbn: isbn,
+                title: title,
+                authors: authors,
+                page_count: pageCount,
+                user_id: userId,
+              },
+            ],
+            {
+              returning: 'representation',
+            }
+          );
         if (error) {
           // addition did not work - network issue
           throw new Error();
@@ -215,8 +280,10 @@ class User {
           const { data, error } = await supabase.supabase
             .from(databaseTable) // getting the id of the book inserted
             .select(idType)
+            .eq('isbn', isbn)
             .eq('title', title)
             .contains('authors', authors)
+            .eq('page_count', pageCount)
             .eq('user_id', userId);
           return data[0];
         }
@@ -311,7 +378,7 @@ class User {
       // attempting database operations
       const { data, error } = await supabase.supabase
         .from(originTable) // grabbing the book details
-        .select('title, authors')
+        .select('isbn, title, authors, page_count')
         .eq(idType, bookId)
         .eq('user_id', userId);
       const book = data; // restoring data for scope
@@ -320,8 +387,15 @@ class User {
         const { data, error } = await supabase.supabase
           .from(destinationTable) // attempting to insert the book into the destination table
           .insert([
-            { title: book[0].title, authors: book[0].authors, user_id: userId },
-          ]).select();
+            {
+              isbn: book[0].isbn,
+              title: book[0].title,
+              authors: book[0].authors,
+              page_count: book[0].page_count,
+              user_id: userId,
+            },
+          ])
+          .select();
         const newId = data.length === 1 ? Object.values(data[0])[0] : null;
         if (!error) {
           // only attempting deletion if the insert worked
@@ -346,7 +420,7 @@ class User {
       }
     } catch (error) {
       // initial select failed, network error
-      return false;
+      throw new Error(error.message);
     }
   }
 
@@ -376,7 +450,7 @@ class User {
       return true;
     } catch (error) {
       // network error
-      throw new Error();
+      throw new Error(error.message);
     }
   }
 
@@ -407,14 +481,14 @@ class User {
   }
 
   /**
- * Moves a book from one shelf to another using its title instead of ID.
- * @param {string} title - the book title
- * @param {string} originShelf - origin shelf )
- * @param {string} destinationShelf - destination shelf 
- * @param {string} userId - user's id
- * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
- */
-  static async moveBookByTitle(title, originShelf, destinationShelf, userId) {
+   * Moves a book from one shelf to another using its title instead of ID.
+   * @param {string} bookId - the book id
+   * @param {string} originShelf - origin shelf )
+   * @param {string} destinationShelf - destination shelf
+   * @param {string} userId - user's id
+   * @returns {Promise<object>} new book id, false if could not move, null if partially worked, 'NOT_FOUND' if no match
+   */
+  static async moveBookByTitle(bookId, originShelf, destinationShelf, userId) {
     const originTable = this.getTableName(originShelf);
     const destinationTable = this.getTableName(destinationShelf);
 
@@ -431,17 +505,16 @@ class User {
       //find a matching book in the origin shelf
       const { data, error } = await supabase.supabase
         .from(originTable)
-        .select(`${idType}, title, authors`)
-        .eq('title', title)
-        .eq('user_id', userId)
-        .limit(1);
+        .select('*')
+        .eq(idType, bookId)
+        .eq('user_id', userId);
 
       if (error) {
-        return false;        // DB error
+        return false; // DB error
       }
 
       if (!data || data.length === 0) {
-        return 'NOT_FOUND';  // no book with that title on this shelf
+        return 'NOT_FOUND'; // no book with that title on this shelf
       }
 
       const book = data[0];
@@ -449,16 +522,14 @@ class User {
       //insert into destination shelf
       const insertResult = await supabase.supabase
         .from(destinationTable)
-        .insert([
-          { title: book.title, authors: book.authors, user_id: userId },
-        ])
+        .insert([{ isbn: book.isbn, title: book.title, authors: book.authors, page_count: book.page_count, user_id: userId }])
         .select();
 
       if (insertResult.error) {
-        return false;        // insert failed
+        return false; // insert failed
       }
 
-      const insertedRows = insertResult.data || [];
+      const insertedRows = insertResult.data || []; 
       const newId =
         insertedRows.length === 1 ? Object.values(insertedRows[0])[0] : null;
 
@@ -466,97 +537,17 @@ class User {
       const deleteResult = await supabase.supabase
         .from(originTable)
         .delete()
-        .eq(idType, book[idType]);
+        .eq(idType, bookId);
 
       if (deleteResult.error) {
-        return null;         // insert worked, delete failed
+        return null; // insert worked, delete failed
       }
 
-      return newId;          // everything worked
+      return newId; // everything worked
     } catch (error) {
-      return false;          // network / unexpected
+      return false; // network / unexpected
     }
   }
-
-
-  //   /**
-  //    * Find all users
-  //    * @returns {Promise<Array>} Array of users
-  //    */
-  //   static async findAll() {
-  //     const query =
-  //       'SELECT id, username, email, created_at FROM users ORDER BY created_at DESC';
-  //     const result = await db.query(query);
-  //     return result.rows;
-  //   }
-
-  //   /**
-  //    * Find user by ID
-  //    * @param {number} id - User ID
-  //    * @returns {Promise<object|null>} User object or null
-  //    */
-  //   static async findById(id) {
-  //     const query =
-  //       'SELECT id, username, email, created_at FROM users WHERE id = $1';
-  //     const result = await db.query(query, [id]);
-  //     return result.rows[0] || null;
-  //   }
-
-  //   /**
-  //    * Find user by email (including password for authentication)
-  //    * @param {string} email - User email
-  //    * @returns {Promise<object|null>} User object or null
-  //    */
-  //   static async findByEmail(email) {
-  //     const query = 'SELECT * FROM users WHERE email = $1';
-  //     const result = await db.query(query, [email]);
-  //     return result.rows[0] || null;
-  //   }
-
-  //   /**
-  //    * Create a new user
-  //    * @param {object} userData - User data { username, email, password }
-  //    * @returns {Promise<object>} Created user object
-  //    */
-  //   static async create(userData) {
-  //     const { username, email, password } = userData;
-  //     const query = `
-  //       INSERT INTO users (username, email, password)
-  //       VALUES ($1, $2, $3)
-  //       RETURNING id, username, email, created_at
-  //     `;
-  //     const result = await db.query(query, [username, email, password]);
-  //     return result.rows[0];
-  //   }
-
-  //   /**
-  //    * Update user
-  //    * @param {number} id - User ID
-  //    * @param {object} userData - User data to update
-  //    * @returns {Promise<object>} Updated user object
-  //    */
-  //   static async update(id, userData) {
-  //     const { username, email } = userData;
-  //     const query = `
-  //       UPDATE users
-  //       SET username = $1, email = $2, updated_at = CURRENT_TIMESTAMP
-  //       WHERE id = $3
-  //       RETURNING id, username, email, created_at, updated_at
-  //     `;
-  //     const result = await db.query(query, [username, email, id]);
-  //     return result.rows[0];
-  //   }
-
-  //   /**
-  //    * Delete user
-  //    * @param {number} id - User ID
-  //    * @returns {Promise<boolean>} True if deleted, false otherwise
-  //    */
-  //   static async delete(id) {
-  //     const query = 'DELETE FROM users WHERE id = $1';
-  //     const result = await db.query(query, [id]);
-  //     return result.rowCount > 0;
-  //   }
 }
 
 module.exports = User;

@@ -113,15 +113,47 @@ main {
   position: absolute;
   left: 50%;
   top: 50%;
+  z-index: 1000;
 }
 
 .spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #333;
+  border: 8px solid transparent;
+  border-left-color: var(--danger-color);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 100px;
+  height: 100px;
   animation: spin 1s linear infinite;
+}
+
+#modal-content {
+  width: 400px;
+  height: 200px;
+  padding: 10px;
+  display: flex;
+  max-height: 600px;
+  margin: 350px auto;
+  border-radius: 5px;
+  flex-direction: column;
+  background-color: white;
+  border: 2px solid black;
+}
+
+#alert-message {
+  flex: 1;
+  display: flex;
+  font-size: 16px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+#ok-button {
+  flex: 1;
+  color: white;
+  font-size: 16px;
+  max-height: 50px;
+  border-radius: 5px;
+  background-color: var(--dark-color);
 }
 
 /* New Stylings for Nav bar and main content */
@@ -272,19 +304,6 @@ h2 {
   border-left: 20px double var(--warning-color);
 }
 
-/* Highlight book when dragging
-.book-column li.dragging {
-  opacity: 0.5;
-  background-color: #d3d3d3;
-}
-
-Highlight drop zone
-.book-column ul.over {
-  background-color: rgba(0, 123, 255, 0.1);
-  border: 2px dashed #007bff;
-  transition: background-color 0.2s;
-} */
-
 .modal {
   display: none;
   position: fixed;
@@ -318,6 +337,10 @@ Highlight drop zone
   color: white;
   border: none;
   border-radius: 4px;
+}
+
+#book-selector {
+  min-width: 800px;
 }
 
 .close {
@@ -385,6 +408,14 @@ Highlight drop zone
   padding-top: 3px;
 }
 
+.isbn-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .title-section {
   display: flex;
   width: 200px;
@@ -399,6 +430,14 @@ Highlight drop zone
   width: 200px;
   text-align: center;
   overflow-y: auto;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-count-section {
+  display: flex;
+  width: 100px;
+  text-align: center;
   flex-direction: column;
   justify-content: center;
 }
@@ -418,6 +457,7 @@ Highlight drop zone
 }
 
 #add-button:hover {
+  cursor: pointer;
   background-color: var(--secondary-color);
 }
 
@@ -517,7 +557,16 @@ Highlight drop zone
 
 /* Lines up the From and To input forms for the move modal */
 #move-to-shelf {
-  margin-left: 20px;   
+  margin-left: 20px;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: var(--secondary-color);
+}
+
+button:active{
+  background-color: var(--dark-color);
 }
 
 /* Footer */

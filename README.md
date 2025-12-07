@@ -1,4 +1,90 @@
-# Feature/week12/deliverable5_api
+# Project Overview
+
+The purpose of Bookshelf is to house three lists of books for a user. These lists include:
+ - Books that the user plans to read in the future
+ - Books that the user is reading currently
+ - Books that the user has already finished reading
+
+Several features included in Bookshelf include:
+ - The ability to add books directly to one of the user's three lists of books from OpenLibrary
+ - The ability to move books between lists in real time
+ - the ability to remove books from a requested list in real time
+
+This app provides a user interface for managing the user's three book lists. This includes:
+ - Book-like objects representing a real book
+ - Columns containing any number of books that represent a bookshelf
+ - The ability to drag a book from one shelf to another
+ - An interface for OpenLibrary to select the correct edition of a book to add to a shelf
+ - A trash can button to remove a book from a bookshelf
+
+## Technical Architecture
+
+MVC: The Model View Controller architecture is used for this project in the following ways:
+ - Model: The backend slice of the project. Only these models contact external sources, such as OpenLibrary and Supabase
+ - View: The frontend slice of the project. The views are the UI that the user interacts with to do things on the web app
+ - Controller: The middle slice of the project. The controllers do the following:
+  - Accept data the views
+  - Analyze data and request content from the models
+  - Analyze content from the models
+  - return new data built from the content back to the views
+
+Our project uses request flow in with the MVC in the following ways:
+ - Rendering pages: view request --page details--> route --page details--> controller -> render view
+ - Loading books: on view loaded -> route -> controller -> model --book list--> controller --book list--> view
+ - Adding OpenLibrary books to selector: view request --book details--> route --book details--> controller --book details--> model --book list--> controller --book list--> view
+ - Moving book between shelves: view request --book details--> route --book details--> controller --book details--> model --new id--> controller --new id--> view
+ - Removing book from shelf: view request --book details--> route --book details--> controller --book details--> model -> controller -> view
+
+## Local Setup Instructions
+
+ 1. Clone the repository
+ 2. Install dependencies:
+  - csurf 1.11.0
+  - dotenv 17.2.3
+  - ejs 3.1.10
+  - express-session 1.18.2
+  - express 4.21.2
+  - helmet 8.1.0
+  - nodemon 3.1.11
+  - pg 8.16.3
+ 3. Create a .env file and add the following:
+  - SUPABASE_URL
+  - SUPABASE_KEY
+ 4. Run the app in the root directory: npm run dev
+ 5. Visit http://localhost:3000
+
+## Error Handling Section
+
+Database errors:
+ - Cannot connect to the database: Show custom alert telling the user we cannot load books or complete an add, move, or delete
+
+OpenLibrary API:
+ - Cannot connect to API: Show custom alert telling the user we cannot load books
+
+Illegal bookshelf access:
+ - User attempts to access bookshelf through the URL instead of my logging in: Show illegal access message asking user to log in to view bookshelf
+
+## Feature/week14/deliverable7_Logging, Error Handling, Comments, and Documentation
+
+Updates to the book selector modal that pops up when attempting to add a book:
+ - Only valid books are now displayed on the selector. This includes books that have:
+  - A cover image
+  - An isbn number
+  - A title
+  - Authors
+  - Page count
+
+Reintegrated default error page that catches 403, 404, and 500
+ - Error code is printed on the screen
+ - Small message is provided for the user
+
+Added logging when needed in the bookshelf controller for successful and unsuccessful add, move, and delete inputs
+ - All actions are properly printed to the console for improved debugging/tracing
+
+Reformatted comment blocks and added additional detail to help with code readability 
+
+
+## Feature/week12/deliverable5_api
 
 Updates to the bookshelf page:
   - Books can now be dragged right after being added on the bookshelf page
@@ -7,7 +93,7 @@ Updates to the bookshelf page:
   - Set bookId to display none, allowing for an anonymous database hook when moving books
 
 Updates for external API (Open Library):
-  - New model created to only fatch from API, separating the API model from the database model
+  - New model created to only fetch from API, separating the API model from the database model
   - Did not add routes or controllers for API calls, instead imported new model into existing
     controllers that need to call to the API
 
@@ -43,7 +129,7 @@ The '+' button on index.ejs is now hooked up to an external API,
 allowing users to select the edition of the book they want to add.
 
 -Bookshelf now displays a user's books, and inside of Manage Books, add is partially functional.
--Working on modifiying the existing code for fetching the books for the page.
+-Working on modifying the existing code for fetching the books for the page.
 -Delete is also partially completed
 
 How would we use row level security?
