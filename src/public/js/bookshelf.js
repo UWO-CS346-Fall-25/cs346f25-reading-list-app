@@ -775,6 +775,29 @@ function setupMoveBookModal() {
     }
   });
 
+  /**
+ * Find the <li> for a given title on a specific shelf
+ * @param {string} shelfId - e.g. 'to-read-books'
+ * @param {string} titleText - the selected title from the modal
+ * @returns {HTMLLIElement|null}
+ */
+  function findBookLiOnShelfByTitle(shelfId, titleText) {
+    const shelf = document.getElementById(shelfId);
+    if (!shelf) return null;
+
+    // only look at titles on this shelf
+    const titleEls = shelf.getElementsByClassName('title');
+
+    for (let i = 0; i < titleEls.length; i++) {
+      const t = titleEls[i];
+      if (t.textContent.trim() === titleText) {
+        // <li> is the ancestor we actually want to move
+        return t.closest('li');
+      }
+    }
+    return null;
+  }
+
   // Submit handler
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -782,23 +805,31 @@ function setupMoveBookModal() {
     const start = fromSelect.value;
     const end = toSelect.value;
     const title = titleInput.value.trim();
-    const titles = document.getElementsByClassName('title');
-    let bookId = null;
-    let index = 0;
-    while (bookId === null) {
-      if (titles[index].textContent === title) {
-        bookId = titles[index].previousSibling.textContent;
-      }
-      index++;
-    }
 
     if (!start || !end || !title) {
       await customAlert('Please fill out all fields.');
       return;
     }
 
-    if (start === end) {
-      await customAlert('The starting and ending shelf must be different.');
+    //find the DOM <li> for this book on the starting shelf
+    const bookLi = findBookLiOnShelfByTitle(start, title);
+    if (!bookLi) {
+      await customAlert('Could not find that book on the selected "From" shelf.');
+      return;
+    }
+
+    //get the bookId from that <li>
+    let bookId = null;
+    const centerDiv = bookLi.querySelector('.center');
+    if (centerDiv) {
+      const idP = centerDiv.querySelector('p'); // first <p> is ID
+      if (idP) {
+        bookId = idP.textContent;
+      }
+    }
+
+    if (!bookId) {
+      await customAlert('Unable to determine the book ID for that title.');
       return;
     }
 
@@ -807,7 +838,7 @@ function setupMoveBookModal() {
       .getElementsByName('csrf-token')[0]
       .getAttribute('content');
 
-    try { //attempt the deletion process using the title, start, and end
+    try {
       console.log('Submitting move request:', { bookId, start, end, title });
       const response = await fetch('move-btn', {
         method: 'DELETE',
@@ -819,10 +850,29 @@ function setupMoveBookModal() {
       });
       console.log('Move response status:', response.status);
       modal.style.display = 'none';
-      if (response.status === 201) { //response was good
+
+      if (response.status === 201) { // response was good
         const json = await response.json();
         console.log('Move 201 JSON:', json);
         if (json.success) {
+
+          //update DOM: move the book <li> to the target shelf
+          const toShelfEl = document.getElementById(end);
+          if (toShelfEl) {
+            toShelfEl.appendChild(bookLi);
+          }
+
+          //backend sends a new ID, update book ID
+          if (json.data) {
+            const newId = json.data;
+            if (centerDiv) {
+              const idP = centerDiv.querySelector('p');
+              if (idP) {
+                idP.textContent = newId;
+              }
+            }
+          }
+
           await customAlert(`"${title}" was moved successfully.`);
         }
       } else if (response.status === 404) {
@@ -843,6 +893,7 @@ function setupMoveBookModal() {
       resetFormState();
     }
   });
+
 }
 
 /**

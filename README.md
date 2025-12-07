@@ -78,6 +78,12 @@ Reintegrated default error page that catches 403, 404, and 500
  - Error code is printed on the screen
  - Small message is provided for the user
 
+Added logging when needed in the bookshelf controller for successful and unsuccessful add, move, and delete inputs
+ - All actions are properly printed to the console for improved debugging/tracing
+
+Reformatted comment blocks and added additional detail to help with code readability 
+
+
 ## Feature/week12/deliverable5_api
 
 Updates to the bookshelf page:
